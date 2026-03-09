@@ -1,0 +1,15 @@
+# dun care about copyright
+startup_message off
+
+# set term
+term screen-256color
+
+# scrollback x1000
+defscrollback 100000
+
+# keep finished screens alive
+zombie kr
+
+# status line (fuck knows who made it, wasnt me)
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{W}%Y-%m-%d %c%{g}]'

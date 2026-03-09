@@ -1,0 +1,34 @@
+#!/bin/sh
+
+[[ $1 ]] || {
+	echo "Needs an IP!"
+	exit 1
+}
+
+IP=$1
+MAX_RES=1280
+MAX_FPS=36
+BIT_RATE=4M
+
+RES_H=2880	# device
+RES_V=1600
+FOV_H=85	# percentage (default: 70/70)
+FOV_V=50
+EYE=1		# 0 or 1
+
+w=$(( RES_H/2 * FOV_H /100 ))
+h=$(( RES_V * FOV_V /100 ))
+x=$(( (RES_H/2-w)/2 + (RES_H/2 * EYE) ))
+y=$(( (RES_V-h)/2 ))
+
+# needs tcpip enabled on device first with adb tcpip 5555
+if ! adb devices | grep -q $IP; then
+	##adb kill-server
+	adb tcpip 5555
+	adb connect $IP
+	sleep 1
+	adb devices
+fi
+
+echo "Crop: $w:$h:$x:$y"
+scrcpy -s $IP:5555 --crop $w:$h:$x:$y --max-size $MAX_RES --max-fps=$MAX_FPS --bit-rate $BIT_RATE #--no-control

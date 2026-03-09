@@ -1,0 +1,22 @@
+#!/bin/bash
+# https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_stl_content
+
+INPUT="$1"
+OUTPUT="$2"
+SIZE="$3"
+URL="$4"
+
+case $(xdg-mime query filetype "$1") in
+	application/x-openscad)
+		openscad --imgsize $SIZE,$SIZE -o "$OUTPUT" "$1" &>/dev/null
+		;;
+	model/stl)
+		echo "import(\"$INPUT\", convexity=10);" | openscad --imgsize $SIZE,$SIZE -o "$OUTPUT" - &>/dev/null
+		;;
+esac
+
+[[ -s "$OUTPUT" ]] || {
+	gdbus call --session --dest=org.freedesktop.thumbnails.Cache1 --object-path /org/freedesktop/thumbnails/Cache1 \
+		--method org.freedesktop.thumbnails.Cache1.Delete "['$URL']" >/dev/null
+	exit 1
+}

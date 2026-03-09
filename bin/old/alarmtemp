@@ -1,0 +1,28 @@
+#!/bin/sh
+
+soundcritical="/home/haarp/misc/mech-heatcritical.wav"
+tempfile="/tmp/heatcritical"
+shutdowninit="/home/haarp/bin/shutdowninit"
+inittempfile="/tmp/shutdowninit"
+
+if [ ! -f "$inittempfile" ]; then
+	#beep -f 1000 -l 500 -n -f 950 -l 500 -D 3000 -n -f 1000 -l 500 -n -f 950 -l 500 -D 3000 &
+	beep -f 1000 -l 500 -n -f 950 -l 500
+
+	#OLDVOL=$(amixer -c 0 get 'Master' | tail -n1 | awk '{print $3}')
+	#amixer -c 0 set 'Master' 100%
+	/usr/bin/aplay "$soundcritical"
+	#amixer -c 0 set 'Master' "$OLDVOL"
+
+
+	# if alarm was sounded more than 3 times in one minute, execute shutdowninit
+	{ sleep 1m; rm "$tempfile" &> /dev/null
+	} &
+
+	echo -ne "warning\n" >> "$tempfile"
+
+	if [ $(grep -c "warning" "$tempfile") -ge 3 ]; then
+		$shutdowninit &
+		rm "$tempfile"
+	fi
+fi

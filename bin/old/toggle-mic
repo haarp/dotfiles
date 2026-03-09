@@ -1,0 +1,14 @@
+#!/bin/sh
+# Toggle microphone input with each execution and handle notifiction and LED
+
+state=$(amixer sget Capture | tail -n1 | awk '{print $NF}')
+case $state in
+	"[on]")		amixer -q sset Capture nocap
+			notify-send -i microphone-sensitivity-muted-symbolic $'\n'
+			###sudo tee "/sys/devices/platform/thinkpad_acpi/leds/tpacpi::micmute/brightness" <<< 1
+			;;
+	"[off]")	amixer -q sset Capture cap
+			notify-send -i microphone-sensitivity-high-symbolic $'\n'
+			###sudo tee "/sys/devices/platform/thinkpad_acpi/leds/tpacpi::micmute/brightness" <<< 0
+			;;
+esac

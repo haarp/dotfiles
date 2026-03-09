@@ -1,0 +1,38 @@
+#!/bin/bash
+# https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_folders
+# needs associated .thumbnailer file (doesn't use $PATH)
+# don't forget to restart tumblerd and thunar
+
+INPUT="$1"
+OUTPUT="$2"
+SIZE="$3"
+URL="$4"
+
+# folder/cover files
+for f in "$INPUT"/{.,}{folder,cover}.{png,jpg,jpeg}; do
+	if [[ -s "$f" ]]; then
+		cover="$f"
+		break
+	fi
+done
+if [[ "$cover" ]]; then
+	if convert -thumbnail "$SIZE" "$cover" "$OUTPUT"; then
+		exit 0
+	else
+		gdbus call --session --dest=org.freedesktop.thumbnails.Cache1 --object-path /org/freedesktop/thumbnails/Cache1 \
+			--method org.freedesktop.thumbnails.Cache1.Delete "['$URL']" >/dev/null
+		exit 1
+	fi
+fi
+
+# or try first music file
+files=("$INPUT"/*)
+firstfile="${files[0]}"
+
+if [[ -s "$firstfile" && $(xdg-mime query filetype "$firstfile") =~ ^audio/ ]]; then
+	~/bin/thumbnailer-cover "$firstfile" "$2" "$3" "$4"
+else
+	gdbus call --session --dest=org.freedesktop.thumbnails.Cache1 --object-path /org/freedesktop/thumbnails/Cache1 \
+		--method org.freedesktop.thumbnails.Cache1.Delete "['$URL']" >/dev/null
+	exit 1
+fi

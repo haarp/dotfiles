@@ -1,0 +1,9 @@
+#!/bin/sh
+
+xcommand="xinit -e "$@" -- :2 -ac vt09"
+
+$xcommand
+
+if [ $(pgrep -f "$xcommand") ]; then
+	pkill -f "$xcommand"
+fi

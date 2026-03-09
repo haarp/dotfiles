@@ -1,0 +1,53 @@
+#!/bin/bash
+# Do various things before and after a backup
+# based on https://github.com/the2masters/fritzbox-config-downloader
+
+# Pre Backup
+if [[ "$1" == "DumpPreUserCmd" || "$1" == "" ]]; then
+	# FRITZ!Box config dump
+	LOCATION="/tmp/FRITZ.Box-Config.export"
+	PASSWORD="$(< ~/.fritzpw)"
+
+	touch "$LOCATION"
+	chmod 700 "$LOCATION"
+
+	if [[ ! "$PASSWORD" ]]; then
+		exit 1
+	fi
+
+	# get challenge
+	data=$( curl -sk https://$host/login_sid.lua )
+	sid=$( sed -n "s|.*<SID>\([0-9a-f]\{16\}\)</SID>.*|\1|p" <<< "$data" )
+	challenge=$( sed -n "s|.*<Challenge>\([0-9a-f]\{8\}\)</Challenge>.*|\1|p" <<< "$data" )
+
+	[[ -z $sid || $sid != "0000000000000000" ]] && exit 2
+
+	# log in, get session id
+	response=$( echo -n "$challenge-$password" | iconv -f utf-8 -t utf-16le | md5 )
+	data=$( curl -sk -d "response=$challenge-$response" -d "username=$fritzuser" https://$host/login_sid.lua )
+	sid=$( sed -n "s|.*<SID>\([0-9a-f]\{16\}\)</SID>.*|\1|p" <<< "$data" )
+
+	[[ -z $sid || $sid == "0000000000000000" ]] && exit 3
+
+	# dump config
+	curl -sk -f -F "sid=$sid" -F "ImportExportPassword=admin" -F "ConfigExport=" https://$host/cgi-bin/firmwarecfg > "$LOCATION"
+
+	if [[ "$?" != "0" ]]; then
+		rm "$LOCATION"; exit 4
+	elif ! head -n1 ""$LOCATION"" | grep -q "^\*\*\*\* FRITZ!Box .* CONFIGURATION EXPORT$"; then
+		rm "$LOCATION"; exit 4
+	elif ! tail -n1 ""$LOCATION"" | grep -q "^\*\*\*\* END OF EXPORT .* \*\*\*\*$"; then
+		rm "$LOCATION"; exit 4
+	fi
+
+	# logout
+	curl -sk -d "sid=$sid" -d "logout=logout" https://$host/login_sid.lua -o /dev/null
+
+# Post Backup
+elif [[ "$1" = "DumpPostUserCmd" ]]; then
+	# FRITZ!Box config dump
+	LOCATION="/tmp/FRITZ.Box-Config.export"
+
+	echo "Purging $LOCATION..."
+	rm -r "$LOCATION" || exit 1
+fi

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+soundinitiate="/home/haarp/misc/mech-shutdowninitiate.wav"
+soundshutdown="/home/haarp/misc/mech-shutdown.wav"
+tempfile="/tmp/shutdowninit"
+emergencyshutdown="/home/haarp/bin/emergencyshutdown"
+
+sleep 0.5 # sounds don't interfere with caller
+#beep -f 950 -l 500 -n -f 1000 -l 500
+beep -f 650 -l 600
+
+#OLDVOL=$(amixer -c 0 get 'Master' | tail -n1 | awk '{print $3}')
+#amixer -c 0 set 'Master' 100%
+/usr/bin/aplay "$soundinitiate" &
+#amixer -c 0 set 'Master' "$OLDVOL"
+
+
+# if file doesn't get deleted within 5 seconds of initiate sounding, shut down
+# make sure $emergencyshutdown is passwordlessly allowed in sudoers!
+touch "$tempfile"
+
+sync &
+sleep 5
+
+if [ -f "$tempfile" ]; then
+	sudo $emergencyshutdown &
+	
+	#OLDVOL=$(amixer -c 0 get 'Master' | tail -n1 | awk '{print $3}')
+	#amixer -c 0 set 'Master' 100%
+	/usr/bin/aplay "$soundshutdown"
+	#amixer -c 0 set 'Master' "$OLDVOL"
+else
+	
+	exit 1
+fi

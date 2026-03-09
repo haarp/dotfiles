@@ -1,0 +1,12 @@
+#!/bin/sh
+
+OLDXMODMAP=$(xmodmap -pke | grep "keycode  49")
+xmodmap -e "keycode 49 = quoteleft asciitilde"
+export __GL_DOOM3=1
+
+cd /opt/etqw && export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:." && ./etqw.x86 $@
+# use etqw-rthread.x86 instead of etqw.x86 for threaded renderer
+
+xmodmap -e "$OLDXMODMAP"
+echo -ne "\n\nPress any key to continue!" ; read </dev/tty
+reset

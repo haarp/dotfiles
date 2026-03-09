@@ -1,0 +1,47 @@
+#!/bin/sh
+# based on https://www.reddit.com/r/thinkpad/comments/5f87sg/hint_blinking_the_thinklight_with_software_on_new/
+# TODO: lock
+
+function switch() {
+	local val=$(sudo ec_access -b 0x3b)
+	if [ $1 = 1 ]; then
+		sudo ec_access -w 0x3b -v 0x$( printf "%x" $(( $val | 0x2 )) )
+	else
+		sudo ec_access -w 0x3b -v 0x$( printf "%x" $(( $val & ~0x2 )) )
+	fi
+}
+function is_on() {
+	local val=$(sudo ec_access -b 0x3b)
+	[[ $(( $val & 0x2 )) -eq 2 ]] && return 0
+	return 1
+}
+
+command -v ec_access >/dev/null || {
+	echo "ec_access not found!"
+	exit 1
+}
+
+case $1 in
+	on) switch 1;;
+	off) switch 0;;
+
+	toggle)
+		if is_on; then	switch 0
+		else		switch 1
+		fi
+	;;
+	[0-9]*)
+		order=(1 0)
+		is_on && order=(0 1)
+
+		for i in $(seq 1 $1); do
+			switch ${order[0]}
+			sleep 0.2
+			switch ${order[1]}
+			sleep 0.2
+		done
+	;;
+	*)
+		echo "Usage: $(basename "$0") <on|off|toggle|n>, n = number of blinks"
+	;;
+esac

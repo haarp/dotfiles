@@ -1,0 +1,102 @@
+[init]
+	defaultBranch = master
+
+[user]
+	name = haarp
+	email = main.haarp@gmail.com
+[credential]
+	helper = cache
+[push]
+	default = current
+	followTags = true
+[core]
+	compression = 9
+	# parallelization
+	preloadindex = true
+
+[color]
+	ui = true
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+[color "diff"]
+	meta = yellow
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
+
+# make diffs a bit more semantic (https://news.ycombinator.com/item?id=11057421)
+#[diff]
+#	algorithm = patience
+
+# infra-line color highlighting (https://github.com/git/git/blob/master/contrib/diff-highlight/README)
+# disabled - Debian has diff-highlight at a different location :|
+##[pager]
+##	log = diff-highlight | less
+##	show = diff-highlight | less
+##	diff = diff-highlight | less
+
+# rebase by default
+[pull]
+	rebase = true
+
+[alias]
+	# get lists
+	branches = branch -a
+	remotes = remote -v
+	stashes = stash list
+	tags = tag
+
+	# undo shit
+	unstage = reset -q HEAD --
+	discard = checkout --
+	uncommit = reset --mixed HEAD~
+	amend = commit --amend
+	unstash = stash pop
+	nuke = !git reset --hard HEAD && git clean -d -f
+
+	# misc
+	graph = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	precommit = diff --cached --diff-algorithm=minimal -w
+
+	# search commits for changes with searchstring
+	search = log -G
+
+	# same-line diff outputs
+	wdiff = diff --color-words
+	wshow = show --color-words
+
+	# https://stackoverflow.com/a/11768843/5424487
+	# e.g.	git change-commits GIT_AUTHOR_NAME "old name" "new name"
+	#	git change-commits GIT_AUTHOR_EMAIL "old@email.com" "new@email.com" [-f] HEAD~10..HEAD
+	#	                   GIT_COMMITTER_EMAIL
+	# also see https://stackoverflow.com/a/750182/5424487
+	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f "
+
+# ZOMG Github workflow
+# Add upstream
+#	git remote add upstream git@github.com:<owner>/<repo>.git
+# Sync branch with upstream (only singular branches...............)
+#	git checkout <branch>
+# or
+#	git checkout -b <branch> upstream/<branch>
+# checked out, now pull upstream commits for that branch
+#	git pull upstream <branch>
+# pull all, including tags (the only way that works)
+#	git fetch --all
+# and push em to ours [all branches]
+#	git push [--all]
+# push tags (the only way that works)
+#	git push --tags
+# rebase current checked out branch onto another branch
+#	git rebase <branch>
+# delete remote branch (uuuugh)
+#	git push <remote> --delete <branch>
+# fix a commit that isn't most recent one (https://stackoverflow.com/a/180085/5424487)
+#	git rebase --interactive $parent_of_(oldest)_flawed_commit
+#	change `pick` to `reword` in front of any commit to be fixed
+#	git gives a shell for each commit to be changed -> change stuff
+#		git commit --amend
+#		git rebase --continue

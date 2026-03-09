@@ -1,0 +1,54 @@
+#!/bin/sh
+
+execute() {
+pi $1 2>&1 1>/dev/tty | egrep --line-buffered 'STOP|Segmentation fault' | while read; do echo "Blargh I'm dead"; beep; done
+}
+
+startcalc() {
+	TEMPDIR=$(mktemp -d /tmp/pi_XXXXX)
+	cd "$TEMPDIR"
+	ln -s /dev/null PI.DAT
+	case "$1" in
+		1M)
+		execute 20
+		;;
+		2M)
+		execute 21
+		;;
+		4M)
+		execute 22
+		;;
+		8M)
+		execute 23
+		;;
+		16M)
+		execute 24
+		;;
+		32M)
+		execute 25
+		;;
+		
+		stop)
+		echo "Killing all super_pi instances"
+		killall pi
+		;;
+		
+		*)
+		echo -e "*** Usage: super_pi [1M|2M|4M|...|32M] [# of instances] OR super_pi stop\n*** defaulting to 1M, 1 instance"
+		pi 20
+		;;
+		
+		esac
+	rm PI.DAT
+	cd - &> /dev/null
+	rmdir "$TEMPDIR"
+}
+
+
+if [ "$2" ]; then
+	for i in $(seq 1 "$2"); do startcalc "$1" & done
+else
+	startcalc "$1"
+fi
+	
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+#swap y and z for as long as the specified app is running
+
+xmodmap -e 'keycode 52 = z Z'
+xmodmap -e 'keycode 29 = y Y'
+
+$@
+
+xmodmap -e 'keycode 52 = y Y'
+xmodmap -e 'keycode 29 = z Z'

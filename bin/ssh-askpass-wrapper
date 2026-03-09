@@ -1,0 +1,44 @@
+#!/bin/bash
+# Invoke pinentry for ssh-askpass, because fuck having multiple programs with duplicate functions around
+# params=question string, stdout=passphrase where applicable, exit code=0 (confirmed), 1 (cancelled)
+
+# Refer to pinentry's Assuan protocol
+
+# avoid leading whitespace
+# avoid percent sign (convert to %25)
+desc="${*//%/%25}"
+# avoid newlines (used as separator, convert to %0A)
+desc="${desc//$'\n'/%0A}"
+
+commands="SETTITLE ssh-askpass"$'\n'"SETDESC $desc"$'\n'"SETPROMPT"
+if [[ "$1" == Add* || "$1" == Allow* ]]; then
+	type="confirm"
+	commands+=$'\n'"CONFIRM"
+else
+	type="passphrase"
+	commands+=$'\n'"GETPIN"
+fi
+
+reply=$(pinentry-qt5 <<< "$commands" 2>/dev/null)	# QT5 version allows doing shit in the background like copying a password
+
+# Debug
+##echo "Commands:" >&2
+##echo "$commands" >&2
+##echo "Reply:" >&2
+##echo "$reply" >&2
+
+if [[ "$reply" =~ "Operation cancelled <Pinentry>" ]]; then
+	exit 1
+elif [[ "$reply" =~ $'\n'"ERR " ]]; then
+	exit 2
+else
+	if [[ "$type" == "passphrase" ]]; then
+		if [[ "$reply" =~ $'\n'"D " ]]; then	# valid passphrase returned
+			pass=${reply#*D }
+			pass=${pass%$'\n'OK}
+			unset PATH	# enforce bash builtin echo
+			echo -nE "$pass"
+		fi
+	fi
+	exit 0
+fi

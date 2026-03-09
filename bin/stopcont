@@ -1,0 +1,26 @@
+#!/bin/bash
+# TODO: cancel? somehow?
+# FIXME: doesn't work for firejail'ed windows (https://github.com/netblue30/firejail/discussions/5967)
+
+pid=$(xprop _NET_WM_PID)
+pid=${pid#_NET_WM_PID(CARDINAL) = }
+kill -0 $pid || exit 1
+
+name="$(basename "$(readlink /proc/$pid/exe)")"
+
+descendant_pids() {
+    pids=$(pgrep -P $1)
+    echo $pids
+    for pid in $pids; do
+        descendant_pids $pid
+    done
+}
+
+
+if grep -q ^State:$'\t'T /proc/$pid/status; then
+	notify-send -i media-playback-start "${0##*/}" "Continuing $name"
+	kill -CONT $pid $(descendant_pids $pid)
+else
+	notify-send -i media-playback-pause "${0##*/}" "Stopping $name"
+	kill -STOP $pid $(descendant_pids $pid)
+fi

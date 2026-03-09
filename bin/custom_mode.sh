@@ -1,0 +1,33 @@
+#!/bin/sh
+# Add a custom xrandr mode to an output and print its name
+
+[ $# -eq 4 ] || {
+	echo "Usage: ${0##*/} <output> <x> <y> <refresh>" >&2
+	exit 127
+}
+command -v cvt12 >/dev/null || {
+	# `cvt` doesn't support reduced blanking v2
+	echo "cvt12 not installed!" >&2
+	exit 127
+}
+
+# generate modeline (always with CVT 1.2 "Reduced Blanking v2")
+# theoretically, more customization is possible with e.g. https://tomverbeure.github.io/video_timings_calculator
+# however, X will not see the proper refresh rate for those...
+modeline=$(cvt12 $2 $3 $4 --rb-v2 | sed -e '1d' -e 's/Modeline //' -e 's/"//g')
+modename=$(awk '{print $1}' <<< "$modeline")
+
+[ "$modeline" ] || exit 1
+
+# create mode in mode pool if it doesn't already exist
+[[ $(xrandr --current) =~ "$modename" ]] || {
+	xrandr --newmode $modeline || exit 2
+}
+
+# add mode to output
+xrandr --addmode "$1" "$modename" || exit 3
+
+echo "$modename"
+
+# switch to mode
+[ $SWITCH ] && xrandr --output "$1" --mode "$modename"

@@ -1,0 +1,82 @@
+#!/bin/bash
+## Upload a file to sprunge.us, or paste from clipboard - now with progress bar!
+## upsprunge v0.2 by haarp
+## Do What the Fuck You Want to Public License
+##
+## Dependencies: curl (mandatory), >=zenity-3.6.0 (mandatory for GUI)
+## Optional: xclip (for clipboard interaction)
+
+function print {	# $1: text, $2: 'info' or 'question'
+			# in question mode, returns 0 if 'yes', 1 if 'no' and 127 if no GUI
+	if [[ $gui == "1" ]]; then
+		if [[ $2 == question ]]; then mode="question"; else mode="info"; fi
+
+		zenity --title=$(basename $0) --$mode --no-markup --no-wrap --text="$1" --icon-name=text
+		return $?
+	else
+		echo -e "$1"
+		return 127
+	fi
+}
+function filechecks {
+	[[ -s "$1" ]] || {
+		print "File '$1' not found or empty, aborting!"; exit 1; }
+	[[ $(stat -c%s "$1") -ge 1048576 ]] && {
+		print "File '$1' too big (max. 1MB), aborting!"; exit 1; }
+}
+function output {
+	if [[ $1 == "clipboard" ]]; then xclip -o -selection clipboard
+	else cat "$1"
+	fi
+}
+
+
+[[ $TERM == "linux" || $TERM == "dumb" ]] && {
+	command -v zenity &>/dev/null || {
+		echo "zenity not found, aborting!"; exit 9; }
+	gui=1
+}
+which curl &>/dev/null || {
+	print "curl not found, aborting!"; exit 9; }
+
+if [[ $1 == "" || $1 == "-h" || $1 == "--help" ]]; then
+	print "Usage: $(basename $0) filename
+	Upload a file to sprunge.us and show the link
+	If xclip is available, the URL is copied into the X clipboard."
+	exit 0
+elif [[ "$1" != "clipboard" ]]; then
+	filechecks "$1"
+fi
+
+if [[ $gui == "1" ]]; then	#swap stdout with stderr, then redirect new stderr to file, pipe new stdout to zenity
+	rfile=$(mktemp --suffix=.curl)
+	trap 'rm "$rfile" &>/dev/null' EXIT
+
+	( output "$1" | curl -# -F 'sprunge=<-' http://sprunge.us 3>&1 1>&2- 2>&3- ) 2>"$rfile" | \
+		stdbuf -o0 tr '\r' '\n' | \
+		stdbuf -o0 grep -o "[0-9]*\.[0-9]" | \
+		zenity --progress --title=$(basename $0) --text="uploading..." --auto-close --auto-kill
+
+	response=$(< "$rfile")
+else
+	response=$(output "$1" | curl -# -F 'sprunge=<-' http://sprunge.us)
+fi
+rm "$rfile" &>/dev/null
+
+if [[ -z "$response" ]]; then
+	print "Upload failed!"
+	exit 1
+#elif echo $response | grep -q "<error_msg>"; then
+#	print "Upload failed:
+#	$(echo $response | sed -r 's/.*<error_msg>(.*)<\/error_msg>.*/\1/')"
+#	exit 1
+fi
+
+clipmessage=":"; question=""
+[[ $DISPLAY ]] && which xclip &>/dev/null && \
+	echo -n "$response" | xclip -selection clipboard && clipmessage=" (copied into clipboard):"
+[[ $gui == "1" ]] && question="open URL now?"
+
+print "URL$clipmessage $response
+
+$question" question && xdg-open "$response"

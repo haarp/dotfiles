@@ -1,0 +1,53 @@
+#!/bin/bash
+# Toggle Synaptics Touchpad state with each execution
+# TODO: implement compatibility for disabling touchpad within Xfce
+##pgrep syndaemon &>/dev/null && sleep 1	# with syndaemon running, it will have disabled our touchpad now due to pressed
+##					# keys. wait for it to enable it again so we can query the correct touch state
+##					# FIXME: doesn't work very reliably tho
+
+##state=$(synclient -l | awk '/TouchpadOff/{print $3}')
+##case $state in
+##	0)	# touchpad is on
+##		notify-send -i input-touchpad "Touchpad" "** scrolling/tapping OFF **"
+##		killall syndaemon &>/dev/null
+##		synclient TouchpadOff=2
+##	;;
+##	2)	# touchpad scrolling/tapping is off
+##		notify-send -i input-touchpad "Touchpad" "** OFF **"
+##		killall syndaemon &>/dev/null
+##		synclient TouchpadOff=1
+##	;;
+##	1)	# touchpad is off
+##		notify-send -i input-touchpad "Touchpad" " ** ON **"
+##		synclient TouchpadOff=0
+##		xfconf-query -c pointers -p /DisableTouchpadWhileTyping | grep -q "true" && {
+##			# re-enable syndaemon by toggling the setting
+##			xfconf-query -c pointers -p /DisableTouchpadWhileTyping -s false
+##			xfconf-query -c pointers -p /DisableTouchpadWhileTyping -s true
+##		}
+##	;;
+##esac
+
+
+# Toggle libinput touchpad state with each execution
+touchpad="$(xinput list --name-only | grep -i touchpad)"
+touchpad="${touchpad#∼ }"	# remove weird shit from name of "floating" switched off devices
+props=$(xinput list-props "$touchpad")
+enabled=$(awk '/Device Enabled \(...\)/{print $4}' <<< "$props")
+tapping=$(awk '/libinput Tapping Enabled \(...\)/{print $5}' <<< "$props")
+
+if [[ $enabled -eq 1 ]]; then
+	if [[ $tapping -eq 1 ]]; then
+		notify-send -i input-touchpad "$touchpad" "** tapping/scrolling OFF **"
+		xinput set-prop "$touchpad" "libinput Tapping Enabled" 0
+		xinput set-prop "$touchpad" "libinput Scroll Method Enabled" 0 0 0
+	else
+		notify-send -i input-touchpad "$touchpad" "** OFF **"
+		xinput set-prop "$touchpad" "Device Enabled" 0
+	fi
+else
+	notify-send -i input-touchpad "$touchpad" " ** ON **"
+	xinput set-prop "$touchpad" "Device Enabled" 1
+	xinput set-prop "$touchpad" "libinput Tapping Enabled" 1
+	xinput set-prop "$touchpad" "libinput Scroll Method Enabled" 1 0 0
+fi

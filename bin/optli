@@ -1,0 +1,176 @@
+#!/bin/bash
+# Alternatives: https://github.com/ajslater/picopt
+#               https://github.com/thebeansgroup/smush.py
+# TODO: support gz archives with zopfli
+
+export MAXSIZE=20	# MB
+
+set -u
+export statefile="$HOME/.local/state/optli"
+
+if [[ $1 == "-h" || $1 == "--help" ]]; then
+	echo "Recursively and losslessly optimize images and ZIP archives. Usage: ${0##*/} [dir] [dir]..."
+	echo "!!! WARNING !!!"
+	echo "    SVG: optimization necessarily changes the file structure/semantics"
+	echo "    ZIP: file signatures will break (e.g. on Android flashable ZIPs)"
+	echo "    PNG: dSIG, bKGD and sBIT chunks will be stripped"
+	#         see https://github.com/google/zopfli/issues/97#issuecomment-200332768
+	echo "    PNG: Some games dislike having their assets messed with"
+	exit 1
+fi
+
+work() {
+	fail() {
+		rm -rf "$temp"
+		echo "0 0 error:$2 $1"
+		exit 1
+	}
+
+	local oldsize=$(wc -c <"$1")
+	local md5=$(md5sum "$1")
+	md5=${md5%% *}
+
+	if [[ $oldsize -gt $(( $MAXSIZE*1024*1024 )) ]]; then
+		echo "0 0 too-big $1"
+		exit 0
+	fi
+
+	if grep -q "$md5" "$statefile" 2>/dev/null; then
+		echo "0 0 already $1"
+		exit 0
+	fi
+
+	local temp=$(mktemp -u "/tmp/${0##*/}_${1##*/}_XXXXXX") || fail "$1" "tempfile"
+
+	[[ -w "$1" ]] || fail "$1" "no-write-permission"
+	[[ "$(dirname "$1")/" =~ "fail/" ]] && fail "$1" "possible-test-image"
+
+	case $(file -b --mime-type "$1") in # detect mime type to catch mislabeled file extensions
+		image/jpeg)
+		case $jpeg in
+			mozjpeg)
+				mozjpegtran -optimize -copy all -outfile "$temp" "$1" || fail "$1" "conversion"
+			;;
+			jpegoptim)
+				jpegoptim -q -f --strip-none --stdout "$1" > "$temp" || fail "$1" "conversion"
+			;;
+		esac
+		;;
+
+		image/png)
+		case $png in
+			zopfli)
+				zopflipng -m --keepchunks=cHRM,gAMA,iCCP,sRGB,hIST,tRNS,pHYs,sPLT,tIME,iTXt,tEXt,zTXt \
+				--always_zopflify "$1" "$temp" >/dev/null
+			;;
+			optipng)
+				optipng -quiet -o7 "$1" -out "$temp" || fail "$1" "conversion"
+			;;
+		esac
+		;;
+
+		image/gif)
+			gifsicle -O3 --careful "$1" > "$temp" || fail "$1" "conversion"
+		:
+		;;
+
+		image/svg+xml|application/xml|text/html|text/plain)
+			scour -q -i "$1" -o "$temp" --enable-viewboxing --enable-id-stripping \
+			--shorten-ids --indent=none || fail "$1" "conversion"
+			# https://github.com/codedread/scour/issues/55 and https://github.com/codedread/scour/issues/56
+			sed -i -e 's/ standalone="no"//' -e 's/&quot;/"/g' "$temp" || fail "$1" "fixups"
+		;;
+
+		application/zip|application/java-archive)
+			7za l -slt "$1" | grep -q "Method = Deflate" || fail "$1" "**store-only**-mode"
+
+			tempdir=$(mktemp -d "/tmp/${1##*/}_XXXXXX") || fail "$1" "tempdir"
+			7za x "$1" -o"$tempdir/" >/dev/null || { rm -rf "$tempdir"; fail "$1" "extraction"; }
+			shopt -s dotglob
+			7za a -tzip -mm=Deflate -mx=9 "$temp" "$tempdir"/* >/dev/null || { rm -rf "$tempdir"; fail "$1" "compression"; }
+			rm -rf "$tempdir"
+		;;
+
+		*)
+		fail "$1" "unknown-filetype"
+		;;
+	esac
+
+	[[ -s "$temp" ]] || fail "$1" "new-file-not-created"
+	local newsize=$(wc -c <"$temp")
+	if [[ $newsize -lt $oldsize ]]; then
+		touch -r "$1" "$temp"
+		trap '' SIGHUP SIGINT SIGQUIT SIGTERM # don't interrupt while file is being written
+		cat "$temp" > "$1" || fail "$1" "writing-new-file" # use cat to preserve owner/perms
+		touch -r "$temp" "$1" || fail "$1" "restoring-timestamp"
+		trap - SIGHUP SIGINT SIGQUIT SIGTERM
+
+		echo "$oldsize $newsize ✓ $1"
+	else
+		echo "$oldsize $newsize skipping $1"
+	fi
+
+	local md5=$(md5sum "$1")
+	md5=${md5%% *}
+	mkdir -p "$(dirname "$statefile")"
+	echo "$md5" >> "$statefile"
+
+	rm "$temp"
+}; export -f work
+
+
+pattern="-false "
+
+if command -v mozjpegtran &>/dev/null; then
+	pattern+="-o -iname *.jpg -o -iname *.jpeg -o -iname *.jpe "; export jpeg="mozjpeg"
+elif command -v jpegoptim &>/dev/null; then
+	pattern+="-o -iname *.jpg -o -iname *.jpeg -o -iname *.jpe "; export jpeg="jpegoptim"
+else
+	echo "mozjpegtran/jpegoptim not found, ignoring JPEGs!"
+fi
+# TODO: test pngwolf
+if command -v zopflipng &>/dev/null; then
+	pattern+="-o -iname *.png "; export png="zopfli"
+elif command -v optipng &>/dev/null; then
+	pattern+="-o -iname *.png "; export png="optipng"
+else
+	echo "zopflipng/optipng not found, ignoring PNGs!"
+fi
+
+if command -v gifsicle &>/dev/null; then
+	pattern+="-o -iname *.gif "
+else
+	echo "gifsicle not found, ignoring GIFs!"
+fi
+
+if command -v scour &>/dev/null; then
+	pattern+="-o -iname *.svg "
+else
+	echo "scour not found, ignoring SVGs!"
+fi
+# TODO: use zopfli here once it supports zip
+if command -v 7za &>/dev/null; then
+	pattern+="-o -iname *.zip"
+else
+	echo "7za not found, ignoring ZIPs!"
+fi
+
+total=0
+saved=0
+
+set -f			# disable shell globbing due to unquoted $pattern
+shopt -s lastpipe	# run last pipe element in current shell
+
+# make SURE to only run on type f
+find "$@" \( $pattern \) -type f -print0 | xargs -r -0 -n1 -P$(getconf _NPROCESSORS_ONLN) bash -c 'work "$@"' _ | while read oldsize newsize status filename; do
+###find "$@" \( $pattern \) -type f | sort | xargs -r -n1 -P1 bash -c 'work "$@"' _ | while read oldsize newsize status filename; do
+	echo "$filename: $oldsize → $newsize, $status"
+
+	total=$(( total + oldsize ))
+	[[ $newsize -lt $oldsize ]] && saved=$(( saved + (oldsize-newsize) ))
+done
+
+if [[ $total == 0 ]]; then percent=0
+else percent=$(( 100*$saved/$total ))
+fi
+printf "\n\n--------------------------------\nTOTAL SAVED (of changed files):\n   %'.fk / %'.fk ($percent%%)\n" $(($saved/1024)) $(($total/1024))

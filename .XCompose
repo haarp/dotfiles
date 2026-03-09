@@ -1,0 +1,262 @@
+### Info
+# max number of elements (inlcuding <Multi-key> and output) is 7
+# output can only be one char
+
+### System
+include "%L"						# import the default Compose file for the locale
+include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
+
+### Custom
+# Superscript
+<Multi_key> <asciicircum> <0>			: "⁰"
+<Multi_key> <asciicircum> <1>			: "¹"
+<Multi_key> <asciicircum> <2>			: "²"
+<Multi_key> <asciicircum> <3>			: "³"
+<Multi_key> <asciicircum> <4>			: "⁴"
+<Multi_key> <asciicircum> <5>			: "⁵"
+<Multi_key> <asciicircum> <6>			: "⁶"
+<Multi_key> <asciicircum> <7>			: "⁷"
+<Multi_key> <asciicircum> <8>			: "⁸"
+<Multi_key> <asciicircum> <9>			: "⁹"
+<Multi_key> <asciicircum> <plus>		: "⁺"
+<Multi_key> <asciicircum> <minus>		: "⁻"
+<Multi_key> <asciicircum> <equal>		: "⁼"
+<Multi_key> <asciicircum> <parenleft>	: "⁽"
+<Multi_key> <asciicircum> <parenright>	: "⁾"
+<Multi_key> <asciicircum> <A>			: "ᴬ"
+<Multi_key> <asciicircum> <B>			: "ᴮ"
+<Multi_key> <asciicircum> <D>			: "ᴰ"
+<Multi_key> <asciicircum> <E>			: "ᴱ"
+<Multi_key> <asciicircum> <G>			: "ᴳ"
+<Multi_key> <asciicircum> <H>			: "ᴴ"
+<Multi_key> <asciicircum> <I>			: "ᴵ"
+<Multi_key> <asciicircum> <J>			: "ᴶ"
+<Multi_key> <asciicircum> <K>			: "ᴷ"
+<Multi_key> <asciicircum> <L>			: "ᴸ"
+<Multi_key> <asciicircum> <M>			: "ᴹ"
+<Multi_key> <asciicircum> <N>			: "ᴺ"
+<Multi_key> <asciicircum> <O>			: "ᴼ"
+<Multi_key> <asciicircum> <P>			: "ᴾ"
+<Multi_key> <asciicircum> <R>			: "ᴿ"
+<Multi_key> <asciicircum> <T>			: "ᵀ"
+<Multi_key> <asciicircum> <U>			: "ᵁ"
+<Multi_key> <asciicircum> <V>			: "ⱽ"
+<Multi_key> <asciicircum> <W>			: "ᵂ"
+<Multi_key> <asciicircum> <a>			: "ᵃ"
+<Multi_key> <asciicircum> <b>			: "ᵇ"
+<Multi_key> <asciicircum> <c>			: "ᶜ"
+<Multi_key> <asciicircum> <d>			: "ᵈ"
+<Multi_key> <asciicircum> <e>			: "ᵉ"
+<Multi_key> <asciicircum> <f>			: "ᶠ"
+<Multi_key> <asciicircum> <g>			: "ᵍ"
+<Multi_key> <asciicircum> <h>			: "ʰ"
+<Multi_key> <asciicircum> <i>			: "ⁱ"
+<Multi_key> <asciicircum> <j>			: "ʲ"
+<Multi_key> <asciicircum> <k>			: "ᵏ"
+<Multi_key> <asciicircum> <l>			: "ˡ"
+<Multi_key> <asciicircum> <m>			: "ᵐ"
+<Multi_key> <asciicircum> <n>			: "ⁿ"
+<Multi_key> <asciicircum> <o>			: "ᵒ"
+<Multi_key> <asciicircum> <p>			: "ᵖ"
+<Multi_key> <asciicircum> <r>			: "ʳ"
+<Multi_key> <asciicircum> <s>			: "ˢ"
+<Multi_key> <asciicircum> <t>			: "ᵗ"
+<Multi_key> <asciicircum> <u>			: "ᵘ"
+<Multi_key> <asciicircum> <v>			: "ᵛ"
+<Multi_key> <asciicircum> <w>			: "ʷ"
+<Multi_key> <asciicircum> <x>			: "ˣ"
+<Multi_key> <asciicircum> <y>			: "ʸ"
+<Multi_key> <asciicircum> <z>			: "ᶻ"
+
+# Subscript
+<Multi_key> <underscore> <0>			: "₀"
+<Multi_key> <underscore> <1>			: "₁"
+<Multi_key> <underscore> <2>			: "₂"
+<Multi_key> <underscore> <3>			: "₃"
+<Multi_key> <underscore> <4>			: "₄"
+<Multi_key> <underscore> <5>			: "₅"
+<Multi_key> <underscore> <6>			: "₆"
+<Multi_key> <underscore> <7>			: "₇"
+<Multi_key> <underscore> <8>			: "₈"
+<Multi_key> <underscore> <9>			: "₉"
+<Multi_key> <underscore> <plus>			: "₊"
+<Multi_key> <underscore> <minus>		: "₋"
+<Multi_key> <underscore> <equal>		: "₌"
+<Multi_key> <underscore> <parenleft>	: "₍"
+<Multi_key> <underscore> <parenright>	: "₎"
+<Multi_key> <underscore> <a>			: "ₐ"
+<Multi_key> <underscore> <e>			: "ₑ"
+<Multi_key> <underscore> <h>			: "ₕ"
+<Multi_key> <underscore> <i>			: "ᵢ"
+<Multi_key> <underscore> <j>			: "ⱼ"
+<Multi_key> <underscore> <k>			: "ₖ"
+<Multi_key> <underscore> <l>			: "ₗ"
+<Multi_key> <underscore> <m>			: "ₘ"
+<Multi_key> <underscore> <n>			: "ₙ"
+<Multi_key> <underscore> <o>			: "ₒ"
+<Multi_key> <underscore> <p>			: "ₚ"
+<Multi_key> <underscore> <r>			: "ᵣ"
+<Multi_key> <underscore> <s>			: "ₛ"
+<Multi_key> <underscore> <t>			: "ₜ"
+<Multi_key> <underscore> <u>			: "ᵤ"
+<Multi_key> <underscore> <v>			: "ᵥ"
+<Multi_key> <underscore> <x>			: "ₓ"
+
+# Greek letters (same as Emacs)
+<Multi_key> <asterisk> <a>					: "α"	# GREEK SMALL LETTER ALPHA
+<Multi_key> <asterisk> <b>					: "β"	# GREEK SMALL LETTER BETA
+<Multi_key> <asciicircum> <asterisk> <b>	: "ᵝ"
+<Multi_key> <underscore> <asterisk> <b>		: "ᵦ"
+<Multi_key> <asterisk> <c>					: "ψ"	# GREEK SMALL LETTER PSI
+<Multi_key> <asterisk> <d>					: "δ"	# GREEK SMALL LETTER DELTA
+<Multi_key> <asciicircum> <asterisk> <d>	: "ᵟ"
+<Multi_key> <asterisk> <e>					: "ε"	# GREEK SMALL LETTER EPSILON
+<Multi_key> <asterisk> <f>					: "φ"	# GREEK SMALL LETTER PHI
+<Multi_key> <asciicircum> <asterisk> <f>	: "ᵠ"
+<Multi_key> <underscore> <asterisk> <f>		: "ᵩ"
+<Multi_key> <asterisk> <g>					: "γ"	# GREEK SMALL LETTER GAMMA
+<Multi_key> <asciicircum> <asterisk> <g>	: "ᵞ"
+<Multi_key> <underscore> <asterisk> <g>		: "ᵧ"
+<Multi_key> <asterisk> <h>					: "η"	# GREEK SMALL LETTER ΕΤΑ
+<Multi_key> <e> <f> <f>						: "η"	# GREEK SMALL LETTER ΕΤΑ
+<Multi_key> <asterisk> <i>					: "ι"	# GREEK SMALL LETTER ΙΟΤΑ
+<Multi_key> <asterisk> <j>					: "ξ"	# GREEK SMALL LETTER XI
+<Multi_key> <asterisk> <k>					: "κ"	# GREEK SMALL LETTER KAPPA
+<Multi_key> <asterisk> <l>					: "λ"	# GREEK SMALL LETTER LAMBDA
+<Multi_key> <asterisk> <m>					: "μ"	# GREEK SMALL LETTER MU
+<Multi_key> <m> <u>							: "μ"	# GREEK SMALL LETTER MU
+<Multi_key> <asterisk> <n>					: "ν"	# GREEK SMALL LETTER NU
+<Multi_key> <asterisk> <o>					: "ο"	# GREEK SMALL LETTER OMICRON
+<Multi_key> <asterisk> <p>					: "π"	# GREEK SMALL LETTER PI
+<Multi_key> <p> <i>							: "π"	# GREEK SMALL LETTER PI
+<Multi_key> <asterisk> <r>					: "ρ"	# GREEK SMALL LETTER RHO
+<Multi_key> <underscore> <asterisk> <r>		: "ᵨ"
+<Multi_key> <asterisk> <s>					: "σ"	# GREEK SMALL LETTER SIGMA
+<Multi_key> <asterisk> <t>					: "τ"	# GREEK SMALL LETTER TAU
+<Multi_key> <asterisk> <u>					: "θ"	# GREEK SMALL LETTER THETA
+<Multi_key> <asciicircum> <asterisk> <u>	: "ᶿ"
+<Multi_key> <asterisk> <v>					: "ω"	# GREEK SMALL LETTER OMEGA
+<Multi_key> <asterisk> <w>					: "ς"	# GREEK SMALL LETTER FINAL SIGMA
+<Multi_key> <asterisk> <x>					: "χ"	# GREEK SMALL LETTER CHI
+<Multi_key> <asciicircum> <asterisk> <x>	: "ᵡ"
+<Multi_key> <underscore> <asterisk> <x>		: "ᵪ"
+<Multi_key> <asterisk> <y>					: "υ"	# GREEK SMALL LETTER UPSILON
+<Multi_key> <asterisk> <z>					: "ζ"	# GREEK SMALL LETTER ZETA
+<Multi_key> <asterisk> <A>					: "Α"	# GREEK CAPITAL LETTER ALPHA
+<Multi_key> <asterisk> <B>					: "Β"	# GREEK CAPITAL LETTER BETA
+<Multi_key> <asterisk> <C>					: "Ψ"	# GREEK CAPITAL LETTER PSI
+<Multi_key> <asterisk> <D>					: "Δ"	# GREEK CAPITAL LETTER DELTA
+<Multi_key> <asterisk> <E>					: "Ε"	# GREEK CAPITAL LETTER EPSILON
+<Multi_key> <asterisk> <F>					: "Φ"	# GREEK CAPITAL LETTER PHI
+<Multi_key> <asterisk> <G>					: "Γ"	# GREEK CAPITAL LETTER GAMMA
+<Multi_key> <asterisk> <H>					: "Η"	# GREEK CAPITAL LETTER ΕΤΑ
+<Multi_key> <asterisk> <I>					: "Ι"	# GREEK CAPITAL LETTER ΙΟΤΑ
+<Multi_key> <asterisk> <J>					: "Ξ"	# GREEK CAPITAL LETTER XI
+<Multi_key> <asterisk> <K>					: "Κ"	# GREEK CAPITAL LETTER KAPPA
+<Multi_key> <asterisk> <L>					: "Λ"	# GREEK CAPITAL LETTER LAMBDA
+<Multi_key> <asterisk> <M>					: "Μ"	# GREEK CAPITAL LETTER MU
+<Multi_key> <asterisk> <N>					: "Ν"	# GREEK CAPITAL LETTER NU
+<Multi_key> <asterisk> <O>					: "Ο"	# GREEK CAPITAL LETTER OMICRON
+<Multi_key> <asterisk> <P>					: "Π"	# GREEK CAPITAL LETTER PI
+<Multi_key> <asterisk> <R>					: "Ρ"	# GREEK CAPITAL LETTER RHO
+<Multi_key> <asterisk> <S>					: "Σ"	# GREEK CAPITAL LETTER SIGMA
+<Multi_key> <asterisk> <T>					: "Τ"	# GREEK CAPITAL LETTER TAU
+<Multi_key> <asterisk> <U>					: "Θ"	# GREEK CAPITAL LETTER THETA
+<Multi_key> <asterisk> <V>					: "Ω"	# GREEK CAPITAL LETTER OMEGA
+<Multi_key> <o> <h> <m>						: "Ω"	# GREEK CAPITAL LETTER OMEGA
+<Multi_key> <asterisk> <X>					: "Χ"	# GREEK CAPITAL LETTER CHI
+<Multi_key> <asterisk> <Y>					: "Υ"	# GREEK CAPITAL LETTER UPSILON
+<Multi_key> <asterisk> <Z>					: "Ζ"	# GREEK CAPITAL LETTER ZETA
+
+# Arrows
+<Multi_key> <less> <minus>			: "←"
+<Multi_key> <minus> <greater>		: "→"
+<Multi_key> <bar> <asciicircum>		: "↑"
+<Multi_key> <asciicircum> <bar>		: "↑"
+<Multi_key> <u> <o>					: "↑"
+<Multi_key> <bar> <v>				: "↓"
+<Multi_key> <v> <bar>				: "↓"
+<Multi_key> <d> <n>				: "↓"
+###<Multi_key> <less> <minus> <greater>		: "↔"	# breaks leftwards arrow
+
+# Math
+<Multi_key> <0> <0>					: "∞"
+<Multi_key> <i> <n> <f>				: "∞"
+<Multi_key> <minus> <plus> 			: "∓"	# replaces plusminus on this
+<Multi_key> <exclam> <equal>		: "≠"
+<Multi_key> <asciitilde> <equal>	: "≈"
+<Multi_key> <equal> <asciitilde>	: "≈"
+<Multi_key> <asciicircum> <equal>	: "≘"
+<Multi_key> <equal> <asciicircum>	: "≘"
+<Multi_key> <question> <equal>		: "≟"
+<Multi_key> <equal> <question>		: "≟"
+<Multi_key> <less> <equal>			: "≤"
+<Multi_key> <greater> <equal>		: "≥"
+<Multi_key> <parenleft> <E>			: "∈"
+<Multi_key> <E> <parenleft>			: "∈"
+<Multi_key> <s> <u> <m>				: "∑"
+<Multi_key> <i> <n> <t>				: "∫"
+<Multi_key> <bar> <C>				: "ℂ"	# complex numbers
+<Multi_key> <bar> <N>				: "ℕ"	# natural numbers
+<Multi_key> <bar> <Q>				: "ℚ"	# rational numbers
+<Multi_key> <bar> <R>				: "ℝ"	# real numbers
+<Multi_key> <bar> <Z>				: "ℤ"	# integers
+
+# Bitcoin (proper char will be U+20BF)
+<Multi_key> <b> <t> <c>				: "฿"
+<Multi_key> <x> <b> <t>				: "฿"
+<Multi_key> <B> <bar>				: "฿"
+<Multi_key> <bar> <B>				: "฿"
+
+# Misc
+<Multi_key> <i> <n> <v> <i> <s>		: "​"	# Zero-width space
+
+# Symbols
+<Multi_key> <slash> <exclam> <backslash>	: "⚠"
+<Multi_key> <o> <x>					: "☠"
+<Multi_key> <a> <t> <o> <m>			: "⚛"
+<Multi_key> <r> <a> <d>				: "☢"
+<Multi_key> <b> <i> <o>				: "☣"
+<Multi_key> <h> <v>					: "⚡"
+<Multi_key> <c> <c> <c> <p>			: "☭"
+<Multi_key> <6> <6> <6>				: "⛧"
+<Multi_key> <o> <minus> <plus>		: "♀"
+<Multi_key> <o> <t>					: "♀"
+<Multi_key> <o> <minus> <greater>	: "♂"
+<Multi_key> <n> <o> <t> <e>			: "♪"
+<Multi_key> <c> <h> <e> <c> <k>		: "✓"	# ☑
+<Multi_key> <exclam> <c> <h> <e> <c>		: "☐"
+<Multi_key> <question> <i>			: "⸮"	# irony
+<Multi_key> <i> <question>			: "⸮"
+
+# Emoji
+<Multi_key> <semicolon> <parenright>		: "😉"
+<Multi_key> <colon> <D>						: "😃"
+<Multi_key> <o> <colon> <parenright>		: "😇"
+<Multi_key> <bar> <colon> <parenright>		: "😇"
+<Multi_key> <greater> <colon> <parenright>	: "😈"
+<Multi_key> <asciicircum> <asciicircum>		: "😊"
+<Multi_key> <8> <parenright>				: "😎"
+<Multi_key> <colon> <bar>					: "😐"
+<Multi_key> <colon> <l>						: "😒"
+<Multi_key> <colon> <slash>					: "😕"
+<Multi_key> <colon> <backslash>				: "😕"
+<Multi_key> <colon> <p>						: "😛"
+<Multi_key> <colon> <P>						: "😛"
+<Multi_key> <greater> <colon> <parenleft>	: "😠"
+<Multi_key> <D> <colon>						: "😦"
+<Multi_key> <colon> <o>						: "😮"
+<Multi_key> <colon> <O>						: "😲"
+<Multi_key> <t> <h> <i> <n> <k>				: "🤔"
+<Multi_key> <c> <a> <t>						: "🐈"
+<Multi_key> <c> <f>							: "🐱"
+<Multi_key> <d> <o> <g>						: "🐕"
+<Multi_key> <s> <n> <e> <k>					: "🐍"
+<Multi_key> <less> <3>						: "♥"
+<Multi_key> <exclam> <less> <3>				: "💔"
+<Multi_key> <less> <slash> <3>				: "💔"
+<Multi_key> <j> <s>							: "ツ"	# "Japanese Smiley"
+<Multi_key> <t> <u>							: "👍"
+<Multi_key> <t> <d>							: "👎"
+<Multi_key> <w> <a> <v> <e>					: "👋"
+<Multi_key> <f> <u>							: "🖕"

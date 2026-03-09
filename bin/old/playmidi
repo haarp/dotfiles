@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ALSA_OUTPUT_PORT=$(aplaymidi -l | grep "Emu10k1 Port 0" | awk '{print $1}')
+aplaymidi --port "$ALSA_OUTPUT_PORT" "$1"

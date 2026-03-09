@@ -1,0 +1,52 @@
+#!/bin/bash
+# Opens URLs with certain protocol scheme, e.g.
+# viewtube:https://www.youtube.com/watch?v=YE7VzlLtp-4
+# openwithff://?exe=/usr/bin/firefox&pat=aut&file=http://barisderin.com/?p=613
+
+if [[ $1 == "viewtube:"* ]]; then
+	# http://isebaro.com/viewtube/protocol/
+	mpv --really-quiet --force-window=immediate --pause --cache-file=TMP "${1/viewtube:/}" </dev/null	##--keep-open --pause
+
+elif [[ $1 == "openwithff://"* ]]; then
+	# https://chrome.google.com/webstore/detail/open-with-firefox/poeacjbaiakjnaepdjgggojcjoajakmd
+	# Needs helper .desktop, e.g. ~/.local/share/applications/openwith.desktop:
+	#	[Desktop Entry]
+	#	Type=Application
+	#	Exec=openwith %u
+	#	NoDisplay=true
+	#	Terminal=false
+	#	MimeType=x-scheme-handler/openwithff
+	# And an entry in ~/.local/share/applications/mimeapps.list or mimeinfo.cache:
+	#	x-scheme-handler/openwithff=openwith.desktop
+
+	COMMANDS="firefox mpv"
+	url="${1:48}"
+
+	command -v zenity >/dev/null || {
+		notify-send -i error "Open With" "zenity not found!"
+		exit 1
+	}
+
+	for command in $COMMANDS; do
+		command -v "$command" >/dev/null || continue
+		[[ $offers ]] && offers+=$'\n'
+		offers+="$command"
+	done
+
+	answer=$(zenity --list --title="${url//&/&amp;}" --text="Open With" --column="" --hide-header <<< "$offers" )
+
+	command -v "$answer" >/dev/null || {
+		notify-send -i error "$answer not found!"
+		exit 1
+	}
+
+	case $answer in
+		mpv)
+		mpv --really-quiet --force-window=immediate --cache-file=TMP "$url" </dev/null
+		;;
+
+		*)
+		"$answer" "$url"
+		;;
+	esac
+fi

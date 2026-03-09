@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# flashpwn-0.4.1 by haarp
+# Accepts one URL as parameter, parses it for flash videos and then launches the video in smplayer2
+# A second parameter can be "download" to start downloading instead or "link" to show the content link
+# For countries in which Youtube censors content, automatically switches to a proxy if necessary
+# Based on the excellent quvi
+# TODO/quvi: Replace --start-time PE with start_time substitution once available (--meta-artist='UPLOADER' --meta-genre='CATEGORY' --meta-copyright='HOST' ---meta-description='DESCRIPTION' --meta-date='UPLOADED')
+# FIXME/terminal: Quitting terminal wont quit wget??
+# TODO/VLC: Youtube FLV (fmt34/35) not seekable (workaround: prefer WebM (fmt43/44) for viewing where available)
+# TODO/VLC: Keep buffering the full video, even when paused, and add buffer bar
+
+# Set your preferred foreign HTTP proxy below:
+PROXY="http://quetzalcoatl:8080/"
+
+# Set your preferred formats below (first applicable is selected):
+# For a list of all available formats, run 'quvi -F videourl'
+PREFERENCE_VIEW="fmt22_720p fmt44_480p fmt35_480p fmt43_360p fmt34_360p mp4_720p mp4_480p mp4_384p hd sd"
+PREFERENCE_DOWNLOAD="fmt38_1536p fmt37_1080p fmt22_720p fmt35_480p fmt34_360p mp4_1080p mp4_720p mp4_480p mp4_384p hd sd"
+# fmt_* = Youtube, mp4_* = DailyMotion, hd/sd = vimeo
+
+
+# function to have notify-send behave like echo
+echonotify() { notify-send -u low -t 2000 "flashpwn" "$1"; }
+# If we're not running on a terminal use above function, else use echo
+shopt -s expand_aliases
+if [[ $TERM = linux ]]; then
+	alias print="echonotify"
+else
+	alias print="echo"
+fi
+
+if [[ $2 = "view" || $2 = "" ]]; then
+	preference="$PREFERENCE_VIEW"
+elif [[ $2 = "download" || $2 = "link" ]]; then
+	preference="$PREFERENCE_DOWNLOAD"
+else
+	print "Syntax error!"
+	exit 1
+fi
+
+if quvi --support "$1" &>/dev/null; then
+	print "Launching flashpwn..."
+else
+	print "URL not supported! Aborting..."
+	exit 1
+fi
+
+available=$(quvi "$1" -e -resolve -e -verify -v quiet -F)
+# quvi uses exit code 68 if Youtube censors
+if [[ $? = 68 ]]; then
+	print "Censorship?! Switching to proxy..."
+	export http_proxy="$PROXY"
+	export https_proxy="$PROXY"
+	available=$(quvi "$1" -e -resolve -e -verify -v quiet -F)
+fi
+
+if [[ $available = "" ]]; then
+	print "Something went wrong! Aborting..."
+	exit 1
+fi
+
+for element in $preference; do
+	if echo $available | grep -q $element; then
+		format=$element
+		break
+	fi
+done
+if [[ $format = "" ]]; then format=default; fi
+
+if [[ $2 = "view" || $2 = "" ]]; then
+	quvi "$1" -e -resolve -e -verify -v mute -f $format --exec \
+	"mpv %u"
+#	"vlc %u	--network-caching=2000 --http-reconnect --http-user-agent='Mozilla/5.0' --no-http-forward-cookies\
+#	--meta-url='$1' --meta-title=%t"
+elif [[ $2 = "download" ]]; then #terminal does not pass through http_proxy, so declare it again
+	quvi "$1" -e -resolve -v mute -f $format --exec \
+	"terminal --geometry=100x20 -H -x \
+	wget -U 'Mozilla/5.0' -O "$HOME/Desktop/%t.%e" %u -c --no-cookies -e 'http_proxy=$http_proxy' -e 'https_proxy=$https_proxy'"
+elif [[ $2 = "link" ]]; then
+	xfce4-terminal --geometry=150x20 -H -x quvi "$1" -e -resolve -f $format
+fi
