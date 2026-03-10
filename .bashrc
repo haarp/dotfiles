@@ -12,7 +12,8 @@
 
 ## Turn us into a var suitable for OpenSSH's default AcceptEnv
 ## also strip leading whitespace, empty lines, comments and lines ending in #-# when creating the variable
-## Note: Once this variable becomes too large, dropbear will fail! https://github.com/mkj/dropbear/issues/177
+## NOTE: Once this variable becomes too large, dropbear will fail! https://github.com/mkj/dropbear/issues/177
+## NOTE: https://github.com/cdown/sshrc also exists. didn't know that. huh.
 export LC_BASHRC=$(sed -e '/#-#$/d' -e 's/^[\t ]*//' -e '/^$/d' -e 's/\t\+#.*$//' -e '/^#/d' ~/.bashrc)$'\n'				#-#
 
 ## Source various files, if they exist, in given order
