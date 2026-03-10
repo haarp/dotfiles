@@ -33,16 +33,17 @@ if true; then																												#-#
 		# Escape \ (first) and $ and " in files
 		LC_BASHRC+="{ "																										#-#
 		# FIXME: slow startup here!
-		LC_BASHRC+="echo \"$(sed -e 's:\\:\\\\:g' -e 's:\$:\\\$:g' -e 's:\":\\\":g' "$HOME/$_file" )\" >\"\$HOME/$_file\";"	#-#
+		_content="$(< "$HOME/$_file")"
+		LC_BASHRC+="echo ${_content@Q} >\"\$HOME/$_file\";"																	#-#
 		LC_BASHRC+=" } 2>/dev/null"$'\n'																					#-#
 		# Set timestamp to original file's
 		LC_BASHRC+="touch -d @$(stat --printf=%Y "$HOME/$_file") \"\$HOME/$_file\" 2>/dev/null"$'\n'						#-#
 
 ##		LC_BASHRC+="fi"$'\n'																								#-#
-	done; unset _shared_dotfiles _file																						#-#
 
 	# And do some replacements in BASHRC depending on whether we are root (use 'if' so shell doesn't see exit code)
 	LC_BASHRC+="if [[ \$EUID == 0 ]]; then sed -i -e 's/256-defbg/256root-defbg/' \"\$HOME/.config/mc/ini\" 2>/dev/null; fi"$'\n'	#-#
+	done; unset _shared_dotfiles _file _content																				#-#
 
 	# If any of above failed, don't pollute exit code
 	LC_BASHRC+="true"$'\n'																									#-#
