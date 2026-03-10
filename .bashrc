@@ -6,7 +6,7 @@
 #set -x
 
 ## Test for non-interactive shell
-[[ $- != *i* ]] && return																									#-#
+[[ $- == *i* ]] || return																									#-#
 ## Don't bother inside mc
 [[ $MC_SID ]] && return																										#-#
 
