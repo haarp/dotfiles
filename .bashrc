@@ -119,9 +119,9 @@ unset _locales _fallback _cat
 declare -A f=(
 	[reset]=$'\e[0m'
 	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [underline]=$'\e[4m' [blink]=$'\e[5m'
-	[Blink]=$'\e[6m' [inverse]=$'\e[7m' [hidden]=$'\e[8m' [strikethrough]=$'\e[9m'
+	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strikethrough]=$'\e[9m'
 	[unbolddim]=$'\e[22m' [unitalic]=$'\e[23m' [ununderline]=$'\e[24m' [unblink]=$'\e[25m'
-	[unBlink]=$'\e[26m' [uninverse]=$'\e[27m' [unhidden]=$'\e[28m' [unstrikethrough]=$'\e[29m'
+	[uninverse]=$'\e[27m' [unhidden]=$'\e[28m' [unstrikethrough]=$'\e[29m'
 
 )
 # normal/high-intensity foreground colors
@@ -550,7 +550,7 @@ alias yt-dlp-audio-thumb='yt-dlp-audio --embed-thumbnail'	# only use when thumb 
 alias yt-dlp-audio-index='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s"'	# index albums/playlists
 alias yt-dlp-audio-index-thumb='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s" --embed-thumbnail'
 alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
-alias format='echo "\\e[Zmfoo OR \\e[XYmfoo"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m \e[5m5:slow-blink\e[0m\n\e[6m6:fast-blink\e[0m\e[7m7:flip-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n21: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
+alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m\n\e[5m5:blink\e[0m \e[7m7:reverse-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n22: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
 alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
