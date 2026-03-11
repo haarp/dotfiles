@@ -489,7 +489,7 @@ alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no 
 complete -F _comp_cmd_scp scpnokey
 alias scp-resume='rsync --partial --progress --rsh=ssh'
 alias glxgears='vblank_mode=0 glxgears'	# no vsync
-# mc: set theme, disable buggy mouse
+# mc: set theme, disable annoying mouse
 if [[ $EUID -eq 0 ]]; then	_MC_SKIN="modarin256root-defbg"
 else						_MC_SKIN="modarin256-defbg"
 fi
