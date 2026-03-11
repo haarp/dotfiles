@@ -470,9 +470,9 @@ complete -F _ping resolve resolve4 resolve6
 ##alias nmap='nmap -PE'			# use ICMP ping for host discovery
 alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (potentially misleadingly slow) reverse DNS lookups on each reply
 alias traceroute='traceroute -n'	# also don't do misleading rDNS queries
-alias suicide='unset HISTFILE; exit'	# exit without saving history
 alias nh='echo "History saving disabled!"; unset HISTFILE'
 alias hs='echo "Saving history now!"; history -a'
+alias suicide='nh; exit'	# exit without saving history
 alias hgrep='history | grep'	# history grep
 alias whoops='history -d -1; history -d -1'	# purge last command from history (and whoops itself)
 alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
