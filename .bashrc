@@ -423,7 +423,7 @@ alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
 #else	# CoW only
 	alias cp='cp --reflink=auto'
 #fi
-alias ls='ls --human --color=auto --group-directories-first'
+alias ls='ls --human --color=auto --classify=auto --group-directories-first'
 alias l="ls -la"; alias lt="ls --sort=time"
 _GREP_OPTIONS="--color=auto"
 alias grep="grep $_GREP_OPTIONS"; alias egrep="egrep $_GREP_OPTIONS"; alias fgrep="fgrep $_GREP_OPTIONS"
