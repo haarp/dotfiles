@@ -22,6 +22,21 @@ do
 	[[ -f "$_file" ]] && . "$_file"
 done; unset _file
 
+## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
+for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
+do
+	[[ -d "$_dir" ]] || continue
+	[[ -L "$_dir" ]] && continue	# for merged-usr setups
+	[[ "$PATH" =~ ":$_dir" ]] && continue
+	PATH="$_dir:$PATH"
+done; unset _dir
+
+## Set CDPATH (works like $PATH but for `cd`)
+## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
+####CDPATH=".:~:/"
+
+
+
 if true; then																												#-#
 	## Master Shell
 	# Add certain dotfiles from home for deployment via BASHRC
@@ -86,19 +101,6 @@ else																														#-#
 	fi
 fi																															#-#
 
-
-## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
-for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin #/usr/lib/distcc/bin
-do
-	[[ -d "$_dir" ]] || continue
-	[[ -L "$_dir" ]] && continue	# for merged-usr setups
-	[[ "$PATH" =~ ":$_dir" ]] && continue
-	PATH="$_dir:$PATH"
-done; unset _dir
-
-## Set CDPATH (works like $PATH but for `cd`)
-## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
-####CDPATH=".:~:/"
 
 ## Reset locales that don't exist on a machine (make perl shut the fuck up, fix mc charset(LANG+LC_NUMERIC))
 _locales=$(locale -a 2>/dev/null) ##&& _locales="${_locales//utf8/UTF-8}"
