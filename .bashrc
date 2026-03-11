@@ -538,16 +538,16 @@ alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
 alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
 alias hexencode='od -A none -t x1'
 alias hexencode2='od -A none -t x2'
-alias yt-dlp="yt-dlp -o '%(title)s.%(ext)s' --embed-metadata"	# cleaner filename, chapter info and stuff
-alias yt-dlp-subs="yt-dlp --all-subs"
-alias yt-dlp-audio="yt-dlp -xf	'(bestaudio/best)[ext=m4a][abr>240]/(bestaudio/best)[ext=mp4][abr>240]/
-										mp3-320/(bestaudio/best)[ext=mp3][abr=320]/
-										aac-hi/22/(bestaudio/best)[ext=m4a]/(bestaudio/best)[ext=mp4]/
-										(bestaudio/best)[ext=mp3]/
-										(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]'"
-alias yt-dlp-audio-thumb="yt-dlp-audio --embed-thumbnail"	# only use when thumb not already included! (needs atomicparsley for mp4)
-alias yt-dlp-audio-index="yt-dlp-audio -o '%(playlist_index)02d - %(title)s.%(ext)s'"	# index albums/playlists
-alias yt-dlp-audio-index-thumb="yt-dlp-audio -o '%(playlist_index)02d - %(title)s.%(ext)s' --embed-thumbnail"
+alias yt-dlp='yt-dlp -o "%(title)s.%(ext)s" --embed-metadata'	# cleaner filename, chapter info and stuff
+alias yt-dlp-subs='yt-dlp --all-subs'
+alias yt-dlp-audio='yt-dlp -xf "(bestaudio/best)[ext=m4a][abr>240]/(bestaudio/best)[ext=mp4][abr>240]/
+								mp3-320/(bestaudio/best)[ext=mp3][abr=320]/
+								aac-hi/22/(bestaudio/best)[ext=m4a]/(bestaudio/best)[ext=mp4]/
+								(bestaudio/best)[ext=mp3]/
+								(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]"'
+alias yt-dlp-audio-thumb='yt-dlp-audio --embed-thumbnail'	# only use when thumb not already included! (needs atomicparsley for mp4)
+alias yt-dlp-audio-index='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s"'	# index albums/playlists
+alias yt-dlp-audio-index-thumb='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s" --embed-thumbnail'
 alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
 alias format='echo "\\e[Zmfoo OR \\e[XYmfoo"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m \e[5m5:slow-blink\e[0m\n\e[6m6:fast-blink\e[0m\e[7m7:flip-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n21: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
