@@ -32,87 +32,98 @@ import = [
   # Cobalt2, oxocarbon, monokai_charcoal
 ]
 
-[bell]
-animation = "Ease"
-duration = 75
-
-[colors]
-draw_bold_text_with_bright_colors = true
-
-# My traditional term colors
-# Termux color mappings in comments
-[colors.primary]
-background = "#181818"			#background i.e. default bg
-foreground = "#d8d8d8"			#foreground i.e. default text
-bright_foreground = "#eeeeec"	#color15 i.e. default bright text (\e[1m)
-##dim_foreground	#i.e. default dim text, let it autogenerate
-[colors.normal]
-black = "#2e3436"	#color0
-red = "#cc0000"		#color1
-green = "#4e9a06"	#color2
-yellow = "#b39000"	#color3
-blue = "#3465a4"	#color4
-magenta = "#75507b"	#color5
-cyan = "#06989a"	#color6
-white = "#d3d7cf"	#color7
-[colors.bright]
-black = "#555853"	#color8
-red = "#ef5c5c"		#color9
-green = "#8ae234"	#color10
-yellow = "#fce94f"	#color11
-blue = "#729fcf"	#color12
-magenta = "#ad7fa8"	#color13
-cyan = "#34e2e2"	#color14
-white = "#eeeeec"	#color15
-[colors.cursor]
-cursor = "#ee00ee"	#cursor
-
 [env]
 TERM = "xterm-256color"
 
+[window]
+# FIXME: no effect in `tabbed`
+dimensions.columns = 119
+dimensions.lines = 35
+padding.x = 1
+padding.y = 1
+opacity = 0.98
+
+[scrolling]
+history = 100000
+multiplier = 8
+
 [font]
+normal.family = "Terminus"
 {% if yadm.class == "home" %}
 size = 6.0
 {% endif $}
 {% if yadm.class == "work" %}
 size = 10.0
 {% endif %}
-normal.family = "Terminus"
+
+[colors]
+draw_bold_text_with_bright_colors = true
+# My classic term colors
+# Termux color mappings in comments
+[colors.primary]
+foreground = "#d8d8d8"			  #foreground i.e. default text
+background = "#181818"			  #background i.e. default bg
+bright_foreground = "#eeeeec"	#color15 i.e. default bright text (\e[1m)
+[colors.cursor]
+cursor = "#ee00ee"	#cursor
+[colors.normal]
+black = "#2e3436" 	#color0
+red = "#cc0000"	  	#color1
+green = "#4e9a06"	  #color2
+yellow = "#b39000"	#color3
+blue = "#3465a4"	  #color4
+magenta = "#75507b"	#color5
+cyan = "#06989a"	  #color6
+white = "#d3d7cf"	  #color7
+[colors.bright]
+black = "#555853"	  #color8
+red = "#ef5c5c"		  #color9
+green = "#8ae234"	  #color10
+yellow = "#fce94f"	#color11
+blue = "#729fcf"	  #color12
+magenta = "#ad7fa8"	#color13
+cyan = "#34e2e2"	  #color14
+white = "#eeeeec"	  #color15
+
+[bell]
+animation = "Ease"
+duration = 75
+
+[selection]
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t‘’/?;_-=#%&^"
 
 [[hints.enabled]]
-command = "xdg-open"
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩`\\\\]+"
 hyperlinks = true
 post_processing = true
-regex = "(ipfs:|ipns:|magnet:|mailto:|gemini:|gopher:|https:|http:|news:|file:|git:|ssh:|ftp:)[^\u0000-\u001F\u007F-<>\"\\s{-}\\^⟨⟩`]+"
+command = "xdg-open"
 mouse.enabled = true
 mouse.mods = "Alt"
 
-# Keybinds
 [keyboard]
 bindings = [
-	#Clipboard
+	# Clipboard
 	{ key = "C", mods = "Control|Shift", action = "Copy" },
 	{ key = "X", mods = "Control", action = "Copy" },
-	#traditional ctrl-x
+	# Traditional Ctrl-x
 	{ key = "X", mods = "Control|Alt", chars = "\u0018" },
 	{ key = "V", mods = "Control", action = "Paste" },
-	#primary selection
-	#don't use just Insert as mc uses that for select
+	# Primary selection
+	# don't use just Insert as mc uses that for select
 	{ key = "Insert", mods = "Shift", action = "PasteSelection" },
-	#Search
+	# Search
 	{ key = "Slash", mods = "Control", action = "SearchForward" },
 	{ key = "N", mods = "Control", action = "SearchFocusNext" },
 	{ key = "N", mods = "Control|Shift", action = "SearchFocusPrevious" },
-	#Misc
+	# Misc
 	{ key = "W", mods = "Control", action = "Quit" },
-	#sigkill processes
-	#but: https://github.com/alacritty/alacritty/issues/3711 so use log filename to get pid
+	# sigkill processes :D (https://github.com/alacritty/alacritty/issues/3711 -> use log filename to get pid)
 	{ key = "C", mods = "Control|Alt", command = { program = "bash", args = ["-c", "shpid=$(pgrep -P ${ALACRITTY_LOG//[^0-9]/}) && pkill -9 -P $shpid"] } },
-	#Open new instance in same dir
+	# Open new instance in same dir
 	{ key = "Return", mods = "Control|Shift", action = "SpawnNewInstance" },
-	#Open file browser
+	# Open file browser
 	{ key = "F5", mods = "Alt", command = { program = "xdg-open", args = ["."] } },
-	#Focus prompt (https://github.com/alacritty/alacritty/issues/5850#issuecomment-2342001833)
+	# Focus prompt (https://github.com/alacritty/alacritty/issues/5850#issuecomment-2342001833)
 	{ key = "Escape", action = "ToggleViMode", mode="Vi" },
 	{ key = "PageUp", mods = "Control", action = "ToggleViMode", mode = "~Search|~Vi" },
 	{ key = "PageUp", mods = "Control", action = "SearchBackward", mode = "~Search|~Vi" },
@@ -121,7 +132,7 @@ bindings = [
 	{ key = "PageUp", mods = "Control", action = "SearchBackward", mode = "Vi" },
 	{ key = "PageUp", mods = "Control", chars = "", mode = "Vi" },
 	{ key = "PageUp", mods = "Control", action = "SearchConfirm", mode = "Vi" },
-	#somehow broken
+	# somehow broken
 	{ key = "PageDown", mods = "Control", action = "ToggleViMode", mode = "~Search|~Vi" },
 	{ key = "PageDown", mods = "Control", action = "SearchForward", mode = "~Search|~Vi" },
 	{ key = "PageDown", mods = "Control", chars = "", mode = "~Search|~Vi" },
@@ -131,17 +142,4 @@ bindings = [
 	{ key = "PageDown", mods = "Control", action = "SearchConfirm", mode = "Vi" },
 ]
 
-[scrolling]
-history = 100000
-multiplier = 8
-
-[selection]
-semantic_escape_chars = ",│`|:\"' ()[]{}<>\t‘’/?;_-=#%&^"
-
-[window]
-opacity = 0.98
-# FIXME: no effect in `tabbed`
-dimensions.columns = 119
-dimensions.lines = 35
-padding.x = 1
-padding.y = 1
+# vim: set filetype=toml noexpandtab tabstop=4 shiftwidth=4
