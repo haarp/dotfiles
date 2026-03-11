@@ -668,7 +668,7 @@ function schedule() {
 	month=$(date "+%m" -d "$1")
 	shift
 
-	command="DISPLAY='$DISPLAY' PATH='$PATH'"
+	command="PATH='$PATH' DISPLAY='$DISPLAY' XAUTHORITY='$XAUTHORITY' DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS' "
 	for p in "$@"; do
 		command+="'$p' "
 	done
@@ -682,7 +682,7 @@ function schedule() {
 
 	echo "$crontab" | crontab -
 
-	echo "*** command scheduled for $(date "+%Y-%m-%d %H:%M" -d "@$schedule") ***"
+	echo "*** command scheduled for $(date "+%b %d %H:%M" -d "@$schedule") ***"
 }
 
 # Wrapper around screen to make it work with dropped privileges (https://serverfault.com/a/620149/315665)
