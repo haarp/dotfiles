@@ -4,6 +4,32 @@
 import = [
 	# custom theme
 #	"~/.config/alacritty/alacritty-theme.git/themes/oxocarbon.toml",
+  # cool themes:
+  # blood_moon, hyper: very saturated, good contrasts
+  # breeze: very good contrast, mostly accurate colors
+  # campbell: very good contrast EXCEPT dark blue, accurate colors
+  # chicago95: muted text, contrasty colors
+  # citylights: contrasty
+  # Cobalt2: pleasant blue hue, contrasty colors
+  # dracula_plus: it's ok
+  # enfocado_dark: ok, low brightness
+  # gnome_terminal: bluish hue, good contrast
+  # iterm, kitty: good contrasts, accurate colors
+  # midnight_haze: low contrast but pleasant pastel color choices
+  # monokai_charcoal: very very nice contrasts, high saturation
+  # omni: purple/pink focus, insanely bright green
+  # oxocarbon: pink focus, nice looking, mediocre contrast
+  # vesper: pink focus, ok-ish contrast
+  # pastel_dark: bad color contrast, nice text contrast
+  # pencil_dark: pleasant colors, mediocre color contrast
+  # seashells: impressive colors, blue focus, bad color contrast
+  # terminal_app, xterm: generic high-contrast
+  # ubuntu: not terrible, red hue
+  # vscode: decent enough, good color contrast
+  # wombat: saturated, excellent contrasts!
+  # zenburn: pleasant low brightness, bad contrast
+  # favs:
+  # Cobalt2, oxocarbon, monokai_charcoal
 ]
 
 [bell]
@@ -114,6 +140,7 @@ semantic_escape_chars = ",│`|:\"' ()[]{}<>\t‘’/?;_-=#%&^"
 
 [window]
 opacity = 0.98
+# FIXME: no effect in `tabbed`
 dimensions.columns = 119
 dimensions.lines = 35
 padding.x = 1
