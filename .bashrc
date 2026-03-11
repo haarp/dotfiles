@@ -423,11 +423,11 @@ alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
 #else	# CoW only
 	alias cp='cp --reflink=auto'
 #fi
-LS_OPTIONS="--human --color=auto --group-directories-first"
-alias ls="ls $LS_OPTIONS"; alias l="ls $LS_OPTIONS -lah"; alias lt="ls $LS_OPTIONS --sort=time"
+alias ls='ls --human --color=auto --group-directories-first'
+alias l="ls -la"; alias lt="ls --sort=time"
 _GREP_OPTIONS="--color=auto"
 alias grep="grep $_GREP_OPTIONS"; alias egrep="egrep $_GREP_OPTIONS"; alias fgrep="fgrep $_GREP_OPTIONS"
-unset LS_OPTIONS _GREP_OPTIONS
+unset _GREP_OPTIONS
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
 ##alias df='df -h'
 alias df2='findmnt -D'
