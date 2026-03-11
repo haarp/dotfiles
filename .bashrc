@@ -502,6 +502,7 @@ alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; slee
 #####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
 if command -v python3.8 >/dev/null; then
 	# https://stackoverflow.com/a/55501674/5424487
+	# TODO: check for newer python too
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3.8 -m http.server 8000 --bind ::'
 else
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000'	## [--bind 127.0.0.1]
@@ -549,7 +550,7 @@ alias colors='echo "\\e[Zmfoo OR \\e[XYmfoo"; echo "Z:"; echo -e "\e[0m0:reset-a
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
 alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
-alias prettyjson='python -m json.tool'
+alias prettyjson='python -m json.tool'	# alternative to `jq`
 alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
 
 
@@ -713,7 +714,6 @@ function mv() {
 }
 
 # Edit variables quickly
-# FIXME: must exist already
 function editvar() {
 	if [[ $# -eq 0 ]]; then
 		echo "Usage: $FUNCNAME <variablename>"
