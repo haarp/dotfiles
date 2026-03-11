@@ -390,10 +390,10 @@ if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 	echo "Last login: $_start from $_addr on $_tty"
 	unset _read _user _tty _addr _start _ _end _dur
 	uptime
-	ip -o addr show scope global primary | while read _ _iface _ _ip _; do
+	ip -o addr show scope global primary | while read _junk _iface _junk _ip _junk; do
 		[[ "$_iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
 		echo "$_iface $_ip"
-	done; unset _ _iface _ip
+	done; unset _junk _iface _ip
 fi
 # Mail notification (regular one [and motd] isn't shown because we aren't considered an "interactive" shell anymore)
 [[ "$MAIL" ]] || MAIL="/var/mail/$USER"
