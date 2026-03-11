@@ -504,9 +504,8 @@ alias less2='LESSOPEN="" less'		# don't open in fucking hex mode
 alias hexdump='hexdump -C'	# better display
 alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'	# pretend you're busy =D
 #####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
-if command -v python3.8 >/dev/null; then
+if [[ $(<<< $'Python 3.8\nPython 3.12' sort -V | head -n1) == "Python 3.8" ]]; then
 	# https://stackoverflow.com/a/55501674/5424487
-	# TODO: check for newer python too
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3.8 -m http.server 8000 --bind ::'
 else
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000'	## [--bind 127.0.0.1]
