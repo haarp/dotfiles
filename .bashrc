@@ -454,7 +454,7 @@ else
 	alias lopri='ionice -c3 nice -n15'
 fi
 alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
-alias reset='tput reset'	# same but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
+alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
 command -v beep >/dev/null || alias beep='echo -ne "\a"'
 alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
 complete -o filenames -F _emerge xemerge demerge
