@@ -113,6 +113,34 @@ do
 done
 unset _locales _fallback _cat
 
+## Colors! Formatting! (https://en.wikipedia.org/wiki/ANSI_escape_code)
+# TODO: 58,59 underline color
+# formatting
+declare -A f=(
+	[reset]=$'\e[0m'
+	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [underline]=$'\e[4m' [blink]=$'\e[5m'
+	[Blink]=$'\e[6m' [inverse]=$'\e[7m' [hidden]=$'\e[8m' [strikethrough]=$'\e[9m'
+	[unbolddim]=$'\e[22m' [unitalic]=$'\e[23m' [ununderline]=$'\e[24m' [unblink]=$'\e[25m'
+	[unBlink]=$'\e[26m' [uninverse]=$'\e[27m' [unhidden]=$'\e[28m' [unstrikethrough]=$'\e[29m'
+
+)
+# normal/high-intensity foreground colors
+declare -A fg=(
+	[black]=$'\e[30m' [red]=$'\e[31m' [green]=$'\e[32m' [yellow]=$'\e[33m'
+	[blue]=$'\e[34m' [magenta]=$'\e[35m' [cyan]=$'\e[36m' [white]=$'\e[37m'
+	[Black]=$'\e[90m' [Red]=$'\e[91m' [Green]=$'\e[92m' [Yellow]=$'\e[93m'
+	[Blue]=$'\e[94m' [Magenta]=$'\e[95m' [Cyan]=$'\e[96m' [White]=$'\e[97m'
+	[reset]=$'\e[39m' [BLACK]=$'\e[38;5;232m'
+)
+# normal/high-intensity background colors
+declare -A bg=(
+	[black]=$'\e[40m' [red]=$'\e[41m' [green]=$'\e[42m' [yellow]=$'\e[43m'
+	[blue]=$'\e[44m' [magenta]=$'\e[45m' [cyan]=$'\e[46m' [white]=$'\e[47m'
+	[Black]=$'\e[100m' [Red]=$'\e[101m' [Green]=$'\e[102m' [Yellow]=$'\e[103m'
+	[Blue]=$'\e[104m' [Magenta]=$'\e[105m' [Cyan]=$'\e[106m' [White]=$'\e[107m'
+	[reset]=$'\e[49m' [BLACK]=$'\e[48;5;232m'
+)
+
 ## Colorful bash prompt with goodies
 ## ref: http://misc.flogisoft.com/bash/tip_colors_and_formatting - wrap in \[ \] to prevent char offset
 ## note: some weird unicode chars only work correctly with terminus-font
