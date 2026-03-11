@@ -40,9 +40,6 @@ if true; then																												#-#
 		LC_BASHRC+="touch -d @$(stat --printf=%Y "$HOME/$_file") \"\$HOME/$_file\" 2>/dev/null"$'\n'						#-#
 
 ##		LC_BASHRC+="fi"$'\n'																								#-#
-
-	# And do some replacements in BASHRC depending on whether we are root (use 'if' so shell doesn't see exit code)
-	LC_BASHRC+="if [[ \$EUID == 0 ]]; then sed -i -e 's/256-defbg/256root-defbg/' \"\$HOME/.config/mc/ini\" 2>/dev/null; fi"$'\n'	#-#
 	done; unset _shared_dotfiles _file _content																				#-#
 
 	# If any of above failed, don't pollute exit code
