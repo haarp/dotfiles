@@ -428,6 +428,13 @@ alias l="ls -la"; alias lt="ls --sort=time"
 _GREP_OPTIONS="--color=auto"
 alias grep="grep $_GREP_OPTIONS"; alias egrep="egrep $_GREP_OPTIONS"; alias fgrep="fgrep $_GREP_OPTIONS"
 unset _GREP_OPTIONS
+# mc: set theme, disable annoying mouse
+if [[ $EUID -eq 0 ]]; then	_MC_SKIN="modarin256root-defbg"
+else						_MC_SKIN="modarin256-defbg"
+fi
+[[ -f "/usr/share/mc/skins/$_MC_SKIN-thin.ini" ]] && _MC_SKIN+="-thin"
+alias mc="mc -S $_MC_SKIN -d"; alias mcdiff="mcdiff -S $_MC_SKIN -d"; alias mcedit="mcedit -S $_MC_SKIN -d"; alias mcview="mcview -S $_MC_SKIN -d"
+unset _MC_SKIN
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
 ##alias df='df -h'
 alias df2='findmnt -D'
@@ -493,13 +500,6 @@ alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no 
 complete -F _comp_cmd_scp scpnokey
 alias scp-resume='rsync --partial --progress --rsh=ssh'
 alias glxgears='vblank_mode=0 glxgears'	# no vsync
-# mc: set theme, disable annoying mouse
-if [[ $EUID -eq 0 ]]; then	_MC_SKIN="modarin256root-defbg"
-else						_MC_SKIN="modarin256-defbg"
-fi
-[[ -f "/usr/share/mc/skins/$_MC_SKIN-thin.ini" ]] && _MC_SKIN+="-thin"
-alias mc="mc -S $_MC_SKIN -d"; alias mcdiff="mcdiff -S $_MC_SKIN -d"; alias mcedit="mcedit -S $_MC_SKIN -d"; alias mcview="mcview -S $_MC_SKIN -d"
-unset _MC_SKIN
 alias less2='LESSOPEN="" less'		# don't open in fucking hex mode
 alias hexdump='hexdump -C'	# better display
 alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'	# pretend you're busy =D
