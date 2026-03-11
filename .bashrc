@@ -147,7 +147,6 @@ declare -A bg=(
 # Get started
 PROMPT_COMMAND=()
 PS1=""
-
 # bottom line status bar (https://mdk.fr/blog/how-apt-does-its-fancy-progress-bar.html, https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html)
 ###PS1+='\033[s'			# save cursor position
 ###PS1+="\033[$LINES;0f"		# go to bottom line
@@ -156,96 +155,69 @@ PS1=""
 ###PS1+="\033[0;$((LINES-1))r"	# reserve bottom line
 ###PS1+='\033[u'			# restore cursor position
 # reset to all bold black text
-PS1+='\[\e[0;1;38;5;232m\]'
-# if exit status >0: lyellow bg exit code (useful symbol: ↯)
+PS1+='\[${f[reset]}${f[bold]}${fg[BLACK]}\]'
+# if exit status >0: exit code (useful symbol: ↯)
 PROMPT_COMMAND+=("_RET=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
 PS1+='$(
 	if [[ $_RET -gt 0 ]]; then
-		echo -n "\[\e[103m\]$_RET"
+		echo -n "\[${bg[Yellow]}\]$_RET"
 	fi
 )'
-# if root: lred bg host, if luser: lgreen bg user@host; use darker color if inside ssd ($EUID is bashism)
+# user/host depending on root or luser, darker color inside ssd ($EUID is bashism)
 if [[ $EUID == 0 ]]; then
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[\e[41m\]\h'
-	else				PS1+='\[\e[101m\]\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[red]}\]\h'
+	else							PS1+='\[${bg[Red]}\]\h'
 	fi
 else
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[\e[102m\]\u@\[\e[42m\]\h'
-	else				PS1+='\[\e[102m\]\u@\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[Green]}\]\u@\[${bg[green]}\]\h'
+	else							PS1+='\[${bg[Green]}\]\u@\h'
 	fi
 fi
-# if screen sessions >0: lwhite bg screen session count
+# if screen sessions >0: session count
 PS1+='$(
 	shopt -s nullglob
 	sessions=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*)
 	if [[ $sessions ]]; then
-		echo -n "\[\e[107m\]${#sessions[@]}"
+		echo -n "\[${bg[White]}\]${#sessions[@]}"
 	fi
 )'
-# if jobs >0: lcyan bg job count
+# if jobs >0: job count
 PS1+='$(
 	if [[ \j -gt 0 ]]; then
-		echo -n "\[\e[106m\]\j"
+		echo -n "\[${bg[Cyan]}\]\j"
 	fi
 )'
-# lblue bg pwd; use darker color if pwd not writable
+# pwd; darker color if not writable
 PS1+='\[$(
 	if [[ -w . ]]; then
-		echo -n "\e[104m"
+		echo -n "${bg[Blue]}"
 	else
-		echo -n "\e[44m"
+		echo -n "${bg[blue]}"
 	fi
 )\]\W'
-# lmagenta bg git info (useful symbols: git= modified=✎ conflicts=✼)
-# grab git info, but if it takes too long (exit=124), just fake output (i.e. repo presence detection only)
-# optionally, use -uno to skip untracked changes and speed up git
-# FIXME: always assumes existence of repo on timeout
-PS1+='$(
-	readarray -n 100 -t status <<< $(LANG=C GIT_OPTIONAL_LOCKS=0 timeout 1s git status --branch --porcelain=v1 2>/dev/null; [[ $? == 124 ]] && echo "timeout")
-	if [[ "$status" == "timeout" ]]; then
-		echo -n "\[\e[105m\]•\[\e[49;95m\]"
-	elif [[ "$status" ]]; then
-		echo -n "\[\e[105m\]"
-		# active branch (if ! master)
-		branch="${status[0]#### }"; branch="${branch%%...*}"
-		[[ $branch == "master" || $branch == "main" ]] || echo -n "$branch"
-		# commits ahead/behind remote
-		if [[ ${status[0]} =~ "[" ]]; then
-			commits="${status[0]#*[}"; commits="${commits//[\\], ]}"
-			commits="${commits/ahead/↑}"; commits="${commits/behind/↓}"
-			echo -n "$commits"
-		fi
-		# stashed changes
-		stashed=$(git stash list)
-		if [[ $stashed ]]; then
-			readarray stashed <<< "$stashed"
-			echo -n "■${#stashed[@]}"
-		fi
-		# staged changes
-		git diff --cached --quiet 2>/dev/null || echo -n "✔"
-		# unstaged/untracked changes
-		i=1
-		while [[ ${status[i]} ]]; do
-			if [[ ${status[i]} =~ ^A ]]; then	# staged changes, ignore
-				((i++))
-				continue
-			else
-				echo -n "±"
-				break
-			fi
-		done
-		# default bg lmagenta fg
-		echo -n "\[\e[49;95m\]"
-	else
-		#default bg lblue fg
-		echo -n "\[\e[49;94m\]"
+# git prompt Mk.2
+for _gp in	/usr/share/git/git-prompt.sh \
+			/usr/lib/git-core/git-sh-prompt
+do
+	if [[ -e "$_gp" ]]; then
+		. "$_gp"
+		GIT_PS1_SHOWCOLORHINTS=''	# uses 0-code to do resets :(
+		GIT_PS1_STATESEPARATOR=''
+		GIT_PS1_SHOWDIRTYSTATE=1
+		GIT_PS1_SHOWSTASHSTATE=1
+		GIT_PS1_SHOWUNTRACKEDFILES=1
+		GIT_PS1_SHOWUPSTREAM="auto"
+		GIT_PS1_SHOWCONFLICTSTATE="yes"
+		PS1+='$(__git_ps1 "\[${bg[Magenta]}\]%s")'
 	fi
-)'
-# right-pointing triangle, reset prompt attributes
-PS1+='\[\e[0m\]'
+done; unset _gp
+
+# right-pointing triangle, and reset formatting
+# FIXME: can't get transparent background with inverse :<
+PS1+='\[${fg[BLACK]}${f[inverse]}\]\[${f[reset]}\]'
 
 # Secondary prompt (e.g. missing closing quotes)
-PS2='\[\e[33m\]\[\e[0m\]'
+PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 
 
 # Re-enable echo with each prompt (view term settings with stty -a)
