@@ -1584,7 +1584,7 @@ function $wrapper_function_name {
 
 ## Terminal title
 # moved to bottom because other directives impact startup performance and can seriously mess up the DEBUG trap
-# Running prompt: Show info, time and last cmd's runtime
+# Showing prompt: Show info, time and last cmd's runtime
 # Running command: show command, hostname, start time
 # FIXME: BASH_COMMAND contains inline foo=bar parameters
 function settermtitle() {
@@ -1615,10 +1615,13 @@ function _show_time() {
 	fi
 }
 function _clean_command() {
-	local cmd="$BASH_COMMAND"
-	cmd="${cmd##*=!( \t) }"	# strip foo=bar assignments (FIXME: "foo x=z foo bar" misinterprets parameters as env)
-	cmd="${cmd%% *}"		# strip everything after, and including, the first space
-	echo "$cmd"
+	local cmd p start=''
+
+	read -a cmd <<< "$BASH_COMMAND"
+	for i in "${!cmd[@]}"; do
+		[[ "${cmd[i]}" =~ '=' ]] || break
+	done
+	echo "${cmd[i]}"
 }
 PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]:$DIRSTACK $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
 PROMPT_COMMAND+=('unset _timer')
