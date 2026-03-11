@@ -10,12 +10,6 @@
 ## Don't bother inside mc
 [[ $MC_SID ]] && return																										#-#
 
-## Turn us into a var suitable for OpenSSH's default AcceptEnv
-## also strip leading whitespace, empty lines, comments and lines ending in #-# when creating the variable
-## NOTE: Once this variable becomes too large, dropbear will fail! https://github.com/mkj/dropbear/issues/177
-## NOTE: https://github.com/cdown/sshrc also exists. didn't know that. huh.
-export LC_BASHRC=$(sed -e '/#-#$/d' -e 's/^[\t ]*//' -e '/^$/d' -e 's/\t\+#.*$//' -e '/^#/d' ~/.bashrc)$'\n'				#-#
-
 ## Source various files, if they exist, in given order
 for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc
 do
@@ -35,7 +29,11 @@ done; unset _dir
 ## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
 ####CDPATH=".:~:/"
 
-
+## Turn us into a var suitable for OpenSSH's default AcceptEnv
+## also strip leading whitespace, empty lines, comments and lines ending in #-# when creating the variable
+## NOTE: Once this variable becomes too large, dropbear will fail! https://github.com/mkj/dropbear/issues/177
+## NOTE: https://github.com/cdown/sshrc also exists. didn't know that. huh.
+export LC_BASHRC=$(sed -e '/#-#$/d' -e 's/^[\t ]*//' -e '/^$/d' -e 's/\t\+#.*$//' -e '/^#/d' ~/.bashrc)$'\n'				#-#
 
 if true; then																												#-#
 	## Master Shell
