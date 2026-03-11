@@ -362,9 +362,11 @@ export LESS="$LESS -RiKM --follow-name"
 export SYSTEMD_LESS="$LESS -F"
 # Don't want less search history (but if I did, it would be in ~/.local/state/!)
 export LESSHISTFILE="/dev/null"
-# newer/different lesspipe offers syntax highlighting??
-###export LESSCOLOR="always"
-# different approach to syntax highlighting, needs source-highlight (based on https://unix.stackexchange.com/q/191487/138699)
+# Basic lesspipe, not necessarily installed
+command -v lesspipe >/dev/null && source <(lesspipe)
+export LESSCOLOR="always"
+# Different approach to syntax highlighting, needs source-highlight (based on https://unix.stackexchange.com/q/191487/138699)
+# not necessarily installed
 command -v source-highlight >/dev/null && \
 	export LESSOPEN='|f=%s; lp="$(lesspipe "$f")"; if [[ "$lp" ]]; then echo "$lp"; else source-highlight -i "$f" -o STDOUT -f esc 2>/dev/null; fi'
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
