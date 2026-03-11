@@ -334,7 +334,11 @@ export VIEWER=less
 export PAGER=less
 
 ## Colorful ls
-[[ -e ~/LS_COLORS ]] && source <(dircolors ~/LS_COLORS)
+if which dircolors >/dev/null; then
+	if [[ -r ~/.dircolors ]]; then	source <(dircolors -b ~/.dircolors)
+	else							source <(dircolors -b)
+	fi
+fi
 
 ## Colorful less and manpages
 export GROFF_NO_SGR=1
