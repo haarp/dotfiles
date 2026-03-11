@@ -1618,10 +1618,10 @@ function _clean_command() {
 	local cmd p start=''
 
 	read -a cmd <<< "$BASH_COMMAND"
-	for i in "${!cmd[@]}"; do
-		[[ "${cmd[i]}" =~ '=' ]] || break
+	for c in "${cmd[@]}"; do
+		[[ "$c" =~ '=' ]] || break
 	done
-	echo "${cmd[i]}"
+	echo "$c"
 }
 PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]:$DIRSTACK $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
 PROMPT_COMMAND+=('unset _timer')
