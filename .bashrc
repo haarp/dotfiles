@@ -649,15 +649,14 @@ function yubi() {
 function schedule() {
 	if [[ $# -lt 2 ]]; then
 		echo "Schedule one-off task using cron with flexible datestring"
-		echo "Usage: $FUNCNAME '<datestring>' <command>"
+		echo "Usage: $FUNCNAME '<datestring>' <command> [parm]..."
 		return 1
 	fi
 
-	local schedule now
+	local schedule
 	schedule=$(date "+%s" -d "$1") || return 2
-	now=$(date "+%s")
-	if [[ $(( $schedule - $now )) -lt 5 ]]; then
-		echo "Scheduled date lies less than a few seconds ahead, aborting!"
+	if [[ $(( $schedule - $EPOCHSECONDS )) -lt 60 ]]; then
+		echo "Scheduled date lies less than a minute ahead, aborting!"
 		return 3
 	fi
 
