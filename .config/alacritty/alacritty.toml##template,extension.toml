@@ -1,4 +1,6 @@
+{% if yadm.class == "home" %}
 [general]
+{% endif %}
 import = [
 	# custom theme
 #	"~/.config/alacritty/alacritty-theme.git/themes/oxocarbon.toml",
@@ -43,7 +45,12 @@ cursor = "#ee00ee"	#cursor
 TERM = "xterm-256color"
 
 [font]
+{% if yadm.class == "home" %}
 size = 6.0
+{% endif $}
+{% if yadm.class == "work" %}
+size = 10.0
+{% endif %}
 normal.family = "Terminus"
 
 [[hints.enabled]]
