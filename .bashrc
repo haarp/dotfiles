@@ -463,6 +463,7 @@ fi
 alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
 alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
 command -v beep >/dev/null || alias beep='echo -ne "\a"'
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'	# from Debian bashrc, alert to be used with long-running commands
 alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
 complete -o filenames -F _emerge xemerge demerge
 alias xorgmerge='emerge -av1 --jobs=4 @x11-module-rebuild'
