@@ -61,29 +61,29 @@ draw_bold_text_with_bright_colors = true
 # My classic term colors
 # Termux color mappings in comments
 [colors.primary]
-foreground = "#d8d8d8"			  #foreground i.e. default text
-background = "#181818"			  #background i.e. default bg
+foreground = "#d8d8d8"			#foreground i.e. default text
+background = "#181818"			#background i.e. default bg
 bright_foreground = "#eeeeec"	#color15 i.e. default bright text (\e[1m)
 [colors.cursor]
 cursor = "#ee00ee"	#cursor
 [colors.normal]
 black = "#2e3436" 	#color0
-red = "#cc0000"	  	#color1
-green = "#4e9a06"	  #color2
+red = "#cc0000"		#color1
+green = "#4e9a06"	#color2
 yellow = "#b39000"	#color3
-blue = "#3465a4"	  #color4
+blue = "#3465a4"	#color4
 magenta = "#75507b"	#color5
-cyan = "#06989a"	  #color6
-white = "#d3d7cf"	  #color7
+cyan = "#06989a"	#color6
+white = "#d3d7cf"	#color7
 [colors.bright]
-black = "#555853"	  #color8
-red = "#ef5c5c"		  #color9
-green = "#8ae234"	  #color10
+black = "#555853"	#color8
+red = "#ef5c5c"		#color9
+green = "#8ae234"	#color10
 yellow = "#fce94f"	#color11
-blue = "#729fcf"	  #color12
+blue = "#729fcf"	#color12
 magenta = "#ad7fa8"	#color13
-cyan = "#34e2e2"	  #color14
-white = "#eeeeec"	  #color15
+cyan = "#34e2e2"	#color14
+white = "#eeeeec"	#color15
 
 [bell]
 animation = "Ease"
