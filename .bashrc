@@ -228,7 +228,7 @@ PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 # Add final newline when running command missed it
 # https://news.ycombinator.com/item?id=23520240 https://www.vidarholen.net/contents/blog/?p=878
 ##PROMPT_COMMAND+=('printf "⏎%$((COLUMNS-1))s\\r\\033[K"')
-PROMPT_COMMAND+=('printf "\e[100m↵\e[49m%$((COLUMNS-1))s\\r"')
+PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
 
 
 ## Readline binds
@@ -340,15 +340,15 @@ if which dircolors >/dev/null; then
 	fi
 fi
 
-## Colorful less and manpages
+## Colorful less and manpages (https://unix.stackexchange.com/a/108840)
 export GROFF_NO_SGR=1
-export LESS_TERMCAP_mb=$'\e[5;1;31m'	# begin blinking
-export LESS_TERMCAP_md=$'\e[1;34m'		# begin bold
-export LESS_TERMCAP_me=$'\e[25;21;39m'	# end mode
-export LESS_TERMCAP_so=$'\e[43m'		# begin standout-mode (status line, search terms)
-export LESS_TERMCAP_se=$'\e[49m'		# end standout-mode
-export LESS_TERMCAP_us=$'\e[4;35m'		# begin underline
-export LESS_TERMCAP_ue=$'\e[24;39m'		# end underline
+export LESS_TERMCAP_md="${f[bold]}${fg[blue]}"						# begin bold
+export LESS_TERMCAP_mb="${f[blink]}${f[bold]}${fg[red]}"			# begin blinking
+export LESS_TERMCAP_me="${f[unblink]}${f[unbolddim]}${fg[reset]}"	# end mode
+export LESS_TERMCAP_so="${bg[yellow]}"								# begin standout (status line, search terms)
+export LESS_TERMCAP_se="${bg[reset]}"								# end mode
+export LESS_TERMCAP_us="${f[underline]}${fg[magenta]}"				# begin underline
+export LESS_TERMCAP_ue="${f[ununderline]}${fg[reset]}"				# end mode
 
 ## Some aliasless defaults
 export WHOIS_OPTIONS="-H"
@@ -384,7 +384,7 @@ function command_not_found_handle {
 ## Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
 # Only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
 if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-	echo -e "\e[46m$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)\e[0m"
+	echo -e "${bg[cyan]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
 	_last=$(last -n 2 --fullnames --time-format iso $USER)
 	read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
 	echo "Last login: $_start from $_addr on $_tty"
@@ -697,7 +697,7 @@ function screen() {
 # Make a bash function runnable as a binary (use with nice, screen, etc.)
 function asbin() {
 	export -f "$1" && \
-	echo -e "\e[9m$1\e[29m → bash -c '$1'"
+	echo "${f[strikethrough]}$1${f[unstrikethrough]} → bash -c '$1'"
 }
 
 # Edit filenames quickly by calling mv with only one arg
