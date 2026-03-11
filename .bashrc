@@ -467,9 +467,10 @@ complete -F _ping resolve resolve4 resolve6
 alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (potentially misleadingly slow) reverse DNS lookups on each reply
 alias traceroute='traceroute -n'	# also don't do misleading rDNS queries
 alias suicide='unset HISTFILE; exit'	# exit without saving history
-alias nh='unset HISTFILE'
-alias hs='history -a'			# save history
+alias nh='echo "History saving disabled!"; unset HISTFILE'
+alias hs='echo "Saving history now!"; history -a'
 alias hgrep='history | grep'	# history grep
+alias whoops='history -d -1; history -d -1'	# purge last command from history (and whoops itself)
 alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
 complete -F _comp_cmd_killall stopall contall
 alias winedesktop='wine explorer /desktop=Wine,1024x768'
@@ -727,11 +728,6 @@ function editvar() {
 	else
 		export -n $1="$newvar"	# set and unexport (wasn't exported to begin with)
 	fi
-}
-
-# Purge last command from history, leaving not even a trace
-function whoops() {
-	history -d -1
 }
 
 # Give information about arg command
