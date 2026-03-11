@@ -196,8 +196,7 @@ PS1+='\[$(
 	fi
 )\]\W'
 # git prompt Mk.2
-for _gp in	/usr/share/git/git-prompt.sh \
-			/usr/lib/git-core/git-sh-prompt
+for _gp in	/usr/share/git/git-prompt.sh /usr/lib/git-core/git-sh-prompt
 do
 	if [[ -e "$_gp" ]]; then
 		. "$_gp"
