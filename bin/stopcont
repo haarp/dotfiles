@@ -24,15 +24,19 @@ pidtree() (
 # gotta make this a process group killer
 # or various xinputs would be left over afterwards
 exit() {
-	kill -- -$$
+##	kill -- -$$
+	# fuck you, fuck this, i don't give a fuck anymore, just kill everything
+	killall xprop xinput
+	command exit "$@"
 }
 
 
 # allow keyboard cancel
 # keyboard names may be duplicates :<
-kbds=(); for id in $(xinput list --id-only); do
+kbds=(); while read id; do
+	id="${id#∼ }"	# remove weird shit from name of "floating" switched off devices
 	xinput list --name-only "$id" | grep -qi 'keyboard' && kbds+=("$id")
-done
+done <<< $(xinput list --id-only)
 for kbd in "${kbds[@]}"; do
 	# we can't get xinput's pid in this pipe :<
 	xinput test "$kbd" | while read line; do
@@ -44,7 +48,7 @@ done
 
 pid=$(xprop _NET_WM_PID)
 pid=${pid#_NET_WM_PID(CARDINAL) = }
-[[ $pid ]] || exit 1
+[[ "$pid" ]] || exit 1
 kill -0 $pid 2>/dev/null || {
 	echo "PID \`$pid\` unusable!"
 	exit 1
