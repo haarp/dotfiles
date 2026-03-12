@@ -1,0 +1,77 @@
+#!/bin/bash
+# Thumbnailer for various file types
+# https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailers
+# needs associated .thumbnailer file (doesn't use $PATH)
+# don't forget to restart tumblerd and thunar
+
+INPUT="$1"
+OUTPUT="$2"
+SIZE="$3"
+URL="$4"
+TYPE="$5"
+
+image_thumb() {
+	convert -thumbnail "$3" "$1" "$2" &>/dev/null
+}
+media_thumb() {
+	ffmpeg -i "$1" -an -vf scale="'if(gt(iw\,ih),$3,-1)':'if(gt(iw\,ih),-1,$3)'" -y "$2" &>/dev/null
+}
+text_thumb() {
+	local contents="$(<"$1")"
+	convert -size 210x290 -background white -pointsize 5 -border 10x10 -bordercolor gray80 caption:"${contents:0:1600}" "$2"
+}
+model_thumb() {
+	case $(xdg-mime query filetype "$1") in
+		application/x-openscad)
+			openscad --imgsize $3,$3 -o "$2" "$1" &>/dev/null
+			;;
+		# https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/STL_Import_and_Export
+		model/*|image/vnd.dxf)
+			echo "import(\"$1\", convexity=10);" | openscad --imgsize $3,$3 -o "$2" - &>/dev/null
+			;;
+		*)
+			return 1
+			;;
+	esac
+}
+
+fail() {
+	gdbus call --session --dest=org.freedesktop.thumbnails.Cache1 --object-path /org/freedesktop/thumbnails/Cache1 \
+		--method org.freedesktop.thumbnails.Cache1.Delete "['$URL']" >/dev/null
+	exit 1
+}
+
+case $TYPE in
+	# cover art for audio files
+	cover)
+		media_thumb "$INPUT" "$OUTPUT" "$SIZE"
+		;;
+	# folder/cover files (https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_folders)
+	folder)
+		for f in "$INPUT"/{.,}{folder,cover}.{png,jpg,jpeg}; do
+			if [[ -s "$f" ]]; then
+				image_thumb "$f" "$OUTPUT" "$SIZE" && break
+			fi
+		done
+		if [[ ! -s "$OUTPUT" ]]; then
+			# or try first music file
+			GLOBSORT='+name'	# bash-5.3+
+			files="$(file --mime-type --no-pad -F':::' "$INPUT"/* | grep '::: audio/.\+$')"
+			firstfile="${files%%:::*}"
+			[[ -s "$firstfile" ]] && media_thumb "$firstfile" "$OUTPUT" "$SIZE"
+		fi
+		;;
+	# any text (https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_text-based_documents)
+	text)
+		text_thumb "$INPUT" "$OUTPUT"
+		;;
+	# 3D models (https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_stl_content)
+	model)
+		model_thumb "$INPUT" "$OPUTPUT" "$SIZE"
+		;;
+	*)
+		exit 1
+		;;
+esac || fail
+
+[[ -s "$OUTPUT" ]] || fail
