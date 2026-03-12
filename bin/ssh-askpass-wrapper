@@ -4,6 +4,13 @@
 
 # Refer to pinentry's Assuan protocol
 
+TOOL='pinentry-qt5'	# QT5 version allows doing shit in the background like copying a password
+
+which "$TOOL" >/dev/null || {
+	echo "Tool $TOOL not found!" >&2
+	exit 3
+}
+
 # avoid leading whitespace
 # avoid percent sign (convert to %25)
 desc="${*//%/%25}"
@@ -19,7 +26,7 @@ else
 	commands+=$'\n'"GETPIN"
 fi
 
-reply=$(pinentry-qt5 <<< "$commands" 2>/dev/null)	# QT5 version allows doing shit in the background like copying a password
+reply=$(pinentry-qt5 <<< "$commands" 2>/dev/null)
 
 # Debug
 ##echo "Commands:" >&2
@@ -42,3 +49,5 @@ else
 	fi
 	exit 0
 fi
+
+# vim: set noexpandtab tabstop=4 shiftwidth=4 wrap
