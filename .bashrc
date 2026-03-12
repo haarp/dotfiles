@@ -350,6 +350,9 @@ export LESS_TERMCAP_se="${bg[reset]}"								# end mode
 export LESS_TERMCAP_us="${f[underline]}${fg[magenta]}"				# begin underline
 export LESS_TERMCAP_ue="${f[ununderline]}${fg[reset]}"				# end mode
 
+## Colorful GCC warnings and errors
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 ## Some aliasless defaults
 export WHOIS_OPTIONS="-H"
 export XZ_DEFAULTS="--threads=0"
