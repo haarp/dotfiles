@@ -1,26 +1,65 @@
 #!/bin/bash
-# TODO: cancel? somehow?
 # FIXME: doesn't work for firejail'ed windows (https://github.com/netblue30/firejail/discussions/5967)
+# or tabbed because it sets no _NET_WM_PID
 
-pid=$(xprop _NET_WM_PID)
-pid=${pid#_NET_WM_PID(CARDINAL) = }
-kill -0 $pid || exit 1
+# https://superuser.com/a/784102
+pidtree() (
+	children=()
+	while read p pp; do
+		children[$pp]+=" $p"
+	done <<< $(ps -e -o pid= -o ppid=)
 
-name="$(basename "$(readlink /proc/$pid/exe)")"
+	walk() {
+		for i in ${children[$1]};do
+			echo $i
+			walk $i
+		done
+	}
 
-descendant_pids() {
-    pids=$(pgrep -P $1)
-    echo $pids
-    for pid in $pids; do
-        descendant_pids $pid
-    done
+	for i in "$@";do
+		walk $i
+	done
+)
+
+# gotta make this a process group killer
+# or various xinputs would be left over afterwards
+exit() {
+	kill -- -$$
 }
 
 
+# allow keyboard cancel
+# keyboard names may be duplicates :<
+kbds=(); for id in $(xinput list --id-only); do
+	xinput list --name-only "$id" | grep -qi 'keyboard' && kbds+=("$id")
+done
+for kbd in "${kbds[@]}"; do
+	# we can't get xinput's pid in this pipe :<
+	xinput test "$kbd" | while read line; do
+		if [[ "$line" == "key release 9" ]]; then
+			exit 1
+		fi
+	done &
+done
+
+pid=$(xprop _NET_WM_PID)
+pid=${pid#_NET_WM_PID(CARDINAL) = }
+[[ $pid ]] || exit 1
+kill -0 $pid 2>/dev/null || {
+	echo "PID \`$pid\` unusable!"
+	exit 1
+}
+
+name="$(basename "$(readlink /proc/$pid/exe)")"
+
 if grep -q ^State:$'\t'T /proc/$pid/status; then
 	notify-send -i media-playback-start "${0##*/}" "Continuing $name"
-	kill -CONT $pid $(descendant_pids $pid)
+	kill -CONT $pid $(pidtree $pid)
 else
 	notify-send -i media-playback-pause "${0##*/}" "Stopping $name"
-	kill -STOP $pid $(descendant_pids $pid)
+	kill -STOP $pid $(pidtree $pid)
 fi
+
+exit 0
+
+# vim: set noexpandtab tabstop=4 shiftwidth=4 wrap
