@@ -362,9 +362,6 @@ export LESS="$LESS -RiKM --follow-name"
 export SYSTEMD_LESS="$LESS -F"
 # Don't want less search history (but if I did, it would be in ~/.local/state/!)
 export LESSHISTFILE="/dev/null"
-# Basic lesspipe, not necessarily installed
-command -v lesspipe >/dev/null && source <(lesspipe)
-export LESSCOLOR="always"
 # Different approach to syntax highlighting, needs source-highlight (based on https://unix.stackexchange.com/q/191487/138699)
 # not necessarily installed
 command -v source-highlight >/dev/null && \
