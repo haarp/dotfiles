@@ -100,3 +100,6 @@
 #	git gives a shell for each commit to be changed -> change stuff
 #		git commit --amend
 #		git rebase --continue
+
+# disaster leak recovery:
+# cd ~; yadm filter-branch -f --env-filter 'GIT_AUTHOR_NAME="me"; GIT_AUTHOR_EMAIL="me@me.com"; GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"; GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"' HEAD
