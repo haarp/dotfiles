@@ -54,11 +54,10 @@ case $TYPE in
 			fi
 		done
 		if [[ ! -s "$OUTPUT" ]]; then
-			# or try first music file
+			# or try first file inside
 			GLOBSORT='+name'	# bash-5.3+
-			files="$(file --mime-type --no-pad -F':::' "$INPUT"/* | grep '::: audio/.\+$')"
-			firstfile="${files%%:::*}"
-			[[ -s "$firstfile" ]] && media_thumb "$firstfile" "$OUTPUT" "$SIZE"
+			files=("$INPUT"/*)
+			[[ -s "${files[0]}" && $(xdg-mime query filetype "${files[0]}") =~ "audio/" ]] && media_thumb "${files[0]}" "$OUTPUT" "$SIZE"
 		fi
 		;;
 	# any text (https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_text-based_documents)
