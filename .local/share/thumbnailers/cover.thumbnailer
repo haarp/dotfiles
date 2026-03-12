@@ -1,0 +1,7 @@
+[Thumbnailer Entry]
+Version=1.0
+Encoding=UTF-8
+Type=X-Thumbnailer
+Name=Cover Thumbnailer
+MimeType=audio/mpeg;audio/mp4;audio/ogg;
+Exec=bash -c '~/bin/thumbnailer "$@"' _ %i %o %s %u cover
