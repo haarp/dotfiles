@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Save and Restore X11 window layout :D
+
+EXCLUDED_CLASSES=(
+	Xfce4-panel
+	Xfdesktop
+)
+
+set -e
+
+save() {
+	mkdir -p "$(dirname "$1")"
+	> "$1"
+
+	windows=$(xprop -root _NET_CLIENT_LIST)
+	windows="${windows##*\# }"
+
+	IFS=', '; for id in $windows; do
+		class=$(xprop -id "$id" WM_CLASS)
+		class="${class##*, }"
+		class="${class//\"/}"
+
+		for c in "${EXCLUDED_CLASSES[@]}"; do
+			[[ "$class" == "$c" ]] && continue 2
+		done
+
+		# grab window content dimensions
+		# TODO: replace sed with pure bash
+		eval $(xwininfo -id "$id" | sed -n \
+			-e "s/^ \+Absolute upper-left X: \+\([0-9]\+\).*/x=\1/p" \
+			-e "s/^ \+Absolute upper-left Y: \+\([0-9]\+\).*/y=\1/p" \
+			-e "s/^ \+Width: \+\([0-9]\+\).*/w=\1/p" \
+			-e "s/^ \+Height: \+\([0-9]\+\).*/h=\1/p"
+		)
+
+		# correct for title bar and borders 😮‍💨️
+		# based on https://unix.stackexchange.com/a/156349
+		extents=$(xprop -id "$id" _NET_FRAME_EXTENTS)
+		extents="${extents##*= }"
+		IFS=', ' read bl br t bb <<< $extents	# border left, border right, title bar, border bottom
+
+		case $class in
+			# Slack for some reason needs no x compensation (?!)
+			Slack)
+				:;;
+			*)
+				x=$(($x-$bl));;
+		esac
+		y=$(($y-$t))
+		# we don't need no correction for width/height?!?
+		##w=$(($w+$bl+$br))
+		##h=$(($h+$t+$bb))
+
+		echo "$id $x $y $w $h" >> "$1"
+	done &
+}
+
+restore() {
+	while read id x y w h; do
+		#DEBUG
+		##[[ $id == '0x0640b7c1' ]] || continue
+
+		xprop -id "$id" WM_STATE &>/dev/null || continue
+
+		##wmctrl -i -r "$id" -e "0,$x,$y,$w,$h"
+		xdotool windowsize "$id" $w $h windowmove "$id" $x $y
+
+	done < "$1"
+}
+
+file="${XDG_STATE_HOME-$HOME/.local/state}/window_layouts/$1"
+
+if [[ "$1" && "$2" == 'save' ]]; then
+	save "$file"
+elif [[ "$1" && "$2" == 'restore' ]]; then
+	restore "$file"
+else
+	echo "Usage: $(basename "$0") <profile> <save|restore>"
+fi
+
+# vim: set noexpandtab tabstop=4 shiftwidth=4:
