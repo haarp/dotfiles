@@ -7,7 +7,7 @@
 	<unique-id>1459188327224642-8</unique-id>
 	<command>exo-open --launch TerminalEmulator --working-directory %f</command>
 	<description>Open in Terminal</description>
-	<range></range>
+	<range>1</range>
 	<patterns>*</patterns>
 	<directories/>
 </action>
@@ -16,9 +16,9 @@
 	<name>Execute</name>
 	<submenu></submenu>
 	<unique-id>1524821177262629-5</unique-id>
-	<command>if [[ -x %f ]]; then %f; else zenity --error --text=&quot;File not executable!&quot;; fi</command>
+	<command>if [[ -x %f ]]; then %f; else zenity --error --title=&quot;Execute&quot; --text=&quot;File not executable!&quot;; fi</command>
 	<description>Run the script or executable</description>
-	<range></range>
+	<range>1</range>
 	<patterns>*</patterns>
 	<other-files/>
 </action>
@@ -27,9 +27,9 @@
 	<name>Edit symlink</name>
 	<submenu></submenu>
 	<unique-id>1773405697057003-1</unique-id>
-	<command>file -b --mime-type &apos;%f&apos; | grep -q &quot;inode/symlink&quot; || exit 1; old=&quot;$(readlink &apos;%f&apos;)&quot;; new=$(zenity --entry --title=&quot;Edit symlink&quot; --text=&quot;Enter new target:&quot; --entry-text=&quot;$old&quot;) &amp;&amp; if [[ -n &quot;$new&quot; &amp;&amp; ! &quot;$new&quot; == &quot;$old&quot; ]]; then ln -sfn -- &quot;$new&quot; &apos;%f&apos;; fi</command>
+	<command>file -b --mime-type %f | grep -q &quot;inode/symlink&quot; || exit 1; old=&quot;$(readlink %f)&quot;; new=$(zenity --entry --title=&quot;Edit symlink&quot; --text=&quot;New target for %n:&quot; --entry-text=&quot;$old&quot;) &amp;&amp; if [[ -n &quot;$new&quot; &amp;&amp; ! &quot;$new&quot; == &quot;$old&quot; ]]; then ln -sfn -- &quot;$new&quot; %f; fi</command>
 	<description>Edit symlink</description>
-	<range>*</range>
+	<range>1</range>
 	<patterns>*</patterns>
 	<directories/>
 	<audio-files/>
@@ -40,12 +40,28 @@
 </action>
 <action>
 	<icon>insert-link</icon>
-	<name>Symlink</name>
+	<name>Symlink (absolute)</name>
 	<submenu></submenu>
 	<unique-id>1692284017675730-1</unique-id>
-	<command>for f in %F; do ln -s &quot;$f&quot; &quot;$f (link)&quot;; done</command>
-	<description>Create symlink(s) in same dir</description>
-	<range>*</range>
+	<command>for f in %F; do ln -s -- &quot;$f&quot; &quot;$f (link)&quot;; done</command>
+	<description>Create absolute symlink(s) in same dir</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>insert-link</icon>
+	<name>Symlink (relative)</name>
+	<submenu></submenu>
+	<unique-id>1773413052055726-3</unique-id>
+	<command>for f in %N; do ln -s -- &quot;$f&quot; &quot;$f (link)&quot;; done</command>
+	<description>Create relative symlink(s) in the same dir</description>
+	<range></range>
 	<patterns>*</patterns>
 	<directories/>
 	<audio-files/>
@@ -75,7 +91,7 @@
 	<name>Shred</name>
 	<submenu></submenu>
 	<unique-id>1524821199300299-6</unique-id>
-	<command>zenity --question --text=&quot;Are you sure that you want to permanently shred these files?\n\n%N&quot; --ok-label Shred --cancel-label Cancel &amp;&amp; shred -fuz -- %F</command>
+	<command>zenity --question --title=&quot;Shred&quot; --text=&quot;Permanently shred these files?\n\n%N&quot; --ok-label Shred --cancel-label Cancel &amp;&amp; shred -fuz -- %F</command>
 	<description>Shred files</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -87,12 +103,12 @@
 </action>
 <action>
 	<icon>mate-disk-usage-analyzer</icon>
-	<name>Disk usage</name>
+	<name>Disk Usage Analzyer</name>
 	<submenu></submenu>
 	<unique-id>1463326878489308-1</unique-id>
-	<command>mate-disk-usage-analyzer %f</command>
-	<description>View the disk usage with mate-disk-usage-analyzer</description>
-	<range></range>
+	<command>mate-disk-usage-analyzer -- %f</command>
+	<description>View the storage usage with mate-disk-usage-analyzer</description>
+	<range>1</range>
 	<patterns>*</patterns>
 	<directories/>
 </action>
@@ -101,7 +117,7 @@
 	<name>Checksums</name>
 	<submenu></submenu>
 	<unique-id>1524821492949567-7</unique-id>
-	<command>zenity --info --text=&quot;$(cd %d; for f in %N; do md5sum --tag -- &quot;$f&quot;; sha1sum --tag -- &quot;$f&quot;; sha256sum --tag -- &quot;$f&quot;; echo -ne &quot;\n&quot;; done)&quot; --ellipsize</command>
+	<command>zenity --info --title=&quot;Checksums&quot; --text=&quot;$(cd %d; for f in %N; do md5sum --tag -- &quot;$f&quot;; sha1sum --tag -- &quot;$f&quot;; sha256sum --tag -- &quot;$f&quot;; echo -ne &quot;\n&quot;; done)&quot; --ellipsize</command>
 	<description>Compute various checksums</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -116,7 +132,7 @@
 	<name>Open in Text Editor</name>
 	<submenu></submenu>
 	<unique-id>1502450948269367-1</unique-id>
-	<command>xed %F</command>
+	<command>xed -- %F</command>
 	<description>Open with xed</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -131,7 +147,7 @@
 	<name>Open in Hex Editor</name>
 	<submenu></submenu>
 	<unique-id>1367862950768375-6</unique-id>
-	<command>qhexedit %F</command>
+	<command>qhexedit -- %F</command>
 	<description>Open with QHexEdit2</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -146,9 +162,9 @@
 	<name>Compare</name>
 	<submenu></submenu>
 	<unique-id>1463326930914351-2</unique-id>
-	<command>diffuse %F</command>
+	<command>diffuse -- %F</command>
 	<description>Compare with Diffuse</description>
-	<range></range>
+	<range>2-5</range>
 	<patterns>*</patterns>
 	<other-files/>
 	<text-files/>
@@ -158,7 +174,7 @@
 	<name>Open in Viewnior</name>
 	<submenu></submenu>
 	<unique-id>1595231901084183-1</unique-id>
-	<command>viewnior %F</command>
+	<command>viewnior -- %F</command>
 	<description>Open with Viewnior (no recursion)</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -176,6 +192,7 @@
 	<patterns>*</patterns>
 	<directories/>
 	<audio-files/>
+	<image-files/>
 	<video-files/>
 </action>
 <action>
@@ -197,7 +214,7 @@
 	<unique-id>1472803200891713-1</unique-id>
 	<command>wget -q --content-disposition --no-clobber -P %f -- &quot;$(xclip -o -selection clipboard)&quot;</command>
 	<description>Download the current clipboard URL into the directory</description>
-	<range></range>
+	<range>1</range>
 	<patterns>*</patterns>
 	<directories/>
 </action>
@@ -206,7 +223,7 @@
 	<name>Upload to Imgur</name>
 	<submenu></submenu>
 	<unique-id>1482516723824333-5</unique-id>
-	<command>imgurbash2 %F</command>
+	<command>tmp=&quot;$(mktemp --suffix=imgur)&quot; || exit 1; imgurbash2 -- %F &amp;&gt;&quot;$tmp&quot;; zenity --info --title=&quot;Imgur Upload&quot; --text=&quot;$(&lt; &quot;$tmp&quot;)\nURL(s) also copied to clipboard!&quot;; rm &quot;$tmp&quot; # cant use shell indirection or xclip gets stuck??</command>
 	<description>Upload image to Imgur</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -215,24 +232,24 @@
 </action>
 <action>
 	<icon>image-x-generic</icon>
-	<name>Prepare pic for sharing</name>
+	<name>Prepare pic(s) for sharing</name>
 	<submenu></submenu>
 	<unique-id>1603022702075128-1</unique-id>
-	<command>size=$(zenity --scale --text=&quot;Size (%%)&quot; --value=50) &amp;&amp; quality=$(zenity --scale --text=Quality --value=75) &amp;&amp; for f in %F; do convert &quot;$f&quot; -resize ${size}%% -quality $quality -strip &quot;$HOME/Downloads/Share/$(basename &quot;$f&quot;)&quot;; done &amp;&amp; dbus-send --type=method_call --dest=org.xfce.Thunar /org/xfce/FileManager org.xfce.FileManager.DisplayFolderAndSelect string:&quot;$HOME/Downloads/Share/&quot; string:&quot;$(basename &apos;%f&apos;)&quot; string:&quot;&quot; string:&quot;&quot;</command>
-	<description>Resize, recompress, strip metadata and put picture in /tmp</description>
+	<command>size=$(zenity --scale --title=&quot;Size&quot; --text=&quot;Size (%%)&quot; --value=50) &amp;&amp; quality=$(zenity --scale --title=&quot;Quality&quot; --text=Quality --value=75) &amp;&amp; for f in %F; do convert &quot;$f&quot; -resize ${size}%% -quality $quality -strip &quot;$HOME/Downloads/Share/$(basename &quot;$f&quot;)&quot;; done &amp;&amp; dbus-send --type=method_call --dest=org.xfce.Thunar /org/xfce/FileManager org.xfce.FileManager.DisplayFolderAndSelect string:&quot;$HOME/Downloads/Share/&quot; string:&quot;$(basename %f)&quot; string:&quot;&quot; string:&quot;&quot;</command>
+	<description>Resize, recompress, strip metadata and put in Share</description>
 	<range></range>
 	<patterns>*</patterns>
 	<image-files/>
 </action>
 <action>
-	<icon>archive-manager</icon>
-	<name>Mount archive</name>
+	<icon>insert-object</icon>
+	<name>Mount file</name>
 	<submenu></submenu>
 	<unique-id>1645981276894311-1</unique-id>
 	<command>/usr/libexec/gvfsd-archive file=%f # also see gio mount</command>
-	<description>Mount archive using GVfs</description>
-	<range></range>
-	<patterns>*.zip;*.rar;*.7z;*.tar.*</patterns>
+	<description>Mount file using GVfs</description>
+	<range>1</range>
+	<patterns>*.zip;*.rar;*.7z;*.tar.*;*.iso</patterns>
 	<other-files/>
 </action>
 </actions>
