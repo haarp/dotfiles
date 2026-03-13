@@ -1,3 +1,6 @@
 [submodule ".local/share/gtksourceview-4/language-specs/gcode-gedit"]
 	path = .local/share/gtksourceview-4/language-specs/gcode-gedit
 	url = https://github.com/jvegaf/gcode-gedit.git
+[submodule ".local/share/gtksourceview-4/styles/omni.git"]
+	path = .local/share/gtksourceview-4/styles/omni.git
+	url = https://github.com/getomni/gedit.git
