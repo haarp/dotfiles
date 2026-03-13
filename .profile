@@ -4,15 +4,22 @@
 export HISTSIZE=-1
 export HISTFILESIZE=$HISTSIZE
 
+# Source user files if they exist
+for _file in ~/.bashrcNOPE ~/.rbenvrc
+do
+	[[ -f "$_file" ]] && . "$_file"
+done; unset _file
+# Set PATH to include user dirs (bashrc also does it)
+for _dir in ~/bin ~/.local/bin
+do
+	[[ -d "$_dir" ]] || continue
+	[[ "$PATH" =~ ":$_dir" ]] && continue
+	PATH="$_dir:$PATH"
+done; unset _dir
 
 # Create cache/temp dirs
 # NOTE: some early starters (gnome-keyring) need ~/.cache earlier → handled by /etc/local.d
-# don't forget correct \ at end of lines that need it
-mkdir -p -m 700 \
-/tmp/cache-$USER \
-/tmp/.wine-$UID \
-/tmp/.wine-$UID/temp \
-$HOME/.cache/gvfs-metadata
+mkdir -p -m 700 "/tmp/cache-$USER" "/tmp/.wine-$UID" "/tmp/.wine-$UID/temp" "$HOME/.cache/gvfs-metadata"
 # Wine temp
 for _temp in \
 	$HOME/.wine*/drive_c/windows/temp \
@@ -24,44 +31,33 @@ do
 		ln -s /tmp/.wine-$UID/temp/ "$_temp"
 	fi
 done
-# Electron cache (https://github.com/electron/electron/issues/8124)
+# Fucking Electron garbage dumps its cache in the wrong place! (https://github.com/electron/electron/issues/8124)
 # steal list from https://github.com/danisztls/ephemeral/blob/main/ephemeral
-# FIXME: doesn't create dirs in cache?
-# FIXME: firejailed apps can't access destination
+# FIXME: apps don't use the symlinks and even reset Dawn{Graphite,WebGPU}Cache, GPUCache on start :|
+shopt -s extglob
 for _app in \
-	discord \
-	Signal \
-	SideQuest
+	"$HOME/.config/discord" \
+	"$HOME/.config/Signal" \
+	"$HOME/.config/SideQuest" \
+	"$HOME/snap/slack/"!(current)"/.config/Slack"
 do
 	for _temp in \
 		Cache \
 		CachedData \
 		CachedExtensions \
 		"Code Cache" \
+		DawnCache \
+		DawnGraphiteCache \
+		DawnWebGPUCache \
 		GPUCache
 	do
-		if [[ "$_app" && "$_temp" && ( -d "$HOME/.config/$_app/$_temp" || -L "$HOME/.config/$_app/$_temp" )  ]]; then
-			echo "$HOME/.cache/$_app/$_temp"
-			mkdir -p -m 700 "$HOME/.cache/$_app/$_temp"
-			rm -rf "$HOME/.config/$_app/$_temp"
-			ln -s "$HOME/.cache/$_app/$_temp/" "$HOME/.config/$_app/$_temp"
+		if [[ -d "$_app/$_temp" && ! -L "$_app/$_temp" ]]; then
+			mkdir -p -m 700 "$HOME/.cache/$(basename "$_app")/$_temp/"
+			rm -rf "$_app/$_temp/"
+			ln -vs "$HOME/.cache/$(basename "$_app")/$_temp/" "$_app/$_temp"
 		fi
 	done
 done
-# Steam Electron cache
-mkdir -p -m 700 "$HOME/.cache/Steam"
-for _app in \
-	$HOME/.local/share/Steam/config/htmlcache\
-	$HOME/.wine*/drive_c/users/*/Local\ Settings/Application\ Data/Steam/htmlcache
-do
-	for _temp in Cache "Code Cache" GPUCache; do
-		if [[ ! -L "$_app/$_temp" && -d "$_app/$_temp" ]]; then
-			rm -rf "$_app/$_temp"
-			ln -s $HOME/.cache/Steam/ "$_app/$_temp"
-		fi
-	done
-done
-
 unset _app _temp
 
 # Video setup
@@ -71,14 +67,16 @@ if [[ $DISPLAY ]]; then
 ##		xrandr --output $display --set TearFree on
 ##	done
 	# amdgpu
-##	$HOME/bin/custom_mode.sh eDP 2560 1600 67.5
-##	$HOME/bin/custom_mode.sh DisplayPort-1 3840 1600 82
+##	custom_mode eDP 2560 1600 67.5
+##	custom_mode DisplayPort-1 3840 1600 82
 	# modesetting
-##	$HOME/bin/custom_mode.sh eDP-1 2560 1600 67.5
-##	$HOME/bin/custom_mode.sh DP-2 3840 1600 82
+##	custom_mode eDP-1 2560 1600 67.5
+##	custom_mode DP-2 3840 1600 82
 	# new thinkpad
-	$HOME/bin/custom_mode.sh eDP-1 1920 1080 82.5
-	$HOME/bin/custom_mode.sh DP-1 3840 1600 82
+	custom_mode eDP-1 1920 1080 82.5
+	custom_mode eDP-1 1920 1080 75
+	custom_mode DP-1 3840 1600 82
+	custom_mode DP-1 3840 1600 75
 fi
 # Input setup
 xinput map-to-output "ELAN Touchscreen" eDP-1
@@ -117,12 +115,6 @@ export SSH_ASKPASS_REQUIRE="force"
 export SQLITE_HISTORY="$HOME/.local/state/sqlite_history"
 ###export XCOMPOSEFILE="$HOME/.config/X11/XCompose"	# doesn't work! (at least in xed 3.4.3)
 
-# Use X input method so ~/.XCompose is parsed
-# FIXME: but causes jumps with smooth scrolling... https://github.com/linuxmint/mintlocale/issues/41
-# TODO: Try again in newer GTK (3.20+), try "gtk-im-context-simple", try "uim" (with app-i18n/uim)
-###export GTK_IM_MODULE=xim
-###export QT_IM_MODULE=$GTK_IM_MODULE
-
 # Disable GTK+-3 CSD with gtk3-nocsd
 # EDIT: not needed anymore, recent Xfce allows disabling CSD
 ###if [[ -e /usr/lib64/libgtk3-nocsd.so.0 ]]; then
@@ -130,7 +122,8 @@ export SQLITE_HISTORY="$HOME/.local/state/sqlite_history"
 ###	export LD_PRELOAD="/usr/lib64/libgtk3-nocsd.so.0 $LD_PRELOAD"
 ###fi
 
-# gtk3-classic settings (https://github.com/lah7/gtk3-classic#patches)
+# gtk3-classic settings (https://github.com/lah7/gtk3-classic/blob/master/README.Variables.md)
+export GTK_USE_IEC_UNITS=1
 ###export GTK_BACKDROP=1
 export GTKM_INSERT_EMOJI=1
 
@@ -139,16 +132,14 @@ export QT_BEARER_POLL_TIMEOUT=-1
 # Make GTK+ apps stop trying to contact non-existent accessibility bus and complaining about it
 export NO_AT_BRIDGE=1
 
-# Make QT copy GTK's style (needs dev-qt/qtstyleplugins)
-# https://wiki.archlinux.org/title/Uniform_look_for_Qt_and_GTK_applications#QGtkStyle
-# mostly doesn't work, very few themes supply compatible GTK2 settings
-export QT_QPA_PLATFORMTHEME="gtk2"
+# Make QT copy GTK's style (needs dev-qt/qtstyleplugins?)
+# https://wiki.archlinux.org/title/Uniform_look_for_Qt_and_GTK_applications#QGtk3Style
+export QT_QPA_PLATFORMTHEME="gtk3"
 # Make Java's GTK+ style work. Maybe.
 # NOPE, enables some awkward DPI scaling
-export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on" # -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
+export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
 
-# Make QT apps not scale horribly
-# https://wiki.archlinux.org/title/HiDPI#Qt_5
+# Make QT apps not scale horribly (https://wiki.archlinux.org/title/HiDPI#Qt_5)
 # also consider `QT_FONT_DPI=96` to override font DPI scaling
 # KeePassXC: https://github.com/keepassxreboot/keepassxc/issues/2815
 # KeePassXC: looks about right on 1.25
@@ -163,6 +154,8 @@ for f in /etc/chromium/*; do [[ -f "$f" ]] && source "$f"; done
 export CHROMIUM_USER_FLAGS="$CHROMIUM_FLAGS"
 CHROMIUM_USER_FLAGS+=" --force-device-scale-factor=1.33333"
 
+# Firefox: Smooth scrolling
+export MOZ_USE_XINPUT2=1
 # Firefox: Fix stuck tooltips (https://bugzilla.mozilla.org/show_bug.cgi?id=1569439#c25)
 export MOZ_GTK_TITLEBAR_DECORATION=system
 
