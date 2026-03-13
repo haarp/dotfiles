@@ -175,7 +175,7 @@
 	<text-files/>
 </action>
 <action>
-	<icon>insert-text</icon>
+	<icon>application-x-partial-download</icon>
 	<name>Download clipboard URL here</name>
 	<submenu></submenu>
 	<unique-id>1472803200891713-1</unique-id>
@@ -184,6 +184,18 @@
 	<range></range>
 	<patterns>*</patterns>
 	<directories/>
+</action>
+<action>
+	<icon>mintupload</icon>
+	<name>Upload to Imgur</name>
+	<submenu></submenu>
+	<unique-id>1482516723824333-5</unique-id>
+	<command>imgurbash2 %F</command>
+	<description>Upload image to Imgur</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+	<video-files/>
 </action>
 <action>
 	<icon>image-x-generic</icon>
@@ -195,18 +207,6 @@
 	<range></range>
 	<patterns>*</patterns>
 	<image-files/>
-</action>
-<action>
-	<icon>insert-image</icon>
-	<name>Upload to Imgur</name>
-	<submenu></submenu>
-	<unique-id>1482516723824333-5</unique-id>
-	<command>imgurbash2 %F</command>
-	<description>Upload image to Imgur</description>
-	<range></range>
-	<patterns>*</patterns>
-	<image-files/>
-	<video-files/>
 </action>
 <action>
 	<icon>archive-manager</icon>
