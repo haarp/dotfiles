@@ -60,13 +60,13 @@ do
 done
 unset _app _temp
 
-# Video setup
-# FIXME: runs too late for xfce4-display-settings to pick up on login?
+{% if yadm.class == "home" %}
 if [[ $DISPLAY ]]; then
+	# Video setup
+	# FIXME: runs too late for xfce4-display-settings to pick up on login?
 ##	xrandr | awk '/connected/{print $1}' | while read display; do
 ##		xrandr --output $display --set TearFree on
 ##	done
-{% if yadm.class == "home" %}
 	# amdgpu
 ##	custom_mode eDP 2560 1600 67.5
 ##	custom_mode DisplayPort-1 3840 1600 82
@@ -78,28 +78,26 @@ if [[ $DISPLAY ]]; then
 	custom_mode eDP-1 1920 1080 75
 	custom_mode DP-1 3840 1600 82
 	custom_mode DP-1 3840 1600 75
-{% else %}
-	:
-{% endif %}
+
+	# Nvidia video setup
+	# Underclock to save power when Nvidia goes to higher P-states (which is all the fucking time)
+	# NOTE: Core below -515 (15MHz bins) will lock GPU into highest P-state
+	# NOTE: Memory can't go below that of second-highest P-state, attempts will lock out the highest P-state
+	# NOTE: to edit specific P-states: [gpu:0]/GPUGraphicsClockOffset[$level]=$offset, [gpu:0]/GPUMemoryTransferRateOffset[$level]=$offset
+	###nvidia-settings \
+	###	-a [gpu:0]/GPUGraphicsClockOffsetAllPerformanceLevels=-500 \
+	###	-a [gpu:0]/GPUMemoryTransferRateOffsetAllPerformanceLevels=-199 \
+	###	2>/dev/null &
+	# Enable ForceCompositionPipeline to prevent tearing, disable Flipping to recover some input lag due to that
+	# EDIT: nope, prevents GPU from dropping to lowest P-state
+	###nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 { ForceCompositionPipeline = On }" --assign AllowFlipping=0 &
 fi
-# Input setup
+{% endif %}
+
 {% if yadm.class == "home" %}
+# Input setup
 xinput map-to-output "ELAN Touchscreen" eDP-1
 {% endif %}
-
-# Nvidia video setup
-# Underclock to save power when Nvidia goes to higher P-states (which is all the fucking time)
-# NOTE: Core below -515 (15MHz bins) will lock GPU into highest P-state
-# NOTE: Memory can't go below that of second-highest P-state, attempts will lock out the highest P-state
-# NOTE: to edit specific P-states: [gpu:0]/GPUGraphicsClockOffset[$level]=$offset, [gpu:0]/GPUMemoryTransferRateOffset[$level]=$offset
-###nvidia-settings \
-###	-a [gpu:0]/GPUGraphicsClockOffsetAllPerformanceLevels=-500 \
-###	-a [gpu:0]/GPUMemoryTransferRateOffsetAllPerformanceLevels=-199 \
-###	2>/dev/null &
-# Enable ForceCompositionPipeline to prevent tearing, disable Flipping to recover some input lag due to that
-# EDIT: nope, prevents GPU from dropping to lowest P-state
-###nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 { ForceCompositionPipeline = On }" --assign AllowFlipping=0 &
-
 
 # LD_PRELOAD
 # Disable Cripple-AMD CPU dispatcher in Intel Math Kernel Library (https://danieldk.eu/Intel-MKL-on-AMD-Zen)
