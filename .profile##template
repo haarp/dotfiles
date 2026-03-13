@@ -78,6 +78,8 @@ if [[ $DISPLAY ]]; then
 	custom_mode eDP-1 1920 1080 75
 	custom_mode DP-1 3840 1600 82
 	custom_mode DP-1 3840 1600 75
+{% else %}
+	:
 {% endif %}
 fi
 # Input setup
