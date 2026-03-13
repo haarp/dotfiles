@@ -704,15 +704,12 @@ function asbin() {
 	echo "${f[strikethrough]}$1${f[unstrikethrough]} → bash -c '$1'"
 }
 
-# Edit filenames quickly by calling mv with only one arg
+# Edit filenames quickly and interactively by calling mv with only one arg
 function mv() {
-	if [[ "$#" -eq 1 && -e "$1" ]]; then
-		local newname
-		read -ei "$1" newname
-
-		if [[ "$newname" != "$1" ]]; then
-			command mv -v -- "$1" "$newname"
-		fi
+	if [[ "$#" -eq 1 ]]; then
+		local new
+		read -ei "$1" new
+		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$newname"
 	else
 		command mv "$@"
 		return
