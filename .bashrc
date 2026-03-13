@@ -693,9 +693,11 @@ function schedule() {
 }
 
 # Wrapper around screen to make it work with dropped privileges (https://serverfault.com/a/620149/315665)
-# FIXME: this does not work with bash -c 'foo bar' due to quoting
 function screen() {
-	script -q -c "screen ${*}" /dev/null
+	# fix screwy quoting with parameter transformation (bash-4.4+)
+	# edge cases can still break (quotes inside quotes)
+	local args="${@@Q}"
+	script -q -c "screen $args" /dev/null
 }
 
 # Make a bash function runnable as a binary (use with nice, screen, etc.)
