@@ -258,7 +258,8 @@ bind '"\C-u": undo'
 bind '"\e[Z": menu-complete'
 # F-keys: various nifty things
 ##bind -x '"\e[15~":" xdg-open . 2>/dev/null"'	# F5, already in Alacritty config
-bind '"\e[17~":"cd -\n"'	# F6
+bind '"\e[17~":" cd -\n"'	# F6
+bind '"\e[18~":" cd ..\n"'	# F7
 # alt + q followed by key ("quick snippets")
 bind '"\eq\"": "\"\"\C-b"'		# paired characters
 bind "\"\eq\'\": \"\'\'\C-b\""
