@@ -719,7 +719,7 @@ function mv() {
 	fi
 }
 
-# Edit symlinks quickly
+# Edit symlinks quickly and interactively
 function editln() {
 	if [[ $# -eq 0 || $# -gt 2 ]]; then
 		echo "Usage: $FUNCNAME <symlink> [target]"
@@ -730,16 +730,16 @@ function editln() {
 	old=$(readlink -v "$1") || return $?
 
 	if [[ -n "$2" ]]; then
-		ln -sfn "$2" "$1"
+		ln -vsfn -- "$2" "$1"
 	else
 		( cd "$(dirname "$1")"	# for tab completion
 		read -e -i "$old" new
-		[[ -n "$new" && ! "$old" == "$new" ]] && ln -sfn "$new" "$1"
+		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "$1"
 		)
 	fi
 }
 
-# Edit variables quickly
+# Edit variables quickly and interactively
 function editvar() {
 	if [[ ! $# -eq 1 ]]; then
 		echo "Usage: $FUNCNAME <variablename>"

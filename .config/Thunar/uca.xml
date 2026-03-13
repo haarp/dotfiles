@@ -27,7 +27,7 @@
 	<name>Edit symlink</name>
 	<submenu></submenu>
 	<unique-id>1773405697057003-1</unique-id>
-	<command>file -b --mime-type &apos;%f&apos; | grep -q &quot;inode/symlink&quot; || exit 1; old=&quot;$(readlink &apos;%f&apos;)&quot;; new=$(zenity --entry --title=&quot;Edit symlink&quot; --text=&quot;Enter new target:&quot; --entry-text=&quot;$old&quot;) &amp;&amp; if [[ -n &quot;$new&quot; &amp;&amp; ! &quot;$old&quot; == &quot;$new&quot; ]]; then ln -sfn &quot;$new&quot; &apos;%f&apos;; fi</command>
+	<command>file -b --mime-type &apos;%f&apos; | grep -q &quot;inode/symlink&quot; || exit 1; old=&quot;$(readlink &apos;%f&apos;)&quot;; new=$(zenity --entry --title=&quot;Edit symlink&quot; --text=&quot;Enter new target:&quot; --entry-text=&quot;$old&quot;) &amp;&amp; if [[ -n &quot;$new&quot; &amp;&amp; ! &quot;$new&quot; == &quot;$old&quot; ]]; then ln -sfn -- &quot;$new&quot; &apos;%f&apos;; fi</command>
 	<description>Edit symlink</description>
 	<range>*</range>
 	<patterns>*</patterns>
