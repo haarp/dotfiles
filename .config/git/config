@@ -101,5 +101,11 @@
 #		git commit --amend
 #		git rebase --continue
 
+# YADM stuff
+
+# submodules (you need to actually be in your home directory for this):
+#yadm submodule add <url> path
+#yadm submodule update --init --recursive
+
 # disaster leak recovery:
-# cd ~; yadm filter-branch -f --env-filter 'GIT_AUTHOR_NAME="me"; GIT_AUTHOR_EMAIL="me@me.com"; GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"; GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"' HEAD
+#cd ~; yadm filter-branch -f --env-filter 'GIT_AUTHOR_NAME="me"; GIT_AUTHOR_EMAIL="me@me.com"; GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"; GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"' HEAD
