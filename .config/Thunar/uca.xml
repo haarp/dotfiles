@@ -103,7 +103,7 @@
 </action>
 <action>
 	<icon>mate-disk-usage-analyzer</icon>
-	<name>Disk Usage Analzyer</name>
+	<name>Disk Usage Analyzer</name>
 	<submenu></submenu>
 	<unique-id>1463326878489308-1</unique-id>
 	<command>mate-disk-usage-analyzer -- %f</command>
