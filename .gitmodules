@@ -4,3 +4,6 @@
 [submodule ".local/share/gtksourceview-4/styles/omni.git"]
 	path = .local/share/gtksourceview-4/styles/omni.git
 	url = https://github.com/getomni/gedit.git
+[submodule ".local/share/gtksourceview-4/styles/catppuccin.git"]
+	path = .local/share/gtksourceview-4/styles/catppuccin.git
+	url = https://github.com/catppuccin/gedit.git
