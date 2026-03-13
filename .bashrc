@@ -730,13 +730,11 @@ function editln() {
 	old=$(readlink -v "$1") || return $?
 
 	if [[ -n "$2" ]]; then
-		rm "$1" && ln -s "$2" "$1"
+		ln -sfn "$2" "$1"
 	else
 		( cd "$(dirname "$1")"	# for tab completion
 		read -e -i "$old" new
-		if [[ ! "$old" == "$new" ]]; then
-			rm "$1" && ln -s "$new" "$1"
-		fi
+		[[ -n "$new" && ! "$old" == "$new" ]] && ln -sfn "$new" "$1"
 		)
 	fi
 }
