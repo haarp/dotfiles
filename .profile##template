@@ -66,6 +66,7 @@ if [[ $DISPLAY ]]; then
 ##	xrandr | awk '/connected/{print $1}' | while read display; do
 ##		xrandr --output $display --set TearFree on
 ##	done
+{% if yadm.class == "home" %}
 	# amdgpu
 ##	custom_mode eDP 2560 1600 67.5
 ##	custom_mode DisplayPort-1 3840 1600 82
@@ -77,9 +78,12 @@ if [[ $DISPLAY ]]; then
 	custom_mode eDP-1 1920 1080 75
 	custom_mode DP-1 3840 1600 82
 	custom_mode DP-1 3840 1600 75
+{% endif %}
 fi
 # Input setup
+{% if yadm.class == "home" %}
 xinput map-to-output "ELAN Touchscreen" eDP-1
+{% endif %}
 
 # Nvidia video setup
 # Underclock to save power when Nvidia goes to higher P-states (which is all the fucking time)
