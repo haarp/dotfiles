@@ -719,9 +719,31 @@ function mv() {
 	fi
 }
 
+# Edit symlinks quickly
+function editln() {
+	if [[ $# -eq 0 || $# -gt 2 ]]; then
+		echo "Usage: $FUNCNAME <symlink> [target]"
+		return 1
+	fi
+
+	local old new
+	old=$(readlink -v "$1") || return $?
+
+	if [[ -n "$2" ]]; then
+		rm "$1" && ln -s "$2" "$1"
+	else
+		( cd "$(dirname "$1")"	# for tab completion
+		read -e -i "$old" new
+		if [[ ! "$old" == "$new" ]]; then
+			rm "$1" && ln -s "$new" "$1"
+		fi
+		)
+	fi
+}
+
 # Edit variables quickly
 function editvar() {
-	if [[ $# -eq 0 ]]; then
+	if [[ ! $# -eq 1 ]]; then
 		echo "Usage: $FUNCNAME <variablename>"
 		return 1
 	fi
