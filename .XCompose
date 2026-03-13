@@ -202,11 +202,11 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <bar> <R>				: "ℝ"	# real numbers
 <Multi_key> <bar> <Z>				: "ℤ"	# integers
 
-# Bitcoin (proper char will be U+20BF)
-<Multi_key> <b> <t> <c>				: "฿"
-<Multi_key> <x> <b> <t>				: "฿"
-<Multi_key> <B> <bar>				: "฿"
-<Multi_key> <bar> <B>				: "฿"
+# Bitcoin
+<Multi_key> <b> <t> <c>				: "₿"
+<Multi_key> <x> <b> <t>				: "₿"
+<Multi_key> <B> <bar>				: "₿"
+<Multi_key> <bar> <B>				: "₿"
 
 # Misc
 <Multi_key> <i> <n> <v> <i> <s>		: "​"	# Zero-width space
