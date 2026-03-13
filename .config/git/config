@@ -101,11 +101,18 @@
 #		git commit --amend
 #		git rebase --continue
 
-# YADM stuff
 
-# submodules (you need to actually be in your home directory for this):
-#yadm submodule add <url> path
-#yadm submodule update --init --recursive
+## YADM stuff
+
+# sub repos
+# git will automatically turn added repos into submodules if .git is present
+# submodules only store an url and commit reference, no local changes >:(
+# -> submodules suck
+# subtree will add a repo, but nuke our checked-out .git
+# -> fuck you, subtrees
+# -> rename .git, add, rename .git back
+[alias]
+addrepo = !sh -c 'mv "$1/.git" "$1/.git-nope" && git add -- "$1" ":!$1/.git-nope" && mv "$1/.git-nope" "$1/.git"' -
 
 # disaster leak recovery:
 #cd ~; yadm filter-branch -f --env-filter 'GIT_AUTHOR_NAME="me"; GIT_AUTHOR_EMAIL="me@me.com"; GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"; GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"' HEAD
