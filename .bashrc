@@ -6,9 +6,9 @@
 #set -x
 
 ## Test for non-interactive shell
-[[ $- == *i* ]] || return																									#-#
+[[ $- == *i* ]] || return
 ## Don't bother inside mc
-[[ $MC_SID ]] && return																										#-#
+[[ $MC_SID ]] && return
 
 ## Source various files, if they exist, in given order
 for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion ~/.rbenvrc
@@ -42,60 +42,34 @@ done; unset _dir
 ## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
 ####CDPATH=".:~:/"
 
-## Turn us into a var suitable for OpenSSH's default AcceptEnv
-## also strip leading whitespace, empty lines, comments and lines ending in #-# when creating the variable
-## NOTE: Once this variable becomes too large, dropbear will fail! https://github.com/mkj/dropbear/issues/177
-## NOTE: https://github.com/cdown/sshrc also exists. didn't know that. huh.
-export LC_BASHRC=$(sed -e '/#-#$/d' -e 's/^[\t ]*//' -e '/^$/d' -e 's/\t\+#.*$//' -e '/^#/d' ~/.bashrc)$'\n'				#-#
-
-if true; then																												#-#
+if [[ (! "$SSH_HOME") && (! "$SU_HOME") ]]; then
 	## Master Shell
-	# Add certain dotfiles from home for deployment via BASHRC
-	_shared_dotfiles=(".config/htop/htoprc" ".config/mc/ini" ".config/mc/panels.ini" ".config/mc/menu" ".config/git/config" ".screenrc")		#-#
-	for _file in "${_shared_dotfiles[@]}"; do																				#-#
-		[[ -r "$HOME/$_file" ]] || continue																					#-#
-##		# Only deploy files that already exist on the target host
-##		LC_BASHRC+="if [[ -w \"\$HOME/$_file\" ]]; then"$'\n'																#-#
-		# Escape \ (first) and $ and " in files
-		LC_BASHRC+="{ "																										#-#
-		# FIXME: slow startup here!
-		_content="$(< "$HOME/$_file")"
-		LC_BASHRC+="echo ${_content@Q} >\"\$HOME/$_file\";"																	#-#
-		LC_BASHRC+=" } 2>/dev/null"$'\n'																					#-#
-		# Set timestamp to original file's
-		LC_BASHRC+="touch -d @$(stat --printf=%Y "$HOME/$_file") \"\$HOME/$_file\" 2>/dev/null"$'\n'						#-#
-
-##		LC_BASHRC+="fi"$'\n'																								#-#
-	done; unset _shared_dotfiles _file _content																				#-#
-
-	# If any of above failed, don't pollute exit code
-	LC_BASHRC+="true"$'\n'																									#-#
 
 	# Start SSH agent if there isn't one already running (note: xfce4-session usually starts it)
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
 	if [[ $SSH_AUTH_SOCK ]] && kill -0 $SSH_AGENT_PID 2>/dev/null; then
 		:
-	elif kill -0 $(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then					#-#
-		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null																			#-#
-	else																															#-#
-		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"																				#-#
-		source "$XDG_CACHE_HOME/ssh-agent-info"																						#-#
-	fi																																#-#
+	elif kill -0 $(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then
+		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
+	else
+		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"
+		source "$XDG_CACHE_HOME/ssh-agent-info"
+	fi
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
-	for _pid in $(pgrep -u $USER -x gvfsd); do																				#-#
-		gdb -batch -ex "attach $_pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null	#-#
-	done & disown																											#-#
+	for _pid in $(pgrep -u $USER -x gvfsd); do
+		gdb -batch -ex "attach $_pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null
+	done & disown
 
 	## Do some things on a Linux console
-	if [[ $TERM == linux ]]; then																							#-#
-		setfont ter-v14n	# Terminus (see /usr/share/consolefonts/README.terminus)										#-#
-		tput cvvis			# block-shaped cursor																			#-#
-		TMOUT=1800			# log out after 30 min inactivity																#-#
-	fi																														#-#
+	if [[ $TERM == linux ]]; then
+		setfont ter-v14n	# Terminus (see /usr/share/consolefonts/README.terminus)
+		tput cvvis			# block-shaped cursor
+		TMOUT=1800			# log out after 30 min inactivity
+	fi
 
-else																														#-#
+else
 	## Slave Shells
 	# Source user bashrc too
 	[[ -f ~/.bashrc ]] && . ~/.bashrc
@@ -110,7 +84,7 @@ else																														#-#
 			}
 		done; unset _pid _name _x _ppid _y
 	fi
-fi																															#-#
+fi
 
 
 ## Reset locales that don't exist on a machine (make perl shut the fuck up, fix mc charset(LANG+LC_NUMERIC))
@@ -574,47 +548,106 @@ alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/ex
 
 ## Custom functions
 
-# SU equivalent using sudo and our bashrc, variant 1 (needs in sudoers: targetpw, closefrom_override)
-###alias dosu='sudo -i -C 4 bash --rcfile /dev/fd/3 3<<< "$LC_BASHRC"'
-# SU equivalent using sudo and our bashrc, variant 2 (needs in sudoers: targetpw, but SPAMS syslog with entire bashrc!!)
-###alias dosu="sudo LC_BASHRC=\"\$LC_BASHRC\" -- bash -c 'exec bash --rcfile <(echo \"\$LC_BASHRC\")'"
-# SU equivalent using sudo and our bashrc, variant 3 (needs in sudoers: targetpw)
-# HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
-# FIXME: `wall` output shown twice inside here
-function dosu() {
-	# sudo can't pass $LC_BASHRC in env without spamming logs, so do it in cmdfile
-	local cmdfile="$(mktemp --suffix=.$FUNCNAME)"
+# Helper function to make certain programs use certain temporary paths
+function _app_env() {
+	if [[ ! -d "$1" ]]; then
+		echo "What are you doing? Need a valid directory as arg!"
+		return 1
+	fi
 
-	echo '#!/bin/bash' > "$cmdfile"
-	echo "rm -f \"$cmdfile\" 2>/dev/null" >> "$cmdfile"
-	echo "exec bash --rcfile <(cat <<'BASHRC_EOF'" >> "$cmdfile"
-	echo "$LC_BASHRC" >> "$cmdfile"
-	echo -e "BASHRC_EOF\n)" >> "$cmdfile"
-	chmod +x "$cmdfile"
-	chmod o+r "$cmdfile"	# make world-readable for sudo -u luser
-
-	sudo "$@" "$cmdfile"
-
-	rm -f "$cmdfile"
+	export HTOPRC="$1/.config/htop/htoprc"
+	ln -sfT "$1/.config/git/config" "$HOME/.gitconfig"
+	export MC_PROFILE_ROOT="$1"
+	export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
+	export SCREENRC="$1/.config/screen/screenrc"
 }
-complete -F _comp_cmd_sudo dosu
 
-# SU using our bashrc, variant 1 (but new shell fails to become controlling terminal: http://serverfault.com/a/605465/315665)
-###alias suenv='su root -- --rcfile <(echo "$LC_BASHRC")'
-# SU using our bashrc, variant 2
-function suenv() {
-	local cmdfile="$(mktemp --suffix=.$FUNCNAME)"
+# SSH using our LC_ env variable hack to dynamically transfer our bashrc and stuff! :3
+# sets $SSH_HOME pointing to our temporary shared extra files
+# Alternative: https://github.com/cdown/sshrc
+function sshlc() {
+	local extra_files=(
+		".config/htop/htoprc"
+		".config/mc/ini"
+		".config/mc/panels.ini"
+		".config/mc/menu"
+		".config/git/config"
+		".config/screen/screenrc"
+	)
 
-	echo '#!/bin/bash' > "$cmdfile"
-	echo "rm -f \"$cmdfile\"" >> "$cmdfile"
-	# su passes env variables, we can use $LC_BASHRC directly
-	# su overrides $SHELL, undo that (or `script` will break)
-	echo "exec bash --rcfile <(echo \"\$LC_BASHRC\"; echo \"export SHELL='$SHELL'\")" >> "$cmdfile"
-	chmod +x "$cmdfile"
+	# turn us into a var suitable for OpenSSH's default AcceptEnv
+	local LC_ENV=$(tar czf - -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${extra_files[@]}" | base64)
+	# NOTE: large variables cause dropbear to fail, openssh doesn't care tho (https://github.com/mkj/dropbear/issues/177)
+#	if [[ "${#LC_ENV}" -gt 35000 ]]; then
+#		echo "Your environment is too big! ${#LC_ENV} > 35000! Aborting." >&2
+#		return 1
+#	fi
 
-	su -s "$cmdfile" "$@"
+	local script='
+		export SSH_HOME=$(mktemp -d -t ssh-$(whoami).XXXXX) &&
+		<<< "$LC_ENV" base64 -d | tar xzf - -C "$SSH_HOME" &&
+		unset LC_ENV &&
+		echo "" >>"$SSH_HOME/.bashrc" &&
+		echo "trap -- \"rm -rf \\\"$SSH_HOME\\\"\" EXIT" >>"$SSH_HOME/.bashrc" &&
+		echo "_app_env \"$SSH_HOME\"" >>"$SSH_HOME/.bashrc" &&
+		exec bash --rcfile "$SSH_HOME/.bashrc"
+	'
 
-	rm -f "$cmdfile"
+	LC_ENV="$LC_ENV" ssh -o SendEnv=LC_ENV -o RemoteCommand="$script" "$@"
+	# TODO: minify bashrc?
+	# strip leading whitespace, empty lines and comments
+	#sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
+}
+complete -F _comp_cmd_ssh sshlc
+
+# SU equivalent using sudo using our environment (needs in sudoers: targetpw)
+# sets $SU_HOME pointing to our temporary shared extra files
+# HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
+# FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME`
+function sudolc() {
+	local extra_files=(
+		".config/htop/htoprc"
+		".config/mc/ini"
+		".config/mc/panels.ini"
+		".config/mc/menu"
+		".config/git/config"
+		".config/screen/screenrc"
+	)
+
+	local SU_HOME
+	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
+	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${extra_files[@]}" "$SU_HOME/") &&
+	echo '' >>"$SU_HOME/.bashrc" &&
+	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
+	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
+	echo "_app_env \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
+
+	sudo "$@" -- bash -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\""
+}
+complete -F _comp_cmd_sudo sudolc
+
+# SU using our environment
+# sets $SU_HOME pointing to our temporary shared extra files
+function sulc() {
+	local extra_files=(
+		".config/htop/htoprc"
+		".config/mc/ini"
+		".config/mc/panels.ini"
+		".config/mc/menu"
+		".config/git/config"
+		".config/screen/screenrc"
+	)
+
+	local SU_HOME
+	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
+	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${extra_files[@]}" "$SU_HOME/") &&
+	echo '' >>"$SU_HOME/.bashrc" &&
+	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
+	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
+	echo "_app_env \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
+
+	# `--login` matches sudo's defaults of stripping env
+	su --login --whitelist-environment='SU_HOME' -c "exec bash --rcfile \"$SU_HOME/.bashrc\"" -- "$@"
 }
 
 # Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
@@ -1285,29 +1318,29 @@ function streamaudio() {
 # Enhance optirun with overclocking (needs >=nvidia-settings-337.19)
 # perf: pgrep/service is super slow, let's check the pidfile instead
 if [[ -e /proc/$( {< /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
-	function optirun() {																									#-#
-		##local GPUOffset=135	# -> 880MHz																					#-#
-		##local MemOffset=420	# -> 2220MHz																				#-#
+	function optirun() {
+		##local GPUOffset=135	# -> 880MHz
+		##local MemOffset=420	# -> 2220MHz
 
-		##( 	command optirun nvidia-settings -c :8 \																		#-#
-		##	-a [gpu:0]/GPUGraphicsClockOffset[1]=$GPUOffset \																#-#
-		##	-a [gpu:0]/GPUMemoryTransferRateOffset[1]=$MemOffset \															#-#
-		##	2>/dev/null &																									#-#
-		##)																													#-#
-		command optirun "$@"																								#-#
-	}																														#-#
+		##( 	command optirun nvidia-settings -c :8 \
+		##	-a [gpu:0]/GPUGraphicsClockOffset[1]=$GPUOffset \
+		##	-a [gpu:0]/GPUMemoryTransferRateOffset[1]=$MemOffset \
+		##	2>/dev/null &
+		##)
+		command optirun "$@"
+	}
 	alias nvidia-settings='optirun nvidia-settings -c :8'
 fi
 # Fix primusrun (https://forums.gentoo.org/viewtopic-p-8380752.html#8380752)
 # (might also need __GLVND_DISALLOW_PATCHING=1 in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
-alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'		#-#
+alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
 # Modern prime-run for native Nvidia setups (https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html)
-prime-run() {																												#-#
-	__NV_PRIME_RENDER_OFFLOAD=1 \																							#-#
-	__GLX_VENDOR_LIBRARY_NAME=nvidia \																						#-#
-	__VK_LAYER_NV_optimus=NVIDIA_only \																						#-#
-	"$@"																													#-#
-}																															#-#
+prime-run() {
+	__NV_PRIME_RENDER_OFFLOAD=1 \
+	__GLX_VENDOR_LIBRARY_NAME=nvidia \
+	__VK_LAYER_NV_optimus=NVIDIA_only \
+	"$@"
+}
 
 # Increase ping for a certain IP
 function pingpwn() {
