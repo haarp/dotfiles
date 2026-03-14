@@ -196,6 +196,7 @@ do
 		GIT_PS1_SHOWUPSTREAM="auto"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
 		PS1+='$(__git_ps1 "\[${bg[Magenta]}\]%s")'
+		break
 	fi
 done; unset _gp
 
