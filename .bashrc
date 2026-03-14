@@ -105,7 +105,7 @@ else																														#-#
 		until [[ ${_ppid:-$PPID} == 1 ]]; do
 			read _pid _name __x _ppid _y < /proc/${_ppid:-$PPID}/stat
 			[[ $_name =~ sshd|dropbear ]] && {
-				SSH_CONNECTION=1
+				export SSH_CONNECTION=1
 				break
 			}
 		done; unset _pid _name _x _ppid _y
