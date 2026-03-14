@@ -60,7 +60,7 @@ if [[ (! "$SSH_HOME") && (! "$SU_HOME") ]]; then
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
 	for _pid in $(pgrep -u $USER -x gvfsd); do
 		gdb -batch -ex "attach $_pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null
-	done & disown
+	done & disown; unset _pid
 
 	## Do some things on a Linux console
 	if [[ $TERM == linux ]]; then
