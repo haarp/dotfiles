@@ -16,8 +16,21 @@ do
 	[[ -f "$_file" ]] && . "$_file"
 done; unset _file
 
+# XDG locations (duplicates from .profile)
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
+export LESSHISTFILE="${LESSHISTFILE:-/dev/null}"
+export MYSQL_HISTFILE="${MYSQL_HISTFILE:-$XDG_STATE_HOME/mysql_history}"
+export PSQL_HISTORY="${PSQL_HISTORY:-$XDG_STATE_HOME/psql_history}"
+export PYTHON_HISTORY="${PYTHON_HISTORY:-$XDG_STATE_HOME/python_history}"
+export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}"
+export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
+
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
-for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
+for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin "$XDG_DATA_HOME/bin" #/usr/lib/distcc/bin
 do
 	[[ -d "$_dir" ]] || continue
 	[[ -L "$_dir" ]] && continue	# for merged-usr setups
@@ -60,14 +73,14 @@ if true; then																												#-#
 
 	# Start SSH agent if there isn't one already running (note: xfce4-session usually starts it)
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
-	if [[ $SSH_AUTH_SOCK ]] && kill -0 $SSH_AGENT_PID 2>/dev/null; then														#-#
-		:																													#-#
-	elif kill -0 $(source "${XDG_CACHE_HOME-/$HOME/.cache}/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then	#-#
-		source "${XDG_CACHE_HOME-/$HOME/.cache}/ssh-agent-info" >/dev/null													#-#
-	else																													#-#
-		ssh-agent > "${XDG_CACHE_HOME-/$HOME/.cache}/ssh-agent-info"														#-#
-		source "${XDG_CACHE_HOME-/$HOME/.cache}/ssh-agent-info"																#-#
-	fi																														#-#
+	if [[ $SSH_AUTH_SOCK ]] && kill -0 $SSH_AGENT_PID 2>/dev/null; then
+		:
+	elif kill -0 $(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then					#-#
+		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null																			#-#
+	else																															#-#
+		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"																				#-#
+		source "$XDG_CACHE_HOME/ssh-agent-info"																						#-#
+	fi																																#-#
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
@@ -326,8 +339,8 @@ export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:c
 
 ## Empty (not remove!) mc histories/filepos on login
 # like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
-[[ -e ~/.local/share/mc/history ]] && > ~/.local/share/mc/history
-[[ -e ~/.local/share/mc/filepos ]] && > ~/.local/share/mc/filepos
+[[ -e "$XDG_DATA_HOME/mc/history" ]] && > "$XDG_DATA_HOME/mc/history"
+[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && > "$XDG_DATA_HOME/mc/filepos"
 
 ## Personal preferences
 export EDITOR="mcedit -d"	# see aliases below
@@ -364,8 +377,6 @@ export ZSTD_NBTHREADS="0"
 export LESS="$LESS -RiKM --follow-name"
 # fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export SYSTEMD_LESS="$LESS -F"
-# Don't want less search history (but if I did, it would be in ~/.local/state/!)
-export LESSHISTFILE="/dev/null"
 # Different approach to syntax highlighting, needs source-highlight (based on https://unix.stackexchange.com/q/191487/138699)
 # not necessarily installed
 command -v source-highlight >/dev/null && \
@@ -489,11 +500,11 @@ alias whoops='history -d -1; history -d -1'	# purge last command from history (a
 alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
 complete -F _comp_cmd_killall stopall contall
 alias winedesktop='wine explorer /desktop=Wine,1024x768'
-alias wine-purgemenu='rm -rv ~/.config/menus/applications-merged/wine* \
-	~/.local/share/applications/wine* \
-	~/.local/share/desktop-directories/wine* \
-	~/.local/share/icons/????_*.xpm \
-	~/.local/share/mime/{application,packages}/x-wine-extension-*'
+alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
+	"$XDG_DATA_HOME"/applications/wine* \
+	"$XDG_DATA_HOME"/desktop-directories/wine* \
+	"$XDG_DATA_HOME"/icons/????_*.xpm \
+	"$XDG_DATA_HOME"/mime/{application,packages}/x-wine-extension-*'
 # wine temp replacer can be found in .profile
 alias rng='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" | head -c80; echo'		# alphanumeric w/o [lI1O0] ([:alnum:] otherwise)
 alias rmg='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 ~!@#$%^&*()_+-=\[\]{}|;\:,./<>?" | head -c80; echo'	# more chars
@@ -533,7 +544,7 @@ function apt-belongs() { dpkg -S "$(realpath "$(which "$1")")"; }	# too retarded
 alias apt-depgraph='apt-cache depends'
 alias apt-depends='apt-cache rdepends --installed'
 alias apt-upgrade='apt install --only-upgrade'
-alias wget='wget --hsts-file=$HOME/.local/state/wget-hsts -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites)
+alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites)
 alias dl='wget -t0 --waitretry=5 -c -T5'
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
@@ -611,7 +622,7 @@ function suenv() {
 # Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
 # also: https://developers.yubico.com/PGP/Importing_keys.html
 function yubi() {
-	local SSH_AGENT_FILE="${XDG_CACHE_HOME-/$HOME/.cache}/ssh-agent-info"
+	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
 
 	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
 		source "$SSH_AGENT_FILE" >/dev/null
@@ -635,7 +646,7 @@ function yubi() {
 		echo SSH_AUTH_SOCK=$SSH_AUTH_SOCK >> "$SSH_AGENT_FILE"
 	fi
 
-	grep -q SSH_AUTH_SOCK "${XDG_CACHE_HOME-/$HOME/.cache}/gpg-agent-info" 2>/dev/null || {
+	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
 		echo "Killing ssh-less gpg-agent..."
 		pkill -u $USER gpg-agent
 		while pgrep -u $USER gpg-agent >/dev/null; do	# wait until really gone
@@ -645,9 +656,9 @@ function yubi() {
 
 	pgrep -u $USER gpg-agent >/dev/null || {
 		echo "Starting gpg-agent..."
-		gpg-agent --daemon --enable-ssh-support > "${XDG_CACHE_HOME-/$HOME/.cache}/gpg-agent-info"
+		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
 	}
-	source "${XDG_CACHE_HOME-/$HOME/.cache}/gpg-agent-info" || return 1
+	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
 
 	gpg-connect-agent updatestartuptty /bye	# fix pinentry (see ~/.gnupg/gpg-agent.conf for details)
 }
@@ -844,7 +855,7 @@ function btrfs.set.zstd() {
 
 # Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
 function mc() {
-	local pwd_file="${XDG_CACHE_HOME-/$HOME/.cache}/mc/pwd.$$"
+	local pwd_file="$XDG_CACHE_HOME/mc/pwd.$$"
 
 	command mc -P "$pwd_file" "$@"
 	local exit=$?
@@ -1545,7 +1556,7 @@ function youtube-dl-us() {
 ##	local us_proxy
 ##	us_proxy=$(us_proxy) || return 1
 ##
-##	sed -i -e "s|control_proxy = http://.*/|control_proxy = http://$us_proxy/|" ~/.config/pianobar/config
+##	sed -i -e "s|control_proxy = http://.*/|control_proxy = http://$us_proxy/|" "$XDG_CONFIG_HOME/pianobar/config"
 ##	command pianobar "$@"
 ##}
 

@@ -9,8 +9,15 @@ for _file in ~/.bashrcNOPE ~/.rbenvrc
 do
 	[[ -f "$_file" ]] && . "$_file"
 done; unset _file
+
+# Set XDG dirs if unset
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
 # Set PATH to include user dirs (bashrc also does it)
-for _dir in ~/bin ~/.local/bin
+for _dir in ~/bin "$XDG_DATA_HOME/bin"
 do
 	[[ -d "$_dir" ]] || continue
 	[[ "$PATH" =~ ":$_dir" ]] && continue
@@ -36,9 +43,9 @@ done
 # FIXME: apps don't use the symlinks and even reset Dawn{Graphite,WebGPU}Cache, GPUCache on start :|
 shopt -s extglob
 for _app in \
-	"$HOME/.config/discord" \
-	"$HOME/.config/Signal" \
-	"$HOME/.config/SideQuest" \
+	"$XDG_CONFIG_HOME/discord" \
+	"$XDG_CONFIG_HOME/Signal" \
+	"$XDG_CONFIG_HOME/SideQuest" \
 	"$HOME/snap/slack/"!(current)"/.config/Slack"
 do
 	for _temp in \
@@ -115,9 +122,16 @@ export SSH_ASKPASS_REQUIRE="force"
 
 # Move some stuff to their proper XDG places
 # also see https://github.com/b3nj5m1n/xdg-ninja/tree/main/programs
-###export SCREENRC="$HOME/.config/screen/screenrc"	# skip for now, due to bashrc delivering this
-export SQLITE_HISTORY="$HOME/.local/state/sqlite_history"
-###export XCOMPOSEFILE="$HOME/.config/X11/XCompose"	# doesn't work! (at least in xed 3.4.3)
+export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
+export GNUPGHOME="$XDG_DATA_HOME/gnupg"
+export SCREENRC="$XDG_CONFIG_HOME/screen/screenrc"
+###export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"	# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
+export LESSHISTFILE="/dev/null"	# wan't no search history (but if I did, it would be in $XDG_STATE_HOME/lesshst)
+export MYSQL_HISTFILE="$XDG_STATE_HOME/mysql_history"
+export PSQL_HISTORY="$XDG_STATE_HOME/psql_history"
+export PYTHON_HISTORY="$XDG_STATE_HOME/python_history"
+export REDISCLI_HISTFILE="$XDG_STATE_HOME/rediscli_history"
+export SQLITE_HISTORY="$XDG_STATE_HOME/sqlite_history"
 
 # Disable GTK+-3 CSD with gtk3-nocsd
 # EDIT: not needed anymore, recent Xfce allows disabling CSD
