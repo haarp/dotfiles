@@ -443,12 +443,11 @@ _GREP_OPTIONS="--color=auto"
 alias grep="grep $_GREP_OPTIONS"; alias egrep="egrep $_GREP_OPTIONS"; alias fgrep="fgrep $_GREP_OPTIONS"
 unset _GREP_OPTIONS
 # mc: set theme, disable annoying mouse
-if [[ $EUID -eq 0 ]]; then	_MC_SKIN="modarin256root-defbg"
-else						_MC_SKIN="modarin256-defbg"
+if [[ $EUID -eq 0 ]]; then	export MC_SKIN="modarin256root-defbg"
+else						export MC_SKIN="modarin256-defbg"
 fi
-[[ -f "/usr/share/mc/skins/$_MC_SKIN-thin.ini" ]] && _MC_SKIN+="-thin"
-alias mc="mc -S $_MC_SKIN -d"; alias mcdiff="mcdiff -S $_MC_SKIN -d"; alias mcedit="mcedit -S $_MC_SKIN -d"; alias mcview="mcview -S $_MC_SKIN -d"
-unset _MC_SKIN
+[[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
+alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
 ##alias df='df -h'
 alias df2='findmnt -D'
