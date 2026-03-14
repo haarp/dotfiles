@@ -426,7 +426,7 @@ if [[ ! -f "/usr/share/bash-completion/completions/apt" && -f "/usr/share/bash-c
 	. "/usr/share/bash-completion/completions/apt-get" && complete -F _apt_get apt
 fi
 # misc additions
-complete -F _ssh salt-ssh
+complete -F _comp_cmd_ssh salt-ssh
 
 
 
@@ -1128,7 +1128,7 @@ function speedtest.ssh.up() {
 	fi
 	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
 }
-complete -F _ssh speedtest.ssh.down speedtest.ssh.up
+complete -F _comp_cmd_ssh speedtest.ssh.down speedtest.ssh.up
 function speedtest.nc.down() {
 	if [[ $# -ne 1 ]]; then
 		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
@@ -1165,7 +1165,7 @@ function remotescreen() {
 	fi
 	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'DISPLAY=:0 xwd -root | convert -resize 50% - -define png:compression-level=9 png:-' | display -
 }
-complete -F _ssh remotescreen
+complete -F _comp_cmd_ssh remotescreen
 
 # Sync portage tree and rebuild, etc.
 function sync-portage() {
