@@ -712,7 +712,7 @@ function screen() {
 
 # Make a bash function runnable as a binary (use with nice, screen, etc.)
 function asbin() {
-	export -f "$1" && \
+	export -f "${1:?missing function name}" && \
 	echo "${f[strikethrough]}$1${f[unstrikethrough]} → bash -c '$1'"
 }
 
@@ -788,7 +788,7 @@ function hilite() {
 	local palette=(41 42 43 44 45 46 101 102 103 104 105 106)
 	local phrase code cmd
 	local i=0
-	for phrase in "$@"; do
+	for phrase in "${@:?missing arg}"; do
 		code=$'\e['${palette[$i]}m
 		cmd="$cmd; s"$'\a'"\($phrase\)"$'\a'"$code\\1"$'\e[49m'$'\a'g	# use $'\a' as separator
 		((i++))
@@ -820,11 +820,7 @@ function curll() {
 
 # Grab site's cert info
 function cert() {
-	if [[ ! $# -eq 1 ]]; then
-		echo "Show SSL/TLS certificate information for a site. Usage: $FUNCNAME <URL>"
-		return 1
-	fi
-	openssl s_client -connect $1:443 -servername $1 </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+	openssl s_client -connect "${1:?missing url}":443 -servername $1 </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
 }
 
 # Recursively show dirs as tree
@@ -834,8 +830,8 @@ function tree() {
 
 # mkdir and cd in one
 function mkcd() {
-	if [[ -d "$1" ]]; then	echo "$1 already exists, entering." >&2
-	else mkdir -p -- "$1"
+	if [[ -d "${1:?missing arg}" ]]; then	echo "$1 already exists, entering." >&2
+	else	mkdir -p -- "$1"
 	fi
 	cd -- "$1"
 }
@@ -962,11 +958,11 @@ function iotop {
 # Interpret compressed Tomato config file
 function tomato-config() {
 	# Note: sometimes it's gzipped twice!
-	gzip -dc "$1" | sort -z | tr '\n\0' '\n\n'
+	gzip -dc "${1:?missing arg}" | sort -z | tr '\n\0' '\n\n'
 }
 # Sort nvram config file (created with 'nvram export --set')
 function nvram-config() {
-	tr '\n' '\a' <"$1" | sed 's:\anvram set :\nnvram set :g' | sort | tr '\a' '\n'
+	tr '\n' '\a' <"${1:?missing arg}" | sed 's:\anvram set :\nnvram set :g' | sort | tr '\a' '\n'
 }
 
 # make make make.conf-aware ;)
@@ -1011,7 +1007,7 @@ function makekernel2() {
 # Crappy make progress meter
 function makeprogress() {
 	if [[ ! $# -eq 1 ]]; then
-		echo "Crappy make progress meter. Usage: $FUNCNAME <dir>"
+		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]"
 		return 1
 	fi
 
