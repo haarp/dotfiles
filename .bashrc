@@ -100,7 +100,8 @@ do
 done
 unset _locales _fallback _cat
 
-## Colors! Formatting! (https://en.wikipedia.org/wiki/ANSI_escape_code)
+## Colors! Formatting!
+# https://en.wikipedia.org/wiki/ANSI_escape_code https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # TODO: 58,59 underline color
 # formatting
 declare -A f=(
@@ -129,7 +130,7 @@ declare -A bg=(
 )
 
 ## Colorful bash prompt with goodies
-## ref: http://misc.flogisoft.com/bash/tip_colors_and_formatting - wrap in \[ \] to prevent char offset
+## wrap in \[ \] to prevent char offset
 ## note: some weird unicode chars only work correctly with terminus-font
 # Get started
 PROMPT_COMMAND=()
