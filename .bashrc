@@ -375,7 +375,7 @@ export ZSTD_NBTHREADS="0"
 ## Interpet escape sequences, dynamic case on less search, allow signal kills, better prompt
 # -Q: don't ring the bell at EOF (edit: nope, it's blocking! fuck.)
 export LESS="$LESS -RiKM --follow-name"
-# fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
+# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export SYSTEMD_LESS="$LESS -F"
 # Different approach to syntax highlighting, needs source-highlight (based on https://unix.stackexchange.com/q/191487/138699)
 # not necessarily installed
