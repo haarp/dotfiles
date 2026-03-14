@@ -543,7 +543,7 @@ function apt-belongs() { dpkg -S "$(realpath "$(which "$1")")"; }	# too retarded
 alias apt-depgraph='apt-cache depends'
 alias apt-depends='apt-cache rdepends --installed'
 alias apt-upgrade='apt install --only-upgrade'
-alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites)
+alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites) FIXME: doesn't work for gui apps, of course
 alias dl='wget -t0 --waitretry=5 -c -T5'
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
