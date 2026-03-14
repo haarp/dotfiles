@@ -932,13 +932,6 @@ function sensors() {
 	command sensors "$@" $(sort <<< $sensor_names)
 }
 
-# Grep paragraph instead of just line
-function grepp() {
-	local x="$1"
-	shift
-	perl -00ne ' print if /'"$x"'/i ' "$*" | highlight "$x"
-}
-
 # run iotop with task delay accounting
 function iotop {
 	if ! command -v iotop >/dev/null; then
