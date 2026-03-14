@@ -565,7 +565,7 @@ function _app_env() {
 # SSH using our LC_ env variable hack to dynamically transfer our bashrc and stuff! :3
 # sets $SSH_HOME pointing to our temporary shared extra files
 # Alternative: https://github.com/cdown/sshrc
-function sshlc() {
+function sshenv() {
 	local extra_files=(
 		".config/htop/htoprc"
 		".config/mc/ini"
@@ -603,8 +603,8 @@ complete -F _comp_cmd_ssh sshlc
 # SU equivalent using sudo using our environment (needs in sudoers: targetpw)
 # sets $SU_HOME pointing to our temporary shared extra files
 # HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
-# FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME`
-function sudolc() {
+# FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME` -> have target user copy files
+function sudoenv() {
 	local extra_files=(
 		".config/htop/htoprc"
 		".config/mc/ini"
@@ -628,7 +628,7 @@ complete -F _comp_cmd_sudo sudolc
 
 # SU using our environment
 # sets $SU_HOME pointing to our temporary shared extra files
-function sulc() {
+function suenv() {
 	local extra_files=(
 		".config/htop/htoprc"
 		".config/mc/ini"
@@ -646,7 +646,7 @@ function sulc() {
 	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
 	echo "_app_env \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 
-	# `--login` matches sudo's defaults of stripping env
+	# `--login` matches sudo's default of stripping env
 	su --login --whitelist-environment='SU_HOME' -c "exec bash --rcfile \"$SU_HOME/.bashrc\"" -- "$@"
 }
 
