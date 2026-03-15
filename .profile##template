@@ -124,14 +124,7 @@ export SSH_ASKPASS_REQUIRE="force"
 # also see https://github.com/b3nj5m1n/xdg-ninja/tree/main/programs
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
-export SCREENRC="$XDG_CONFIG_HOME/screen/screenrc"
 ###export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"	# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
-export LESSHISTFILE="/dev/null"	# wan't no search history (but if I did, it would be in $XDG_STATE_HOME/lesshst)
-export MYSQL_HISTFILE="$XDG_STATE_HOME/mysql_history"
-export PSQL_HISTORY="$XDG_STATE_HOME/psql_history"
-export PYTHON_HISTORY="$XDG_STATE_HOME/python_history"
-export REDISCLI_HISTFILE="$XDG_STATE_HOME/rediscli_history"
-export SQLITE_HISTORY="$XDG_STATE_HOME/sqlite_history"
 
 # Disable GTK+-3 CSD with gtk3-nocsd
 # EDIT: not needed anymore, recent Xfce allows disabling CSD
