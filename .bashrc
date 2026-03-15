@@ -571,9 +571,7 @@ function _app_env() {
 function sshenv() {
 	local extra_files=(
 		".config/htop/htoprc"
-		".config/mc/ini"
-		".config/mc/panels.ini"
-		".config/mc/menu"
+		".config/mc/"
 		".config/git/config"
 		".config/screen/screenrc"
 	)
@@ -610,9 +608,7 @@ complete -F _comp_cmd_ssh sshenv
 function sudoenv() {
 	local extra_files=(
 		".config/htop/htoprc"
-		".config/mc/ini"
-		".config/mc/panels.ini"
-		".config/mc/menu"
+		".config/mc/"
 		".config/git/config"
 		".config/screen/screenrc"
 	)
@@ -634,9 +630,7 @@ complete -F _comp_cmd_sudo sudoenv
 function suenv() {
 	local extra_files=(
 		".config/htop/htoprc"
-		".config/mc/ini"
-		".config/mc/panels.ini"
-		".config/mc/menu"
+		".config/mc/"
 		".config/git/config"
 		".config/screen/screenrc"
 	)
