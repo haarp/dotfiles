@@ -333,7 +333,7 @@ export VIEWER=less
 export PAGER=less
 
 ## Colorful ls
-if which dircolors >/dev/null; then
+if command -v dircolors >/dev/null; then
 	if [[ -r ~/.dircolors ]]; then	. <(dircolors -b ~/.dircolors)
 	else							. <(dircolors -b)
 	fi
