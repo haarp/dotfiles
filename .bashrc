@@ -228,7 +228,7 @@ stty -ixon
 # page up/down: cycle through history for commands that start with currently entered text
 bind '"\e[5~": history-search-backward'
 bind '"\e[6~": history-search-forward'
-# ctrl + arrow up/down: cycle through history yanking the first argument of the entry
+# ctrl + arrow up/down: cycle through history yanking the last argument of the entry
 bind '"\e[1;5A": yank-last-arg'
 bind '"\e[1;5B": "\e-1\e."'
 # ctrl + arrow left/right
@@ -238,8 +238,8 @@ bind '"\e[1;5C": forward-word'
 bind '"\b": backward-kill-word'
 # ctrl + del
 bind '"\e[3;5~": kill-word'
-# ctrl + g: expand glob behind cursor
-bind '"\C-g":glob-expand-word'
+# ctrl + g: list elements of glob behind cursor
+bind '"\C-g":glob-list-expansions'
 # ctrl + u
 bind "set bind-tty-special-chars off"
 bind '"\C-u": undo'
