@@ -226,6 +226,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <a> <t> <o> <m>					: "⚛"
 <Multi_key> <r> <a> <d>						: "☢"
 <Multi_key> <b> <i> <o>						: "☣"
+<Multi_key> <z> <a> <p>						: "↯"
 <Multi_key> <h> <v>							: "⚡"
 <Multi_key> <c> <c> <c> <p>					: "☭"
 <Multi_key> <6> <6> <6>						: "⛧"
