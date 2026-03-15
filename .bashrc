@@ -74,6 +74,13 @@ else
 	# Source user bashrc too
 	[[ -f ~/.bashrc ]] && . ~/.bashrc
 
+	# Include temporary homes in PATH
+	for _dir in "$SSH_HOME/bin" "$SSH_HOME/.local/share/bin" "$SU_HOME/bin" "$SU_HOME/.local/share/bin"
+	do
+		[[ -d "$_dir" ]] || continue
+		PATH="$_dir:$PATH"
+	done; unset _dir
+
 	# Detect if we are an SSH session
 	if [[ ! $SSH_CONNECTION ]]; then
 		until [[ ${_ppid:-$PPID} == 1 ]]; do
