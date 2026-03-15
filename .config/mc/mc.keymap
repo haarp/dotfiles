@@ -1,0 +1,7 @@
+# only delta from /etc/mc/mc.default.keymap
+[main]
+Select = equal
+[panel]
+Search = shift-slash
+PanelOtherSync = shift-tab
+Select = equal
