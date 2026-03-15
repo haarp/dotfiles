@@ -171,6 +171,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 # Arrows
 <Multi_key> <less> <minus>				: "←"
 <Multi_key> <minus> <greater>			: "→"
+<Multi_key> <minus> <less> <greater>	: "↔"
 <Multi_key> <bar> <asciicircum>			: "↑"
 <Multi_key> <asciicircum> <bar>			: "↑"
 <Multi_key> <u> <o>						: "↑"
@@ -180,7 +181,6 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <asciicircum> <bar> <v>		: "↕"
 <Multi_key> <v> <bar> <asciicircum>		: "↕"
 <Multi_key> <u> <p> <d> <n>				: "↕"
-###<Multi_key> <less> <minus> <greater>	: "↔"	# breaks leftwards arrow
 
 # Math
 <Multi_key> <0> <0>					: "∞"
