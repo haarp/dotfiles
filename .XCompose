@@ -216,21 +216,21 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 
 # Symbols
 <Multi_key> <slash> <exclam> <backslash>	: "⚠"
-<Multi_key> <o> <x>					: "☠"
-<Multi_key> <a> <t> <o> <m>			: "⚛"
-<Multi_key> <r> <a> <d>				: "☢"
-<Multi_key> <b> <i> <o>				: "☣"
-<Multi_key> <h> <v>					: "⚡"
-<Multi_key> <c> <c> <c> <p>			: "☭"
-<Multi_key> <6> <6> <6>				: "⛧"
-<Multi_key> <o> <minus> <plus>		: "♀"
-<Multi_key> <o> <t>					: "♀"
-<Multi_key> <o> <minus> <greater>	: "♂"
-<Multi_key> <n> <o> <t> <e>			: "♪"
-<Multi_key> <c> <h> <e> <c> <k>		: "✓"	# ☑
+<Multi_key> <o> <x>							: "☠"
+<Multi_key> <a> <t> <o> <m>					: "⚛"
+<Multi_key> <r> <a> <d>						: "☢"
+<Multi_key> <b> <i> <o>						: "☣"
+<Multi_key> <h> <v>							: "⚡"
+<Multi_key> <c> <c> <c> <p>					: "☭"
+<Multi_key> <6> <6> <6>						: "⛧"
+<Multi_key> <o> <minus> <plus>				: "♀"
+<Multi_key> <o> <t>							: "♀"
+<Multi_key> <o> <minus> <greater>			: "♂"
+<Multi_key> <n> <o> <t> <e>					: "♪"
+<Multi_key> <c> <h> <e> <c> <k>				: "✓"	# ☑
 <Multi_key> <exclam> <c> <h> <e> <c>		: "☐"
-<Multi_key> <question> <i>			: "⸮"	# irony
-<Multi_key> <i> <question>			: "⸮"
+<Multi_key> <question> <i>					: "⸮"	# irony
+<Multi_key> <i> <question>					: "⸮"
 
 # Emoji
 <Multi_key> <semicolon> <parenright>		: "😉"
@@ -263,3 +263,5 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <t> <d>							: "👎"
 <Multi_key> <w> <a> <v> <e>					: "👋"
 <Multi_key> <f> <u>							: "🖕"
+
+# vim: set noexpandtab tabstop=4 shiftwidth=4
