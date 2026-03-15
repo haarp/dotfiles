@@ -934,16 +934,16 @@ function diff() {
 
 	if [[ -t 1 ]]; then	# stdout a terminal?
 		if [[ "$diffhighlight" ]]; then
-			command diff "$@" | "$diffhighlight" | sed -e 's/$/\x1b[0m/' \
-				-e 's/^@/\x1b[36m&/' -e 's/^-/\x1b[31m&/' -e 's/^+/\x1b[32m&/' \
-				-e 's/^[0-9]/\x1b[36m&/' -e 's/^</\x1b[31m&/' -e 's/^>/\x1b[32m&/'
+			command diff "$@" | "$diffhighlight" | sed -e "s/\$/${fg[reset]}/" \
+				-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
+				-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
 			local _exit=${PIPESTATUS[0]}
 			[[ "$builtdh" ]] && rm -r "/tmp/diff-highlight-$$"
 			return $_exit
 		else
-			command diff "$@" | sed -e 's/$/\x1b[0m/' \
-				-e 's/^@/\x1b[36m&/' -e 's/^-/\x1b[31m&/' -e 's/^+/\x1b[32m&/' \
-				-e 's/^[0-9]/\x1b[36m&/' -e 's/^</\x1b[31m&/' -e 's/^>/\x1b[32m&/'
+			command diff "$@" | sed -e "s/\$/${fg[reset]}/" \
+				-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
+				-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
 			return ${PIPESTATUS[0]}
 		fi
 	else
