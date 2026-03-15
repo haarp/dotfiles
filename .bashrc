@@ -180,21 +180,11 @@ else
 	fi
 fi
 # if screen sessions >0: session count
-PS1+='$(
-	shopt -s nullglob
-	sessions=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*)
-	[[ $sessions ]] && echo -n "\[${bg[White]}\]${#sessions[@]}"
-)'
+PS1+='$( shopt -s nullglob; sess=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*); [[ $sess ]] && echo -n "\[${bg[White]}\]${#sess[@]}" )'
 # if jobs >0: job count
 PS1+='$( [[ \j -gt 0 ]] && echo -n "\[${bg[Cyan]}\]\j" )'
 # pwd; darker color if not writable
-PS1+='\[$(
-	if [[ -w . ]]; then
-		echo -n "${bg[Blue]}"
-	else
-		echo -n "${bg[blue]}"
-	fi
-)\]\W'
+PS1+='\[$( [[ -w . ]] && echo -n "${bg[Blue]}" || echo -n "${bg[blue]}" )\]\W'
 # git prompt Mk.2
 for _gp in	/usr/share/git/git-prompt.sh /usr/lib/git-core/git-sh-prompt
 do
