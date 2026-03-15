@@ -920,33 +920,28 @@ function diff() {
 	# we also additionally colorize the entire lines
 	# also see git config
 
+	local diffhighlight="cat"	# if below fails
+
 	if [[ -e "/usr/bin/diff-highlight" ]]; then	# Gentoo
-		local diffhighlight="/usr/bin/diff-highlight"
+		diffhighlight="/usr/bin/diff-highlight"
 	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then		# Debian 9
-		local diffhighlight="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
+		diffhighlight="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
 	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; then	# Debian 10+
-		if (
-			cp -r "/usr/share/doc/git/contrib/diff-highlight" "/tmp/diff-highlight-$$" && \
-			cd "/tmp/diff-highlight-$$" && make >/dev/null
-		); then
-			local diffhighlight="/tmp/diff-highlight-$$/diff-highlight"; local builtdh=1;
+		if ( cp -r "/usr/share/doc/git/contrib/diff-highlight" "/tmp/diff-highlight-$$" &&
+			cd "/tmp/diff-highlight-$$" &&
+			make >/dev/null )
+		then
+			diffhighlight="/tmp/diff-highlight-$$/diff-highlight"; local builtdh=1;
 		fi
 	fi
 
 	if [[ -t 1 ]]; then	# stdout a terminal?
-		if [[ "$diffhighlight" ]]; then
-			command diff "$@" | "$diffhighlight" | sed -e "s/\$/${fg[reset]}/" \
-				-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
-				-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
-			local _exit=${PIPESTATUS[0]}
-			[[ "$builtdh" ]] && rm -r "/tmp/diff-highlight-$$"
-			return $_exit
-		else
-			command diff "$@" | sed -e "s/\$/${fg[reset]}/" \
-				-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
-				-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
-			return ${PIPESTATUS[0]}
-		fi
+		command diff "$@" | "$diffhighlight" | sed -e "s/\$/${fg[reset]}/" \
+			-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
+			-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
+		local _exit=${PIPESTATUS[0]}
+		[[ "$builtdh" ]] && rm -r "/tmp/diff-highlight-$$"
+		return $_exit
 	else
 		command diff "$@"
 		return $?
