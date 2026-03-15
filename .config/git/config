@@ -28,8 +28,8 @@
 	untracked = cyan
 
 # make diffs a bit more semantic (https://news.ycombinator.com/item?id=11057421)
-#[diff]
-#	algorithm = patience
+[diff]
+	algorithm = patience
 
 # infra-line color highlighting (https://github.com/git/git/blob/master/contrib/diff-highlight/README)
 [pager]
