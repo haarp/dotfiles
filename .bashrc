@@ -118,7 +118,6 @@ declare -A f=(
 	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strikethrough]=$'\e[9m'
 	[unbolddim]=$'\e[22m' [unitalic]=$'\e[23m' [ununderline]=$'\e[24m' [unblink]=$'\e[25m'
 	[uninverse]=$'\e[27m' [unhidden]=$'\e[28m' [unstrikethrough]=$'\e[29m'
-
 )
 # normal/high-intensity foreground colors
 declare -A fg=(
@@ -154,11 +153,7 @@ PS1=""
 PS1+='\[${f[reset]}${f[bold]}${fg[BLACK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
 PROMPT_COMMAND+=("_exit=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
-PS1+='$(
-	if [[ $_exit -gt 0 ]]; then
-		echo -n "\[${bg[Yellow]}\]$_exit"
-	fi
-)'
+PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Yellow]}\]$_exit" )'
 # user/host depending on root or luser, darker color inside ssd ($EUID is bashism)
 if [[ $EUID == 0 ]]; then
 	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[red]}\]\h'
@@ -173,16 +168,10 @@ fi
 PS1+='$(
 	shopt -s nullglob
 	sessions=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*)
-	if [[ $sessions ]]; then
-		echo -n "\[${bg[White]}\]${#sessions[@]}"
-	fi
+	[[ $sessions ]] && echo -n "\[${bg[White]}\]${#sessions[@]}"
 )'
 # if jobs >0: job count
-PS1+='$(
-	if [[ \j -gt 0 ]]; then
-		echo -n "\[${bg[Cyan]}\]\j"
-	fi
-)'
+PS1+='$( [[ \j -gt 0 ]] && echo -n "\[${bg[Cyan]}\]\j" )'
 # pwd; darker color if not writable
 PS1+='\[$(
 	if [[ -w . ]]; then
