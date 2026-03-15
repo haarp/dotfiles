@@ -572,7 +572,7 @@ function sshenv() {
 #	fi
 
 	local script='
-		[ "$LC_ENV" ] || { echo "sshd rejected our \$LC_ENV?! Bailing out!"; exit 254; }
+		[ "$LC_ENV" ] || { echo "sshd rejected our \$LC_ENV?! Bailing out!" >&1; exit 254; }
 		export SSH_HOME=$(mktemp -d -t ssh-$(whoami).XXXXX) &&
 		<<< "$LC_ENV" base64 -d | tar xzf - -C "$SSH_HOME" &&
 		unset LC_ENV &&
