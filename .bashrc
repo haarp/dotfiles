@@ -50,11 +50,11 @@ if [[ (! "$SSH_HOME") && (! "$SU_HOME") ]]; then
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
 	if [[ $SSH_AUTH_SOCK ]] && kill -0 $SSH_AGENT_PID 2>/dev/null; then
 		:
-	elif kill -0 $(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then
-		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
+	elif kill -0 $(. "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then
+		. "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
 	else
 		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"
-		source "$XDG_CACHE_HOME/ssh-agent-info"
+		. "$XDG_CACHE_HOME/ssh-agent-info"
 	fi
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
@@ -231,7 +231,7 @@ PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
 ## Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
 # Only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
 if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-	echo -e "${bg[cyan]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
+	echo -e "${bg[cyan]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
 	_last=$(last -n 2 --fullnames --time-format iso $USER)
 	read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
 	echo "Last login: $_start from $_addr on $_tty"
@@ -354,8 +354,8 @@ export PAGER=less
 
 ## Colorful ls
 if which dircolors >/dev/null; then
-	if [[ -r ~/.dircolors ]]; then	source <(dircolors -b ~/.dircolors)
-	else							source <(dircolors -b)
+	if [[ -r ~/.dircolors ]]; then	. <(dircolors -b ~/.dircolors)
+	else							. <(dircolors -b)
 	fi
 fi
 
@@ -662,7 +662,7 @@ function yubi() {
 	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
 
 	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
-		source "$SSH_AGENT_FILE" >/dev/null
+		. "$SSH_AGENT_FILE" >/dev/null
 		return
 
 	elif [[ $1 == "kill" ]]; then	# Restart scdaemon when it fucks up
@@ -695,7 +695,7 @@ function yubi() {
 		echo "Starting gpg-agent..."
 		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
 	}
-	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
+	. "$XDG_CACHE_HOME/gpg-agent-info" || return 1
 
 	gpg-connect-agent updatestartuptty /bye	# fix pinentry (see ~/.gnupg/gpg-agent.conf for details)
 }
@@ -1002,7 +1002,7 @@ function nvram-config() {
 #make
 function make2() { (
 	shopt -s extglob
-	source /etc/portage/make.conf
+	. /etc/portage/make.conf
 	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
 ) }
 complete -F _make make2
