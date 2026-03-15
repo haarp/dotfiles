@@ -92,6 +92,21 @@ else
 			}
 		done; unset _pid _name _x _ppid _y
 	fi
+
+	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
+	# but not when SU_HOME set to avoid showing it again when using su/sudo)
+	if [[ ! "$SU_HOME" ]]; then
+		echo -e "${bg[cyan]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
+		_last=$(last -n 2 --fullnames --time-format iso $USER)
+		read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
+		echo "Last login: $_start from $_addr on $_tty"
+		unset _read _user _tty _addr _start _ _end _dur
+		uptime
+		ip -o addr show scope global primary | while read _junk _iface _junk _ip _junk; do
+			[[ "$_iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
+			echo "$_iface $_ip"
+		done; unset _junk _iface _ip
+	fi
 fi
 
 
@@ -217,24 +232,9 @@ PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
 
 
-## Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
-# Only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
-if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-	echo -e "${bg[cyan]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
-	_last=$(last -n 2 --fullnames --time-format iso $USER)
-	read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
-	echo "Last login: $_start from $_addr on $_tty"
-	unset _read _user _tty _addr _start _ _end _dur
-	uptime
-	ip -o addr show scope global primary | while read _junk _iface _junk _ip _junk; do
-		[[ "$_iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
-		echo "$_iface $_ip"
-	done; unset _junk _iface _ip
-fi
 # Mail notification (regular one [and motd] isn't shown because we aren't considered an "interactive" shell anymore)
 [[ "$MAIL" ]] || MAIL="/var/mail/$USER"
 [[ -s "$MAIL" ]] && echo "You have mail in $MAIL"
-
 
 ## Empty (not remove!) mc histories/filepos on login
 # like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
