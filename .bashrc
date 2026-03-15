@@ -600,7 +600,7 @@ function sshenv() {
 	# strip leading whitespace, empty lines and comments
 	#sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
 }
-complete -F _comp_cmd_ssh sshlc
+complete -F _comp_cmd_ssh sshenv
 
 # SU equivalent using sudo using our environment (needs in sudoers: targetpw)
 # sets $SU_HOME pointing to our temporary shared extra files
@@ -626,7 +626,7 @@ function sudoenv() {
 
 	sudo "$@" -- bash -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\""
 }
-complete -F _comp_cmd_sudo sudolc
+complete -F _comp_cmd_sudo sudoenv
 
 # SU using our environment
 # sets $SU_HOME pointing to our temporary shared extra files
