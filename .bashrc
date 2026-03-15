@@ -145,10 +145,10 @@ PS1=""
 # reset to all bold black text
 PS1+='\[${f[reset]}${f[bold]}${fg[BLACK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
-PROMPT_COMMAND+=("_RET=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
+PROMPT_COMMAND+=("_exit=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
 PS1+='$(
-	if [[ $_RET -gt 0 ]]; then
-		echo -n "\[${bg[Yellow]}\]$_RET"
+	if [[ $_exit -gt 0 ]]; then
+		echo -n "\[${bg[Yellow]}\]$_exit"
 	fi
 )'
 # user/host depending on root or luser, darker color inside ssd ($EUID is bashism)
@@ -939,12 +939,11 @@ function diff() {
 		command diff "$@" | "$diffhighlight" | sed -e "s/\$/${fg[reset]}/" \
 			-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
 			-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
-		local _exit=${PIPESTATUS[0]}
+		local exit=${PIPESTATUS[0]}
 		[[ "$builtdh" ]] && rm -r "/tmp/diff-highlight-$$"
-		return $_exit
+		return $exit
 	else
 		command diff "$@"
-		return $?
 	fi
 }
 
@@ -1506,7 +1505,7 @@ function settermtitle() {
 	# check each component against BASH_COMMAND
 	local cmd
 	for cmd in "${PROMPT_COMMAND[@]}"; do
-		###echo "$_cmd"
+		###echo "$cmd"
 		if [[ "$BASH_COMMAND" == "$cmd" ]]; then
 			return
 		fi
