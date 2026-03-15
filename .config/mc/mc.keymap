@@ -3,5 +3,5 @@
 Select = equal
 [panel]
 Search = shift-slash
-PanelOtherSync = shift-tab
 Select = equal
+PanelOtherSync = shift-tab
