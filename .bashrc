@@ -220,6 +220,31 @@ PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
 
 
+## Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
+# Only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
+if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
+	echo -e "${bg[cyan]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
+	_last=$(last -n 2 --fullnames --time-format iso $USER)
+	read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
+	echo "Last login: $_start from $_addr on $_tty"
+	unset _read _user _tty _addr _start _ _end _dur
+	uptime
+	ip -o addr show scope global primary | while read _junk _iface _junk _ip _junk; do
+		[[ "$_iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
+		echo "$_iface $_ip"
+	done; unset _junk _iface _ip
+fi
+# Mail notification (regular one [and motd] isn't shown because we aren't considered an "interactive" shell anymore)
+[[ "$MAIL" ]] || MAIL="/var/mail/$USER"
+[[ -s "$MAIL" ]] && echo "You have mail in $MAIL"
+
+
+## Empty (not remove!) mc histories/filepos on login
+# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
+[[ -e "$XDG_DATA_HOME/mc/history" ]] && > "$XDG_DATA_HOME/mc/history"
+[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && > "$XDG_DATA_HOME/mc/filepos"
+
+
 ## Readline binds
 #	press ctrl+v or run `read`, then the key to see codes
 #	"bind -p" to dump current binds, "bind -r" to unbind (might be necessary before adding new compose-style binds)
@@ -313,10 +338,6 @@ export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:c
 ##bind '"\C-[[24~": "\C-ahh\C-j"'	# bind to F12
 ##HISTIGNORE="$HISTIGNORE:hh"
 
-## Empty (not remove!) mc histories/filepos on login
-# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
-[[ -e "$XDG_DATA_HOME/mc/history" ]] && > "$XDG_DATA_HOME/mc/history"
-[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && > "$XDG_DATA_HOME/mc/filepos"
 
 ## Personal preferences
 export EDITOR="mcedit -d"	# see aliases below
@@ -369,26 +390,6 @@ function command_not_found_handle {
 	echo "What did you think \`$1\` was, dumb meatbag?!" >&2
 	return 127
 }
-
-
-## Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
-# Only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
-if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-	echo -e "${bg[cyan]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
-	_last=$(last -n 2 --fullnames --time-format iso $USER)
-	read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
-	echo "Last login: $_start from $_addr on $_tty"
-	unset _read _user _tty _addr _start _ _end _dur
-	uptime
-	ip -o addr show scope global primary | while read _junk _iface _junk _ip _junk; do
-		[[ "$_iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
-		echo "$_iface $_ip"
-	done; unset _junk _iface _ip
-fi
-# Mail notification (regular one [and motd] isn't shown because we aren't considered an "interactive" shell anymore)
-[[ "$MAIL" ]] || MAIL="/var/mail/$USER"
-[[ -s "$MAIL" ]] && echo "You have mail in $MAIL"
-
 
 ## Source a few bash-completions non-dynamically so we can assign more commands to them later on
 # TODO: See if we can recreate /usr/share/bash-completion/completions in home so this works dynamically
