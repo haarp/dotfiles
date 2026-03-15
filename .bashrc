@@ -125,6 +125,7 @@ unset _locales _fallback _cat
 
 ## Colors! Formatting!
 # https://en.wikipedia.org/wiki/ANSI_escape_code https://misc.flogisoft.com/bash/tip_colors_and_formatting
+# also useful: x11-apps/rgb or x11-server-utils
 # TODO: 58,59 underline color
 # formatting
 declare -A f=(
