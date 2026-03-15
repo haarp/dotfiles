@@ -1,7 +1,14 @@
 # only delta from /etc/mc/mc.default.keymap
+# default binds are eternal and refuse to be unbound. like ctrl-enter -> PutCurrentSelected or plus -> Select
 [main]
-Select = equal
+PutCurrentTagged = ctrl-enter; ctrl-del
+PutCurrentFullSelected = ctrl-shift-enter
+CompareFiles = alt-d
+
 [panel]
-Search = shift-slash
+# shift-slash also inserts a `?`
+Search = alt-slash
 Select = equal
+Unselect = minus
+SelectInvert = plus; del
 PanelOtherSync = shift-tab
