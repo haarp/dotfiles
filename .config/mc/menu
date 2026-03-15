@@ -95,10 +95,6 @@ shell_patterns=0
 ##############################################################################
 
 
-= ! t t & x /usr/bin/xdg-open
-o Open file with GUI application
-	xdg-open "%f"
-
 +
 ! Create empty file
 	f=%{filename}
