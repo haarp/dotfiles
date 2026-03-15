@@ -435,17 +435,17 @@ if command -v schedtool >/dev/null && [[ $(</proc/version) =~ '-ck' ]]; then
 	# more info on classes/policies: https://lwn.net/Articles/805317/
 	# schedtool -I and -D need -ck kernels
 	if [[ $EUID -eq 0 ]]; then	alias hipri='schedtool -I -n-10 -e'
-	else				alias hipri='schedtool -I -n-5 -e'	# -5 only works on hellbringer, usually limited to 0
+	else						alias hipri='schedtool -I -n-5 -e'	# -5 only works on hellbringer, usually limited to 0
 	fi
 	alias lopri='ionice -c3 schedtool -D -n15 -e'	# ionice supports -c3 but only as root
 elif command -v schedtool >/dev/null; then
 	if [[ $EUID -eq 0 ]]; then	alias hipri='nice -n-10'
-	else				alias hipri='nice -n-5'
+	else						alias hipri='nice -n-5'
 	fi
 	alias lopri='ionice -c3 schedtool -B -n15 -e'
 else
 	if [[ $EUID -eq 0 ]]; then	alias hipri='nice -n-10'
-	else				alias hipri='nice -n-5'
+	else						alias hipri='nice -n-5'
 	fi
 	alias lopri='ionice -c3 nice -n15'
 fi
@@ -531,10 +531,11 @@ alias hexencode2='od -A none -t x2'
 alias yt-dlp='yt-dlp -o "%(title)s.%(ext)s" --embed-metadata'	# cleaner filename, chapter info and stuff
 alias yt-dlp-subs='yt-dlp --all-subs'
 alias yt-dlp-audio='yt-dlp -xf "(bestaudio/best)[ext=m4a][abr>240]/(bestaudio/best)[ext=mp4][abr>240]/
-								mp3-320/(bestaudio/best)[ext=mp3][abr=320]/
-								aac-hi/22/(bestaudio/best)[ext=m4a]/(bestaudio/best)[ext=mp4]/
-								(bestaudio/best)[ext=mp3]/
-								(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]"'
+	mp3-320/(bestaudio/best)[ext=mp3][abr=320]/
+	aac-hi/22/(bestaudio/best)[ext=m4a]/(bestaudio/best)[ext=mp4]/
+	(bestaudio/best)[ext=mp3]/
+	(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]"
+'
 alias yt-dlp-audio-thumb='yt-dlp-audio --embed-thumbnail'	# only use when thumb not already included! (needs atomicparsley for mp4)
 alias yt-dlp-audio-index='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s"'	# index albums/playlists
 alias yt-dlp-audio-index-thumb='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s" --embed-thumbnail'
@@ -545,7 +546,6 @@ alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://git
 alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
 alias prettyjson='python -m json.tool'	# alternative to `jq`
 alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
-
 
 
 ## Custom functions
@@ -866,7 +866,7 @@ function tree() {
 # mkdir and cd in one
 function mkcd() {
 	if [[ -d "${1:?missing arg}" ]]; then	echo "$1 already exists, entering." >&2
-	else	mkdir -p -- "$1"
+	else									mkdir -p -- "$1"
 	fi
 	cd -- "$1"
 }
@@ -1531,7 +1531,7 @@ function _show_time() {
 
 	if ((h>0)); then	echo " (${h}h ${m}m ${s}s)"
 	elif ((m>0)); then	echo " (${m}m ${s}s)"
-	else			echo " (${s}s)"
+	else				echo " (${s}s)"
 	fi
 }
 function _clean_command() {
