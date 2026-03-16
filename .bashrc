@@ -107,6 +107,10 @@ else
 			echo "$_iface $_ip"
 		done; unset _junk _iface _ip
 	fi
+
+	# Mail notification isn't shown because we aren't considered an "interactive" shell anymore
+	[[ "$MAILPATH" ]] || MAILPATH="/var/mail/$USER"
+	[[ -s "$MAILPATH" ]] && echo "You have mail in $MAILPATH"
 fi
 
 
@@ -222,10 +226,6 @@ PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 ##PROMPT_COMMAND+=('printf "⏎%$((COLUMNS-1))s\\r\\033[K"')
 PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
 
-
-# Mail notification (regular one [and motd] isn't shown because we aren't considered an "interactive" shell anymore)
-[[ "$MAIL" ]] || MAIL="/var/mail/$USER"
-[[ -s "$MAIL" ]] && echo "You have mail in $MAIL"
 
 ## Empty (not remove!) mc histories/filepos on login
 # like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
