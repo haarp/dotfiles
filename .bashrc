@@ -52,9 +52,9 @@ done; unset _dir
 declare -A f=(
 	[reset]=$'\e[0m'
 	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [underline]=$'\e[4m' [blink]=$'\e[5m'
-	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strikethrough]=$'\e[9m'
+	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strike]=$'\e[9m'
 	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~underline]=$'\e[24m' [~blink]=$'\e[25m'
-	[~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strikethrough]=$'\e[29m'
+	[~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strike]=$'\e[29m'
 )
 # normal/high-intensity foreground colors
 declare -A fg=(
@@ -735,7 +735,7 @@ function screen() {
 # Make a bash function runnable as a binary (use with nice, screen, etc.)
 function asbin() {
 	export -f "${1:?missing function name}" && \
-	echo "${f[strikethrough]}$1${f[~strikethrough]} → bash -c '$1'"
+	echo "${f[strike]}$1${f[~strike]} → bash -c '$1'"
 }
 
 # Edit filenames quickly and interactively by calling mv with only one arg
