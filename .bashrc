@@ -221,6 +221,11 @@ PS1+='\[${fg[BLACK]}${f[inverse]}\]\[${f[reset]}\]'
 # Secondary prompt (e.g. missing closing quotes)
 PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 
+# Terminal title used while idle (prompt-like)
+PST1='[\u@\h]: \w $( _show_time $(($SECONDS - ${_timer:-0})) )(\t)'
+# Terminal title used while running command (prompt-like)
+PST2='\c [@\h] (\t)'
+
 
 # Re-enable echo with each prompt (view term settings with stty -a)
 # (very useful when a stupid cmd like patch is ctrl+c'ed while prompting for something)
@@ -233,6 +238,8 @@ PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 ##PROMPT_COMMAND+=('printf "⏎%$((COLUMNS-1))s\\r\\033[K"')
 PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
 
+# Trim dirs displayed with `\w`
+PROMPT_DIRTRIM=3
 
 ## Empty (not remove!) mc histories/filepos on login
 # like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
@@ -401,7 +408,6 @@ fi
 complete -F _comp_cmd_ssh salt-ssh
 
 
-
 ## Custom aliases
 alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
 #if cp --help | grep -q '\-\-progress-bar'; then	# progress bars with advcpmv, CoW
@@ -545,6 +551,51 @@ alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/ex
 
 
 ## Custom functions
+
+# Set the terminal title
+# parses prompt-like strings
+# $1: title, $2: optional command string, will be cleaned up and `\c` will be substituted by it
+function settermtitle() {
+	[[ "$TERM" == linux ]] && return	# not on vt
+	[[ "$COMP_LINE" ]] && return		# not when bash-completing
+
+	local cmd
+
+	# we don't want PROMPT_COMMAND-triggered DEBUG traps to be able to set the title
+	# check each component against BASH_COMMAND
+	for cmd in "${PROMPT_COMMAND[@]}"; do
+		[[ "$BASH_COMMAND" == "$cmd" ]] && return
+	done
+
+	local text="${1@P}"
+
+	if [[ "$2" ]]; then
+		# clean up the command string
+		# strip env variable assignments and args (FIXME: cmd names with spaces get split)
+		for cmd in $2; do
+			[[ "$cmd" =~ '=' ]] || {
+				# strip path
+				cmd="${cmd##*/}"
+				break
+			}
+		done
+
+		text="${text/\\c/$cmd}"
+	fi
+	echo -ne "\e]0;$text\a"
+}
+# Turn seconds into Hh Mm Ss
+function _show_time() {
+	(($1<5)) && return 1	# don't bother below 5s
+
+	local h m s
+	(( h=$1/3600, m=$1%3600/60, s=$1%60 ))
+
+	if ((h>0)); then	echo "(${h}h ${m}m ${s}s) "
+	elif ((m>0)); then	echo "(${m}m ${s}s) "
+	else				echo "(${s}s) "
+	fi
+}
 
 # Helper function to make certain programs use certain temporary paths
 function _app_env() {
@@ -1487,64 +1538,12 @@ function $wrapper_function_name {
 }
 
 
-
-## Terminal title
-# moved to bottom because other directives impact startup performance and can seriously mess up the DEBUG trap
-function settermtitle() {
-	[[ "$TERM" == linux ]] && return	# not on vt
-	[[ -n "$COMP_LINE" ]] && return		# not when bash-completing
-
-	# we don't want PROMPT_COMMAND-triggered DEBUG traps to mess around here
-	# check each component against BASH_COMMAND
-	local cmd
-	for cmd in "${PROMPT_COMMAND[@]}"; do
-		###echo "$cmd"
-		if [[ "$BASH_COMMAND" == "$cmd" ]]; then
-			return
-		fi
-	done
-	echo -ne "\e]0;$*\a"
-}
-function _show_time() {
-	(($1<5)) && return		# don't bother below 5s
-
-	local h=$(($1/3600))
-	local m=$((($1%3600)/60))
-	local s=$(($1%60))
-
-	if ((h>0)); then	echo " (${h}h ${m}m ${s}s)"
-	elif ((m>0)); then	echo " (${m}m ${s}s)"
-	else				echo " (${s}s)"
-	fi
-}
-function _clean_command() {
-	local c
-
-	for c in "$@"; do
-		[[ "$c" =~ '=' ]] || break
-	done
-	echo "$c"
-}
-function _dir_trim() {
-	local IFS='/'
-	local count="${PROMPT_DIRTRIM:-3}"
-	local dirs
-	read -r -a dirs <<< "$(echo "$@")"
-	[[ "${dirs[0]}" ]] || dirs=("${dirs[@]:1}")
-	if [[ "$count" -ge "${#dirs[@]}" ]]; then
-		local start="/"
-		count="${#dirs[@]}"
-	else
-		local start="…/"
-	fi
-	echo "$start${dirs[*]: -$count}"
-}
-
-# command has ended - reset timer, set title to info and previous cmd's runtime
-PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]: $(_dir_trim "$DIRSTACK") $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
+## Timers and terminal title
+PROMPT_COMMAND+=('settermtitle "$PST1"')
+# should be last PROMPT_COMMAND
 PROMPT_COMMAND+=('unset _timer')
-# command started - start/keep timer, set title to command and start time
-trap '_timer=${_timer:-$SECONDS}; settermtitle "$(_clean_command $BASH_COMMAND) [@$HOSTNAME] ($(printf "%(%H:%M:%S)T" -1))";' DEBUG
+# moved to bottom because other directives put a lot of garbage through the DEBUG trap on startup
+trap ' _timer=${_timer:-$SECONDS}; settermtitle "$PST2" "$BASH_COMMAND" ' DEBUG
 
 
 ## Performance profiling tail
