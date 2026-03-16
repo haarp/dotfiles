@@ -597,7 +597,7 @@ function _show_time() {
 	fi
 }
 
-# Helper function to make certain programs use certain temporary paths
+# Helper function to make some programs use a temporary home
 function _app_env() {
 	if [[ ! -d "$1" ]]; then
 		echo "What are you doing? Need a valid directory as arg!"
