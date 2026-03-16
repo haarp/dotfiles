@@ -1514,18 +1514,16 @@ function _show_time() {
 	fi
 }
 function _clean_command() {
-	local cmd p start=''
+	local c
 
-	read -a cmd <<< "$BASH_COMMAND"
-	for c in "${cmd[@]}"; do
+	for c in "$@"; do
 		[[ "$c" =~ '=' ]] || break
 	done
 	echo "$c"
 }
 PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]:$DIRSTACK $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
 PROMPT_COMMAND+=('unset _timer')
-trap '_timer=${_timer:-$SECONDS}; settermtitle "$(_clean_command) [@$HOSTNAME] ($(printf "%(%H:%M:%S)T" -1))";' DEBUG
-
+trap '_timer=${_timer:-$SECONDS}; settermtitle "$(_clean_command $BASH_COMMAND) [@$HOSTNAME] ($(printf "%(%H:%M:%S)T" -1))";' DEBUG
 
 
 ## Performance profiling tail
