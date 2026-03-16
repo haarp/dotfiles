@@ -554,7 +554,7 @@ function _app_env() {
 	fi
 
 	export HTOPRC="$1/.config/htop/htoprc"
-	ln -sfT "$1/.config/git/config" "$HOME/.gitconfig"
+	alias git="git -c 'include.path=$1/.config/git/config'"
 	export MC_PROFILE_ROOT="$1"
 	export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
 	export SCREENRC="$1/.config/screen/screenrc"
