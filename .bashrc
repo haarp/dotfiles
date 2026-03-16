@@ -1486,9 +1486,6 @@ function $wrapper_function_name {
 
 ## Terminal title
 # moved to bottom because other directives impact startup performance and can seriously mess up the DEBUG trap
-# Showing prompt: Show info, time and last cmd's runtime
-# Running command: show command, hostname, start time
-# FIXME: BASH_COMMAND contains inline foo=bar parameters
 function settermtitle() {
 	[[ "$TERM" == linux ]] && return	# not on vt
 	[[ -n "$COMP_LINE" ]] && return		# not when bash-completing
