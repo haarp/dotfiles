@@ -877,7 +877,7 @@ function btrfs.set.zstd() {
 
 # Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
 function mc() {
-	local pwd_file="$XDG_CACHE_HOME/mc/pwd.$$"
+	local pwd_file="$XDG_CACHE_HOME/mc-pwd.$$"
 
 	command mc -P "$pwd_file" "$@"
 	local exit=$?
