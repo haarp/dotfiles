@@ -1521,8 +1521,11 @@ function _clean_command() {
 	done
 	echo "$c"
 }
+
+# command has ended - reset timer, set title to info and previous cmd's runtime
 PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]:$DIRSTACK $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
 PROMPT_COMMAND+=('unset _timer')
+# command started - start/keep timer, set title to command and start time
 trap '_timer=${_timer:-$SECONDS}; settermtitle "$(_clean_command $BASH_COMMAND) [@$HOSTNAME] ($(printf "%(%H:%M:%S)T" -1))";' DEBUG
 
 
