@@ -31,7 +31,7 @@ export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}
 export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
-for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin "$XDG_DATA_HOME/bin" #/usr/lib/distcc/bin
+for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
 do
 	[[ -d "$_dir" ]] || continue
 	[[ -L "$_dir" ]] && continue	# for merged-usr setups
@@ -107,7 +107,7 @@ else
 	[[ -f ~/.bashrc ]] && . ~/.bashrc
 
 	# Include temporary homes in PATH
-	for _dir in "$SSH_HOME/bin" "$SSH_HOME/.local/share/bin" "$SU_HOME/bin" "$SU_HOME/.local/share/bin"
+	for _dir in "$SSH_HOME/bin" "$SSH_HOME/.local/bin" "$SU_HOME/bin" "$SU_HOME/.local/bin"
 	do
 		[[ -d "$_dir" ]] || continue
 		PATH="$_dir:$PATH"
