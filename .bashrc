@@ -1521,9 +1521,23 @@ function _clean_command() {
 	done
 	echo "$c"
 }
+function _dir_trim() {
+	local IFS='/'
+	local count="${PROMPT_DIRTRIM:-3}"
+	local dirs
+	read -r -a dirs <<< "$(echo "$@")"
+	[[ "${dirs[0]}" ]] || dirs=("${dirs[@]:1}")
+	if [[ "$count" -ge "${#dirs[@]}" ]]; then
+		local start="/"
+		count="${#dirs[@]}"
+	else
+		local start="…/"
+	fi
+	echo "$start${dirs[*]: -$count}"
+}
 
 # command has ended - reset timer, set title to info and previous cmd's runtime
-PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]:$DIRSTACK $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
+PROMPT_COMMAND+=('settermtitle "[$USER@$HOSTNAME]: $(_dir_trim "$DIRSTACK") $(printf "%(%H:%M:%S)T" -1)$(_show_time $(($SECONDS - $_timer)) )"')
 PROMPT_COMMAND+=('unset _timer')
 # command started - start/keep timer, set title to command and start time
 trap '_timer=${_timer:-$SECONDS}; settermtitle "$(_clean_command $BASH_COMMAND) [@$HOSTNAME] ($(printf "%(%H:%M:%S)T" -1))";' DEBUG
