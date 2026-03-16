@@ -53,8 +53,8 @@ declare -A f=(
 	[reset]=$'\e[0m'
 	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [underline]=$'\e[4m' [blink]=$'\e[5m'
 	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strikethrough]=$'\e[9m'
-	[unbolddim]=$'\e[22m' [unitalic]=$'\e[23m' [ununderline]=$'\e[24m' [unblink]=$'\e[25m'
-	[uninverse]=$'\e[27m' [unhidden]=$'\e[28m' [unstrikethrough]=$'\e[29m'
+	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~underline]=$'\e[24m' [~blink]=$'\e[25m'
+	[~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strikethrough]=$'\e[29m'
 )
 # normal/high-intensity foreground colors
 declare -A fg=(
@@ -346,11 +346,11 @@ fi
 export GROFF_NO_SGR=1
 export LESS_TERMCAP_md="${f[bold]}${fg[blue]}"						# begin bold
 export LESS_TERMCAP_mb="${f[blink]}${f[bold]}${fg[red]}"			# begin blinking
-export LESS_TERMCAP_me="${f[unblink]}${f[unbolddim]}${fg[reset]}"	# end mode
+export LESS_TERMCAP_me="${f[~blink]}${f[~bolddim]}${fg[reset]}"		# end mode
 export LESS_TERMCAP_so="${bg[yellow]}"								# begin standout (status line, search terms)
 export LESS_TERMCAP_se="${bg[reset]}"								# end mode
 export LESS_TERMCAP_us="${f[underline]}${fg[magenta]}"				# begin underline
-export LESS_TERMCAP_ue="${f[ununderline]}${fg[reset]}"				# end mode
+export LESS_TERMCAP_ue="${f[~underline]}${fg[reset]}"				# end mode
 
 ## Colorful GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
@@ -735,7 +735,7 @@ function screen() {
 # Make a bash function runnable as a binary (use with nice, screen, etc.)
 function asbin() {
 	export -f "${1:?missing function name}" && \
-	echo "${f[strikethrough]}$1${f[unstrikethrough]} → bash -c '$1'"
+	echo "${f[strikethrough]}$1${f[~strikethrough]} → bash -c '$1'"
 }
 
 # Edit filenames quickly and interactively by calling mv with only one arg
