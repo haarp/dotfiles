@@ -572,8 +572,8 @@ function sshenv() {
 	)
 
 	# turn us into a var suitable for OpenSSH's default AcceptEnv
-	local LC_ENV=$(tar czf - -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${extra_files[@]}" | base64)
-	# NOTE: large variables cause dropbear to fail, openssh doesn't care tho (https://github.com/mkj/dropbear/issues/177)
+	local LC_ENV=$(tar cJf - -h -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${extra_files[@]}" | base64)
+	# NOTE: dropbear fails on large vars, openssh doesn't care (https://github.com/mkj/dropbear/issues/177)
 #	if [[ "${#LC_ENV}" -gt 35000 ]]; then
 #		echo "Your environment is too big! ${#LC_ENV} > 35000! Aborting." >&2
 #		return 1
@@ -582,7 +582,7 @@ function sshenv() {
 	local script='
 		[ "$LC_ENV" ] || { echo "sshd rejected our \$LC_ENV?! Bailing out!" >&1; exit 254; }
 		export SSH_HOME=$(mktemp -d -t ssh-$(whoami).XXXXX) &&
-		<<< "$LC_ENV" base64 -d | tar xzf - -C "$SSH_HOME" &&
+		<<< "$LC_ENV" base64 -d | tar xJf - -C "$SSH_HOME" &&
 		unset LC_ENV &&
 		echo "" >>"$SSH_HOME/.bashrc" &&
 		echo "trap -- \"rm -rf \\\"$SSH_HOME\\\"\" EXIT" >>"$SSH_HOME/.bashrc" &&
