@@ -1,4 +1,5 @@
 #!/bin/bash
+### Aut inveniam viam aut faciam
 
 ## Performance profiling (https://stackoverflow.com/a/5015179/5424487) - also see bottom of file
 #PS4='+ $EPOCHREALTIME\011 '
@@ -107,8 +108,8 @@ if [[ (! "$SSH_HOME") && (! "$SU_HOME") ]]; then
 
 else
 	## Slave Shells
-	# Source user bashrc too
-	[[ -f ~/.bashrc ]] && . ~/.bashrc
+	# Source user bashrc too, if it isn't the same as us (loops!)
+	[[ -f ~/.bashrc ]] && { grep -q 'Aut inveniam viam aut faciam' ~/.bashrc || . ~/.bashrc; }
 
 	# Include temporary homes in PATH
 	for _dir in "$SSH_HOME/bin" "$SSH_HOME/.local/bin" "$SU_HOME/bin" "$SU_HOME/.local/bin"
