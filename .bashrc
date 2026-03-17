@@ -845,14 +845,14 @@ function editvar() {
 
 # Give information about arg command
 function wtf() {
+	whatis "$1" | tr -s ' '
 	local path="$(which "$1" 2>/dev/null)"
-	type "$1"
+	type -a "$1"
 	if [[ $path ]]; then
 		local realpath=$(realpath "$path")
 		if [[ "$path" != "$realpath" ]]; then
 			echo "$path is symlinked to $realpath"
 		fi
-		whatis "$1"
 		echo -n "package: "
 		if command -v equery >/dev/null; then equery belongs "$path"; fi
 		if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
