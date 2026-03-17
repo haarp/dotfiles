@@ -377,10 +377,13 @@ export ZSTD_NBTHREADS="0"
 export LESS="$LESS -RiKM --follow-name"
 # Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export SYSTEMD_LESS="$LESS -F"
-# Different approach to syntax highlighting, needs source-highlight (based on https://unix.stackexchange.com/q/191487/138699)
-# not necessarily installed
-command -v source-highlight >/dev/null && \
+# Syntax highlighting for less
+if command -v lesspipe >/dev/null; then
+	export LESSOPEN="|lesspipe %s"
+	export LESSCOLORIZER='pygmentize -P style=emacs'	# less awful color scheme
+elif command -v source-highlight >/dev/null; then	# based on https://unix.stackexchange.com/q/191487/138699
 	export LESSOPEN='|f=%s; lp="$(lesspipe "$f")"; if [[ "$lp" ]]; then echo "$lp"; else source-highlight -i "$f" -o STDOUT -f esc 2>/dev/null; fi'
+fi
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
 ###unset LESSOPEN
