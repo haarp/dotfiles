@@ -605,7 +605,16 @@ function _show_time() {
 	fi
 }
 
-# Helper function to make some programs use a temporary home
+# Files (relative to $HOME) to always take along with the following functions
+ENV_FILES=(
+	".config/git/config"
+	".config/htop/htoprc"
+	".config/lesskey"
+	".config/mc/"
+	".config/screen/screenrc"
+)
+
+# Helper function to make programs use ENV_FILES
 function _app_env() {
 	if [[ ! -d "$1" ]]; then
 		echo "What are you doing? Need a valid directory as arg!"
@@ -621,20 +630,12 @@ function _app_env() {
 }
 
 # SSH using our LC_ env variable hack to dynamically transfer our bashrc and stuff! :3
-# sets $SSH_HOME pointing to our temporary shared extra files
+# sets $SSH_HOME pointing to our temporary ENV_FILES
 # Alternative: https://github.com/cdown/sshrc
 # TODO: check and fix for unpatched ssh (RemoteCommand quirks, tty allocation)
 function sshenv() {
-	local extra_files=(
-		".config/git/config"
-		".config/htop/htoprc"
-		".config/lesskey"
-		".config/mc/"
-		".config/screen/screenrc"
-	)
-
 	# turn us into a var suitable for OpenSSH's default AcceptEnv
-	local LC_ENV=$(tar cJf - -h -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${extra_files[@]}" | base64)
+	local LC_ENV=$(tar cJf - -h -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${ENV_FILES[@]}" | base64)
 	# NOTE: dropbear fails on large vars, openssh doesn't care (https://github.com/mkj/dropbear/issues/177)
 #	if [[ "${#LC_ENV}" -gt 35000 ]]; then
 #		echo "Your environment is too big! ${#LC_ENV} > 35000! Aborting." >&2
@@ -660,21 +661,13 @@ function sshenv() {
 complete -F _comp_cmd_ssh sshenv
 
 # SU equivalent using sudo using our environment (needs in sudoers: targetpw)
-# sets $SU_HOME pointing to our temporary shared extra files
+# sets $SU_HOME pointing to our temporary ENV_FILES
 # HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
 # FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME` -> have target user copy files
 function sudoenv() {
-	local extra_files=(
-		".config/git/config"
-		".config/htop/htoprc"
-		".config/lesskey"
-		".config/mc/"
-		".config/screen/screenrc"
-	)
-
 	local SU_HOME
 	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${extra_files[@]}" "$SU_HOME/") &&
+	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
 	echo '' >>"$SU_HOME/.bashrc" &&
 	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
@@ -685,19 +678,11 @@ function sudoenv() {
 complete -F _comp_cmd_sudo sudoenv
 
 # SU using our environment
-# sets $SU_HOME pointing to our temporary shared extra files
+# sets $SU_HOME pointing to our temporary ENV_FILES
 function suenv() {
-	local extra_files=(
-		".config/git/config"
-		".config/htop/htoprc"
-		".config/lesskey"
-		".config/mc/"
-		".config/screen/screenrc"
-	)
-
 	local SU_HOME
 	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${extra_files[@]}" "$SU_HOME/") &&
+	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
 	echo '' >>"$SU_HOME/.bashrc" &&
 	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
