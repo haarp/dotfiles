@@ -1488,10 +1488,10 @@ function youtube-dl-us() {
 function noise() {
 	local P=(' ' '░' '▒' '▓' '█')
 
-	trap 'trap - SIGINT; tput rmcup; tput cvvis; return' SIGINT
+	trap 'trap - SIGINT; echo -e "\e[?1049l"; echo -e "\e[?25h"; return' SIGINT
 
-	tput civis	# invisible cursor
-	tput smcup	# switch to alternate screen (https://unix.stackexchange.com/q/447009)
+	echo -e "\e[?25l"	# invisible cursor
+	echo -e "\e[?1049h"	# switch to alternate screen
 	while true; do
 		echo -ne "\e[$(( RANDOM % (LINES+1) ));$(( RANDOM % (COLUMNS+1) ))f${P[ $RANDOM%5 ]}"
 	done
