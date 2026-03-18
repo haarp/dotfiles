@@ -386,7 +386,7 @@ elif command -v source-highlight >/dev/null; then	# based on https://unix.stacke
 fi
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
-###unset LESSOPEN
+###LESS="$LESS --no-lessopen"
 
 ## sudo prompt includes target username and fancy lock character
 export SUDO_PROMPT='[sudo] %p  '
@@ -496,7 +496,7 @@ alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no 
 complete -F _comp_cmd_scp scpnokey
 alias scp-resume='rsync --partial --progress --rsh=ssh'
 alias glxgears='vblank_mode=0 glxgears'	# no vsync
-alias less2='LESSOPEN="" less'		# don't open in fucking hex mode
+alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex mode
 alias hexdump='hexdump -C'	# better display
 alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'	# pretend you're busy =D
 #####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
