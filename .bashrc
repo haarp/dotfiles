@@ -667,7 +667,7 @@ complete -F _comp_cmd_ssh sshenv
 function sudoenv() {
 	local SU_HOME
 	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
+	(cd "${SU_HOME:-${SSH_HOME:-$HOME}}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
 	echo '' >>"$SU_HOME/.bashrc" &&
 	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
@@ -682,7 +682,7 @@ complete -F _comp_cmd_sudo sudoenv
 function suenv() {
 	local SU_HOME
 	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "${SSH_HOME:-$HOME}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
+	(cd "${SU_HOME:-${SSH_HOME:-$HOME}}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
 	echo '' >>"$SU_HOME/.bashrc" &&
 	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
