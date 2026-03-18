@@ -820,7 +820,7 @@ function editln() {
 	old=$(readlink -v "$1") || return $?
 
 	if [[ -n "$2" ]]; then
-		ln -vsfn -- "$2" "$1"
+		ln -vsfT -- "$2" "$1"
 	else
 		( cd "$(dirname "$1")"	# for tab completion
 		read -e -i "$old" new
