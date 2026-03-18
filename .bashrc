@@ -378,11 +378,15 @@ export LESS="$LESS -RiKM --follow-name"
 # Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export SYSTEMD_LESS="$LESS -F"
 # Syntax highlighting for less
-if command -v lesspipe >/dev/null; then
-	export LESSOPEN="|lesspipe %s"
-	export LESSCOLORIZER='pygmentize -P style=emacs'	# less awful color scheme
-elif command -v source-highlight >/dev/null; then	# based on https://unix.stackexchange.com/q/191487/138699
-	export LESSOPEN='|f=%s; lp="$(lesspipe "$f")"; if [[ "$lp" ]]; then echo "$lp"; else source-highlight -i "$f" -o STDOUT -f esc 2>/dev/null; fi'
+# TODO: re-investigate `|-` to trigger when piping into less (pygmentize needs `-s` to not block until EOF and can't guess lexer then)
+if command -v lesspipe >/dev/null && grep -q "# Preprocessor for 'less'." "$(which "lesspipe")"; then
+	# Gentoo's app-text/lesspipe will do syntax highlighting
+	export LESSOPEN='|lesspipe %s'
+	export LESSCOLORIZER='pygmentize -g -O style=emacs'	# look at file contents, less awful color scheme
+elif command -v pygmentize >/dev/null; then
+	# Debian's lesspipe will not; manually plug in pygmentize
+	# based on https://unix.stackexchange.com/q/191487/138699
+	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; if [[ "$lp" ]]; then echo "$lp"; else pygmentize -g -O style=emacs "$s"; fi'
 fi
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
