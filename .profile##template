@@ -26,7 +26,7 @@ done; unset _dir
 
 # Create cache/temp dirs
 # NOTE: some early starters (gnome-keyring) need ~/.cache earlier → handled by /etc/local.d
-mkdir -p -m 700 "/tmp/cache-$USER" "$HOME/.cache/gvfs-metadata" "/tmp/.wine-$UID" "/tmp/.wine-$UID/temp"
+mkdir -p -m 700 "/tmp/cache-$USER" "$XDG_CONFIG_HOME/gvfs-metadata" "/tmp/.wine-$UID" "/tmp/.wine-$UID/temp"
 # Wine temp
 for _temp in \
 	$HOME/.wine*/drive_c/windows/temp \
@@ -59,9 +59,9 @@ do
 		GPUCache
 	do
 		if [[ ! -L "$_app/$_temp" && -d "$_app/$_temp" ]]; then
-			mkdir -p -m 700 "$HOME/.cache/$(basename "$_app")/$_temp/"
+			mkdir -p -m 700 "$XDG_CONFIG_HOME/$(basename "$_app")/$_temp/"
 			rm -rf "$_app/$_temp/"
-			ln -s "$HOME/.cache/$(basename "$_app")/$_temp/" "$_app/$_temp"
+			ln -s "$XDG_CONFIG_HOME/$(basename "$_app")/$_temp/" "$_app/$_temp"
 		fi
 	done
 done
