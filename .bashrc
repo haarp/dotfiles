@@ -612,8 +612,9 @@ function _app_env() {
 		return 1
 	fi
 
-	export HTOPRC="$1/.config/htop/htoprc"
 	alias git="git -c 'include.path=$1/.config/git/config'"
+	export HTOPRC="$1/.config/htop/htoprc"
+	export LESSKEYIN="$1/.config/lesskey"
 	export MC_PROFILE_ROOT="$1"
 	export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
 	export SCREENRC="$1/.config/screen/screenrc"
@@ -622,11 +623,13 @@ function _app_env() {
 # SSH using our LC_ env variable hack to dynamically transfer our bashrc and stuff! :3
 # sets $SSH_HOME pointing to our temporary shared extra files
 # Alternative: https://github.com/cdown/sshrc
+# TODO: check and fix for unpatched ssh (RemoteCommand quirks, tty allocation)
 function sshenv() {
 	local extra_files=(
-		".config/htop/htoprc"
-		".config/mc/"
 		".config/git/config"
+		".config/htop/htoprc"
+		".config/lesskey"
+		".config/mc/"
 		".config/screen/screenrc"
 	)
 
@@ -662,9 +665,10 @@ complete -F _comp_cmd_ssh sshenv
 # FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME` -> have target user copy files
 function sudoenv() {
 	local extra_files=(
-		".config/htop/htoprc"
-		".config/mc/"
 		".config/git/config"
+		".config/htop/htoprc"
+		".config/lesskey"
+		".config/mc/"
 		".config/screen/screenrc"
 	)
 
@@ -684,9 +688,10 @@ complete -F _comp_cmd_sudo sudoenv
 # sets $SU_HOME pointing to our temporary shared extra files
 function suenv() {
 	local extra_files=(
-		".config/htop/htoprc"
-		".config/mc/"
 		".config/git/config"
+		".config/htop/htoprc"
+		".config/lesskey"
+		".config/mc/"
 		".config/screen/screenrc"
 	)
 
