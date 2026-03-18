@@ -8,7 +8,7 @@ shell_patterns=1
 auto_save_setup=1
 auto_menu=0
 use_internal_view=1
-use_internal_edit=1
+use_internal_edit=0
 clear_before_exec=1
 mix_all_files=0
 fast_reload=1
@@ -204,7 +204,7 @@ torben_fj_mode=false
 simple_swap=false
 select_flags=6
 
-panel_scroll_center=false
+panel_scroll_center=true
 
 [DiffView]
 show_symbols=false
