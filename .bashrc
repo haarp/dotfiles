@@ -111,8 +111,8 @@ else
 	# Source user bashrc too, if it isn't the same as us (loops!)
 	[[ -f ~/.bashrc ]] && { grep -q 'Aut inveniam viam aut faciam' ~/.bashrc || . ~/.bashrc; }
 
-	# Include temporary homes in PATH
-	for _dir in "$SSH_HOME/bin" "$SSH_HOME/.local/bin" "$SU_HOME/bin" "$SU_HOME/.local/bin"
+	# Include ENV_HOME bins in PATH
+	for _dir in "$ENV_HOME/bin" "$ENV_HOME/.local/bin"
 	do
 		[[ -d "$_dir" ]] || continue
 		PATH="$_dir:$PATH"
@@ -130,8 +130,8 @@ else
 	fi
 
 	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
-	# but not when SU_HOME set to avoid showing it again when using su/sudo)
-	if [[ ! "$SU_HOME" ]]; then
+	# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
+	if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 		echo -e "${bg[cyan]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
 		_last=$(last -n 2 --fullnames --time-format iso $USER)
 		read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
