@@ -643,7 +643,7 @@ function envy() {
 
 	local env=$( tar cJf - -h -C "${ENV_HOME:-$HOME}" -- ".bashrc" "${ENV_FILES[@]}" | base64 ) &&
 	local script="
-		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$(whoami).XXXXXX\" )\" &&
+		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$USER.XXXXXX\" )\" &&
 		<<< \"$env\" base64 -d | tar xJf - -C \"\$ENV_HOME\" &&
 		echo '
 			trap -- \"rm -rf \\\"\$ENV_HOME\\\"\" EXIT
