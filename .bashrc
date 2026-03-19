@@ -502,7 +502,6 @@ alias scp-resume='rsync --partial --progress --rsh=ssh'
 alias glxgears='vblank_mode=0 glxgears'	# no vsync
 alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex mode
 alias hexdump='hexdump -C'	# better display
-alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'	# pretend you're busy =D
 #####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
 if [[ $(<<< $'Python 3.8\n'"$(python --version 2>&1)" sort -V | head -n1) == "Python 3.8" ]]; then
 	# https://stackoverflow.com/a/55501674/5424487
@@ -1489,6 +1488,8 @@ function noise() {
 		echo -ne "\e[$(( RANDOM % (LINES+1) ));$(( RANDOM % (COLUMNS+1) ))f${P[ $RANDOM%5 ]}"
 	done
 }
+# Pretend you're busy =D
+alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'
 
 # Reverse a patch file (http://stackoverflow.com/a/3902431/5424487)
 function reversepatch() {
