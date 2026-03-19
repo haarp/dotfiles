@@ -950,7 +950,8 @@ function mc() {
 
 # Process name for lsof
 function lsofp() {
-	local pids=$(pgrep -d, "$1")
+	local pids
+	pids=$(pgrep -d, "${1:?missing arg}") || return 1
 	shift
 
 	[[ "$pids" ]] || {
