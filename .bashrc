@@ -606,6 +606,7 @@ function _show_time() {
 }
 
 # Environment-providing wrapper :3
+# creates a temporary ENV_HOME on the target system to place ENV_FILES into
 # inspired partially by my old LC_BASHRC and by sshrc
 # TODO: minify bashrc?
 # strip leading whitespace, empty lines and comments
