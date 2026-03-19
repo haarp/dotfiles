@@ -1026,16 +1026,6 @@ function iotop {
 	fi
 }
 
-# Interpret compressed Tomato config file
-function tomato-config() {
-	# Note: sometimes it's gzipped twice!
-	gzip -dc "${1:?missing arg}" | sort -z | tr '\n\0' '\n\n'
-}
-# Sort nvram config file (created with 'nvram export --set')
-function nvram-config() {
-	tr '\n' '\a' <"${1:?missing arg}" | sed 's:\anvram set :\nnvram set :g' | sort | tr '\a' '\n'
-}
-
 # make make make.conf-aware ;)
 # to make autotools shit:
 #libtoolize
