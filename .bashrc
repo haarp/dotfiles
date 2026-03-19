@@ -612,7 +612,7 @@ function _show_time() {
 # strip leading whitespace, empty lines and comments
 #sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
 function envy() {
-	# Files (relative to $HOME) to always take along with us
+	# Files (relative to $HOME or $ENV_HOME) to take along with us
 	# .bashrc is always included.
 	local ENV_FILES=(
 		".config/git/config"
