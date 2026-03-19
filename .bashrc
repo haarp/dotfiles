@@ -956,27 +956,27 @@ function diff() {
 	# we also additionally colorize the entire lines
 	# also see git config
 
-	local diffhighlight="cat"	# if below fails
+	local dh="cat"	# if below fails
 
 	if [[ -e "/usr/bin/diff-highlight" ]]; then	# Gentoo
-		diffhighlight="/usr/bin/diff-highlight"
+		dh="/usr/bin/diff-highlight"
 	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then		# Debian 9
-		diffhighlight="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
+		dh="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
 	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; then	# Debian 10+
 		if ( cp -r "/usr/share/doc/git/contrib/diff-highlight" "/tmp/diff-highlight-$$" &&
 			cd "/tmp/diff-highlight-$$" &&
 			make >/dev/null )
 		then
-			diffhighlight="/tmp/diff-highlight-$$/diff-highlight"; local builtdh=1;
+			dh="/tmp/diff-highlight-$$/diff-highlight"
 		fi
 	fi
 
 	if [[ -t 1 ]]; then	# stdout a terminal?
-		command diff "$@" | "$diffhighlight" | sed -e "s/\$/${fg[reset]}/" \
+		command diff "$@" | "$dh" | sed -e "s/\$/${fg[reset]}/" \
 			-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
 			-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
 		local exit=${PIPESTATUS[0]}
-		[[ "$builtdh" ]] && rm -r "/tmp/diff-highlight-$$"
+		[[ "$dh" == "/tmp/diff-highlight-$$/diff-highlight" ]] && rm -r "/tmp/diff-highlight-$$"
 		return $exit
 	else
 		command diff "$@"
