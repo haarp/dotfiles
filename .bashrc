@@ -606,7 +606,7 @@ function _show_time() {
 }
 
 # Environment-providing wrapper :3
-# inspired by sshrc
+# inspired partially by my old LC_BASHRC and by sshrc
 # TODO: minify bashrc?
 # strip leading whitespace, empty lines and comments
 #sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
