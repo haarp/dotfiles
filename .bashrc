@@ -661,36 +661,26 @@ function sshenv() {
 }
 complete -F _comp_cmd_ssh sshenv
 
-# SU equivalent using sudo using our environment (needs in sudoers: targetpw)
+# sudo/su using our environment
+# defaults to sudo, set SU env var to switch to su (`SU=1 dosu`)
 # sets $SU_HOME pointing to our temporary ENV_FILES
-# HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
-# FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME` -> have target user copy files
-function sudoenv() {
-	local SU_HOME
-	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "${SU_HOME:-${SSH_HOME:-$HOME}}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
+function dosu() {
+	local source="${SU_HOME:-${SSH_HOME:-$HOME}}" &&
+	local SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
+	(cd "$source" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
 	echo '' >>"$SU_HOME/.bashrc" &&
 	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
 	echo "_app_env \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
 
-	sudo "$@" -- bash -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\""
-}
-complete -F _comp_cmd_sudo sudoenv
-
-# SU using our environment
-# sets $SU_HOME pointing to our temporary ENV_FILES
-function suenv() {
-	local SU_HOME
-	export SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "${SU_HOME:-${SSH_HOME:-$HOME}}" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
-	echo '' >>"$SU_HOME/.bashrc" &&
-	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
-	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
-	echo "_app_env \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
-
-	# `--login` matches sudo's default of stripping env
-	su --login --whitelist-environment='SU_HOME' -c "exec bash --rcfile \"$SU_HOME/.bashrc\"" -- "$@"
+	if [[ "$SU" ]]; then
+		# `--login` matches sudo's default of stripping env
+		su --login -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\"" -- "$@"
+	else
+		# HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
+		# FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME` -> have target user copy files
+		sudo "$@" -- bash -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\""
+	fi
 }
 
 # Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
