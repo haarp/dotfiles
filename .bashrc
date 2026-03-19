@@ -1500,32 +1500,6 @@ function reversepatch() {
 		-e "s/^PPP${FUNCNAME}PPP/---/" -e "s/^MMM${FUNCNAME}MMM/+++/" "$1" > "$2"
 }
 
-# Create new completion wrapper
-# Source: http://ubuntuforums.org/showthread.php?t=733397&p=4573310#post4573310
-# FIXME: Seems to only use the last char of parameter??
-# Make sure dynamic bashcomp are loaded already. Usage:
-#	Create new alias:					alias lsl='ls -l'
-#	Find old completer (usually starts with _):		complete -p ls → _longopt
-#	Create new completer with additional args:		make-completion-wrapper _longopt _longopt_custom ls -l
-#	Apply new completer:					complete -F _longopt_custom lsl
-# Tip: to create new completions:
-# https://github.com/mbrubeck/compleat
-# https://github.com/posener/complete
-function make-completion-wrapper() {
-	local completer_function_name="$1"
-	local wrapper_function_name="$2"
-	local arg_count=$(($#-3))
-	shift 2
-	local function="
-function $wrapper_function_name {
-	((COMP_CWORD+=$arg_count))
-	COMP_WORDS=( "$@" \${COMP_WORDS[@]:1} )
-	"$completer_function_name"
-}"
-###	echo "$function"
-	eval "$function"
-}
-
 
 ## Timers and terminal title
 PROMPT_COMMAND+=('settermtitle "$PST1"')
