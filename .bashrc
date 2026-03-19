@@ -56,9 +56,9 @@ done; unset _dir
 # formatting
 declare -A f=(
 	[reset]=$'\e[0m'
-	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [underline]=$'\e[4m' [blink]=$'\e[5m'
+	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [uline]=$'\e[4m' [blink]=$'\e[5m'
 	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strike]=$'\e[9m'
-	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~underline]=$'\e[24m' [~blink]=$'\e[25m'
+	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~uline]=$'\e[24m' [~blink]=$'\e[25m'
 	[~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strike]=$'\e[29m'
 )
 # normal/high-intensity foreground colors
@@ -361,8 +361,8 @@ export LESS_TERMCAP_mb="${f[blink]}${f[bold]}${fg[red]}"			# begin blinking
 export LESS_TERMCAP_me="${f[~blink]}${f[~bolddim]}${fg[reset]}"		# end mode
 export LESS_TERMCAP_so="${bg[yellow]}"								# begin standout (status line, search terms)
 export LESS_TERMCAP_se="${bg[reset]}"								# end mode
-export LESS_TERMCAP_us="${f[underline]}${fg[magenta]}"				# begin underline
-export LESS_TERMCAP_ue="${f[~underline]}${fg[reset]}"				# end mode
+export LESS_TERMCAP_us="${f[uline]}${fg[magenta]}"					# begin underline
+export LESS_TERMCAP_ue="${f[~uline]}${fg[reset]}"					# end mode
 
 ## Colorful GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
