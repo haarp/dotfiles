@@ -606,6 +606,7 @@ function _show_time() {
 }
 
 # Files (relative to $HOME) to always take along with the following functions
+# .bashrc is always included.
 ENV_FILES=(
 	".config/git/config"
 	".config/htop/htoprc"
@@ -635,7 +636,7 @@ function _app_env() {
 # TODO: check and fix for unpatched ssh (RemoteCommand quirks, tty allocation)
 function sshenv() {
 	# turn us into a var suitable for OpenSSH's default AcceptEnv
-	local LC_ENV=$(tar cJf - -h -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${ENV_FILES[@]}" | base64)
+	local LC_ENV=$(tar cJf - -h -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${ENV_FILES[@]}" | base64) &&
 	# NOTE: dropbear fails on large vars, openssh doesn't care (https://github.com/mkj/dropbear/issues/177)
 #	if [[ "${#LC_ENV}" -gt 35000 ]]; then
 #		echo "Your environment is too big! ${#LC_ENV} > 35000! Aborting." >&2
