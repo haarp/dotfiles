@@ -79,7 +79,7 @@ declare -A bg=(
 )
 
 
-if [[ (! "$SSH_HOME") && (! "$SU_HOME") ]]; then
+if [[ ! "$ENV_HOME" ]]; then
 	## Master Shell
 
 	# Start SSH agent if there isn't one already running (note: xfce4-session usually starts it)
@@ -605,83 +605,99 @@ function _show_time() {
 	fi
 }
 
-# Files (relative to $HOME) to always take along with the following functions
-# .bashrc is always included.
-ENV_FILES=(
-	".config/git/config"
-	".config/htop/htoprc"
-	".config/lesskey"
-	".config/mc/"
-	".config/screen/screenrc"
-)
-
-# Helper function to make programs use ENV_FILES
-function _app_env() {
-	if [[ ! -d "$1" ]]; then
-		echo "What are you doing? Need a valid directory as arg!"
-		return 1
-	fi
-
-	alias git="git -c 'include.path=$1/.config/git/config'"
-	export HTOPRC="$1/.config/htop/htoprc"
-	export LESSKEYIN="$1/.config/lesskey"
-	export MC_PROFILE_ROOT="$1"
-	export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
-	export SCREENRC="$1/.config/screen/screenrc"
-}
-
-# SSH using our LC_ env variable hack to dynamically transfer our bashrc and stuff! :3
-# sets $SSH_HOME pointing to our temporary ENV_FILES
-# Alternative: https://github.com/cdown/sshrc
-# TODO: check and fix for unpatched ssh (RemoteCommand quirks, tty allocation)
-function sshenv() {
-	# turn us into a var suitable for OpenSSH's default AcceptEnv
-	local LC_ENV=$(tar cJf - -h -C "${SU_HOME:-${SSH_HOME:-$HOME}}" -- ".bashrc" "${ENV_FILES[@]}" | base64) &&
-	# NOTE: dropbear fails on large vars, openssh doesn't care (https://github.com/mkj/dropbear/issues/177)
-#	if [[ "${#LC_ENV}" -gt 35000 ]]; then
-#		echo "Your environment is too big! ${#LC_ENV} > 35000! Aborting." >&2
-#		return 1
-#	fi
-
-	local script='
-		[ "$LC_ENV" ] || { echo "sshd rejected our \$LC_ENV?! Bailing out!" >&1; exit 254; }
-		export SSH_HOME=$(mktemp -d -t ssh-$(whoami).XXXXX) &&
-		<<< "$LC_ENV" base64 -d | tar xJf - -C "$SSH_HOME" &&
-		unset LC_ENV &&
-		echo "" >>"$SSH_HOME/.bashrc" &&
-		echo "trap -- \"rm -rf \\\"$SSH_HOME\\\"\" EXIT" >>"$SSH_HOME/.bashrc" &&
-		echo "_app_env \"$SSH_HOME\"" >>"$SSH_HOME/.bashrc" &&
-		exec bash --rcfile "$SSH_HOME/.bashrc"
+# Environment-providing wrapper :3
+# inspired by sshrc
+# TODO: minify bashrc?
+# strip leading whitespace, empty lines and comments
+#sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
+function envy() {
+	# Files (relative to $HOME) to always take along with us
+	# .bashrc is always included.
+	local ENV_FILES=(
+		".config/git/config"
+		".config/htop/htoprc"
+		".config/lesskey"
+		".config/mc/"
+		".config/screen/screenrc"
+	)
+	# Commands to make apps use the ENV_FILES under ENV_HOME
+	local ENV_COMMANDS='
+		alias git="git -c \"include.path=$ENV_HOME/.config/git/config\""
+		export HTOPRC="$ENV_HOME/.config/htop/htoprc"
+		export LESSKEYIN="$ENV_HOME/.config/lesskey"
+		export MC_PROFILE_ROOT="$ENV_HOME"
+		export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
+		export SCREENRC="$ENV_HOME/.config/screen/screenrc"
 	'
 
-	LC_ENV="$LC_ENV" ssh -o SendEnv=LC_ENV -o RemoteCommand="$script" "$@"
-	# TODO: minify bashrc?
-	# strip leading whitespace, empty lines and comments
-	#sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
+	case "$1" in
+		ssh|sudo|su) ;;
+		*)
+			echo "Wrapper around ssh|sudo|su that brings our environment! ${fg[Magenta]}:3${fg[reset]}" >&2
+			echo "Usage: ${f[bold]}${fg[Magenta]}$FUNCNAME ${fg[blue]}<ssh|sudo|su>${fg[reset]} ${f[~bolddim]}${f[dim]}[args...]${f[~bolddim]}" >&2
+			echo "accepts no commands in ssh mode, interactive sessions only!" >&2
+			return 1
+			;;
+	esac
+
+	local env=$( tar cJf - -h -C "${ENV_HOME:-$HOME}" -- ".bashrc" "${ENV_FILES[@]}" | base64 ) &&
+	local script="
+		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$(whoami).XXXXXX\" )\" &&
+		<<< \"$env\" base64 -d | tar xJf - -C \"\$ENV_HOME\" &&
+		echo '
+			trap -- \"rm -rf \\\"\$ENV_HOME\\\"\" EXIT
+			$ENV_COMMANDS
+		' >> \"\$ENV_HOME/.bashrc\" &&
+		exec bash --rcfile \"\$ENV_HOME/.bashrc\" \"\$@\"
+	" &&
+
+	local via="$1"; shift; case "$via" in
+		ssh)
+			##LC_ENV="$env" ssh -t -o SendEnv=LC_ENV -o RemoteCommand="$script" "$@"
+			ssh -t -o RemoteCommand="$script" "$@"
+			;;
+		sudo|su)
+			local cmdfile="$(mktemp --suffix=.$FUNCNAME)"
+			echo '#!/bin/bash' > "$cmdfile"
+			echo "rm -f \"$cmdfile\"" >> "$cmdfile"
+			echo "$script" >> "$cmdfile"
+			chmod +rx "$cmdfile"	# make executable; and world-readable for `sudo -u luser`
+
+			if [[ "$via" == "sudo" ]]; then
+				SHELL="$cmdfile" sudo -s "$@"
+			else
+				su -s "$cmdfile" "$@"
+			fi
+
+			rm -f "$cmdfile"	# if above failed
+			;;
+	esac
 }
-complete -F _comp_cmd_ssh sshenv
-
-# sudo/su using our environment
-# defaults to sudo, set SU env var to switch to su (`SU=1 dosu`)
-# sets $SU_HOME pointing to our temporary ENV_FILES
-function dosu() {
-	local source="${SU_HOME:-${SSH_HOME:-$HOME}}" &&
-	local SU_HOME=$(mktemp -d -t su-$(whoami).XXXXX) &&
-	(cd "$source" && cp -a --parents ".bashrc" "${ENV_FILES[@]}" "$SU_HOME/") &&
-	echo '' >>"$SU_HOME/.bashrc" &&
-	echo "chown -R \"$USER:\" \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
-	echo "trap -- \"rm -rf \\\"$SU_HOME\\\"\" EXIT" >>"$SU_HOME/.bashrc" &&
-	echo "_app_env \"$SU_HOME\"" >>"$SU_HOME/.bashrc" &&
-
-	if [[ "$SU" ]]; then
-		# `--login` matches sudo's default of stripping env
-		su --login -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\"" -- "$@"
-	else
-		# HINT: use `-EH` to maintain vars such as `$SSH_AUTH_SOCK`
-		# FIXME: `sudo -u luser` broken due to ownership of `$SU_HOME` -> have target user copy files
-		sudo "$@" -- bash -c "SU_HOME=\"$SU_HOME\" exec bash --rcfile \"$SU_HOME/.bashrc\""
+_envy_completion() {
+	# FIXME: ssh and sudo subcmds can't complete options tarting with dashes
+    if [[ $COMP_CWORD -eq 1 ]]; then
+		COMPREPLY=( $(compgen -W "ssh sudo su" -- "${COMP_WORDS[COMP_CWORD]}") )
+		return 0
 	fi
+
+	##declare -p COMP_WORDS COMP_CWORD COMP_LINE COMP_POINT >&2
+
+	# current completion for subcmd
+	local subcmd="${COMP_WORDS[1]}" subcmd_comp temp
+	[[ -f "/usr/share/bash-completion/completions/$subcmd" ]] && . "/usr/share/bash-completion/completions/$subcmd"
+	read -ra temp <<< "$(complete -p "$subcmd")"
+	subcmd_comp="${temp[2]}"
+	[[ "$subcmd_comp" ]] || return 1
+
+	# fool the next call
+	COMP_WORDS=( "${COMP_WORDS[@]:1}" )
+	((COMP_CWORD--))
+##	COMP_LINE="${COMP_LINE##envy }"
+##	COMP_POINT=$(( COMP_POINT-5 ))
+	##declare -p COMP_WORDS COMP_CWORD COMP_LINE COMP_POINT subcmd_comp >&2
+	"$subcmd_comp"
 }
+complete -F _envy_completion envy
 
 # Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
 # Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
