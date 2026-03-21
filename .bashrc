@@ -932,8 +932,9 @@ function btrfs.set.zstd() {
 }
 
 # Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
+# early mc don't use existing files!
 function mc() {
-	local pwd_file="${TMPDIR-/tmp}/mc-$USER/mc.pwd.$$"
+	local pwd_file="${MC_TMPDIR:-${TMPDIR:-/tmp}}/mc.pwd.XXXXXX"
 
 	command mc -P "$pwd_file" "$@"
 	local exit=$?
