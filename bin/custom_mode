@@ -8,15 +8,20 @@
 }
 command -v cvt12 >/dev/null || {
 	# `cvt` doesn't support reduced blanking v2
-	echo "cvt12 not installed!" >&2
-	exit 127
+	echo "cvt12 not installed! Falling back to cvt and reduced blanking v1" >&2
+	oldcvt=1
 }
 
-# generate modeline (always with CVT 1.2 "Reduced Blanking v2")
+# generate modeline (always with best "Reduced Blanking" available)
 # theoretically, more customization is possible with e.g. https://tomverbeure.github.io/video_timings_calculator
 # however, X will not see the proper refresh rate for those...
-modeline=$(cvt12 $2 $3 $4 --rb-v2 | sed -e '1d' -e 's/Modeline //' -e 's/"//g')
-modename=$(awk '{print $1}' <<< "$modeline")
+if [ "$oldcvt" ]; then
+	modeline=$(cvt -r $2 $3 $4)
+else
+	modeline=$(cvt12 $2 $3 $4 --rb-v2)
+fi
+modeline=$(echo "$modeline" | sed -e '1d' -e 's/Modeline //' -e 's/"//g')
+modename=$(echo "$modeline" | awk '{print $1}')
 
 [ "$modeline" ] || exit 1
 
