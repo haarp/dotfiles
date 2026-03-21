@@ -803,7 +803,7 @@ function mv() {
 	if [[ "$#" -eq 1 ]]; then
 		local new
 		read -ei "$1" new
-		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$newname"
+		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$new"
 	else
 		command mv "$@"
 		return
