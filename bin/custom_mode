@@ -1,8 +1,9 @@
 #!/bin/sh
 # Add a custom xrandr mode to an output and print its name
+# keep compatible with `sh`
 
 [ $# -eq 4 ] || {
-	echo "Usage: ${0##*/} <output> <x> <y> <refresh>" >&2
+	echo "Usage: $(basename "$0") <output> <x> <y> <refresh>" >&2
 	exit 127
 }
 command -v cvt12 >/dev/null || {
@@ -20,7 +21,7 @@ modename=$(awk '{print $1}' <<< "$modeline")
 [ "$modeline" ] || exit 1
 
 # create mode in mode pool if it doesn't already exist
-[[ $(xrandr --current) =~ "$modename" ]] || {
+xrandr --current | grep -q "$modename" || {
 	xrandr --newmode $modeline || exit 2
 }
 
@@ -30,4 +31,7 @@ xrandr --addmode "$1" "$modename" || exit 3
 echo "$modename"
 
 # switch to mode
-[ $SWITCH ] && xrandr --output "$1" --mode "$modename"
+# `if` to avoid polluting exit code
+if [ $SWITCH ]; then
+	xrandr --output "$1" --mode "$modename"
+fi
