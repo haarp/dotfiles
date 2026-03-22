@@ -399,18 +399,15 @@ else
 fi
 [[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
 
-## Colorful GCC warnings and errors
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
 ## Some aliasless defaults
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'	# warnings and errors
+export LESS="$LESS -RiKMQ --follow-name --tabs=4"	# allow escapes, dynamic case on search, allow signal kills, better prompt, no bell (can block on older less!), follow filename not inode, proper default tab width
+export SUDO_PROMPT='[sudo] %p  '	# target username and lock char
+export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"
 export XZ_DEFAULTS="--threads=0"
 export ZSTD_NBTHREADS="0"
 
-## Interpet escape sequences, dynamic case on less search, allow signal kills, better prompt, no bell (can block on older less!)
-export LESS="$LESS -RiKMQ --follow-name"
-# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
-export SYSTEMD_LESS="$LESS -F"
 # Syntax highlighting for less
 # TODO: re-investigate `|-` to trigger when piping into less (pygmentize needs `-s` to not block until EOF and can't guess lexer then)
 # FIXME: pygmentize w/ `-g` takes 0.25s to finish
@@ -426,9 +423,6 @@ fi
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
 ###LESS="$LESS --no-lessopen"
-
-## sudo prompt includes target username and fancy lock character
-export SUDO_PROMPT='[sudo] %p  '
 
 ## custom command-not-found handler
 function command_not_found_handle {
