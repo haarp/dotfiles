@@ -625,6 +625,7 @@ function _show_time() {
 # Environment-providing wrapper :3
 # creates a temporary ENV_HOME on the target system to place ENV_FILES into
 # inspired partially by my old LC_BASHRC and by sshrc
+# FIXME: running commands inside sudo won't run bashrc, leading to lots of missing vars
 # TODO: minify bashrc?
 # strip leading whitespace, empty lines and comments
 #sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
@@ -646,7 +647,10 @@ function envy() {
 		export MC_PROFILE_ROOT="$ENV_HOME"
 		export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
 		export SCREENRC="$ENV_HOME/.config/screen/screenrc"
-	'
+	'"
+		export EDITOR=\"$EDITOR\" VIEWER=\"$VIEWER\" PAGER=\"$PAGER\"	# workarounds cuz bashrc might not be read
+		export LESS=\"$LESS\" LESSOPEN=\"$LESSOPEN\" LESSCOLORIZER=\"$LESSCOLORIZER\"
+	"
 
 	case "$1" in
 		ssh|sudo|su) ;;
@@ -660,13 +664,12 @@ function envy() {
 
 	local env=$( tar cJf - -h -C "${ENV_HOME:-$HOME}" -- ".bashrc" "${ENV_FILES[@]}" | base64 ) &&
 	local script="
-		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$USER.XXXXXX\" )\" &&
-		<<< \"$env\" base64 -d | tar xJf - -C \"\$ENV_HOME\" &&
-		echo '
-			SHELL=\"/bin/bash\"
-			trap -- \"rm -rf \\\"\$ENV_HOME\\\"\" EXIT
-			$ENV_COMMANDS
-		' >> \"\$ENV_HOME/.bashrc\" &&
+		set -e
+		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$USER.XXXXXX\" )\"
+		<<< \"$env\" base64 -d | tar xJf - -C \"\$ENV_HOME\"
+		SHELL=\"/bin/bash\"
+		$ENV_COMMANDS
+		echo 'trap -- \"rm -rf \\\"\$ENV_HOME\\\"\" EXIT' >> \"\$ENV_HOME/.bashrc\"
 		exec bash --rcfile \"\$ENV_HOME/.bashrc\" \"\$@\"
 	" &&
 
