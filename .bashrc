@@ -322,6 +322,7 @@ bind "set visible-stats on"					# show character denoting file type in completio
 
 ## Shell options
 export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
+set +o histexpand		# get rid off the fucking annoying `!!` expansion
 ##set -o noclobber		# don't allow > to clobber files (use >| to force)
 ##shopt -s autocd		# cd into dirs by just typing their name
 shopt -s cdspell		# correct typoes while cding
