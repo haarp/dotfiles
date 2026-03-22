@@ -371,7 +371,7 @@ export PAGER=less
 
 ## Colorful ls
 if command -v dircolors >/dev/null; then
-	if [[ -r ~/.dircolors ]]; then	. <(dircolors -b ~/.dircolors)
+	if [[ -r ~/.dir_colors ]]; then	. <(dircolors -b ~/.dir_colors)
 	else							. <(dircolors -b)
 	fi
 fi
