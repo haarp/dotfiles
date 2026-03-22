@@ -298,32 +298,32 @@ bind '"\eqf":"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C
 ## Readline options
 bind "set enable-bracketed-paste on"		# ignore special editing chars (during paste)
 ##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
-##bind "set bell-style visible"			# turn the bell into visible flash (but blocks shell whilst doing so...)
+##bind "set bell-style visible"				# turn the bell into visible flash (but blocks shell whilst doing so...)
 bind "set bell-style none"
 ##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
-bind "set page-completions off"			# no completion pager and don't ask to display smaller lists
+bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
 bind "set completion-query-items 1024"
-bind "set match-hidden-files off"		# don't show hidden files in completions unless requested by prepending .
-bind "set blink-matching-paren on"		# briefly highlight matching bracket on insertion!
-bind "set visible-stats on"			# show character denoting file type in completions
-bind "set colored-stats on"			# colored completion list (using $LS_COLORS)
+bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
+bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
+bind "set visible-stats on"					# show character denoting file type in completions
+bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
 bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
-##bind "set completion-map-case on"		# equal - and _ on completions (also fucks with typed entries)
+##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
 
 ## Shell options
-shopt -s histappend	# don't overwrite history
+shopt -s histappend		# don't overwrite history
 shopt -s checkwinsize	# update $LINES and $COLUMNS after each command
-##shopt -s autocd	# cd into dirs by just typing their name
-shopt -s extglob	# allow some globs like !(foo)
-##shopt -s dotglob	# make * match dotfiles too
-shopt -s globstar	# make ** work recursively
+##shopt -s autocd		# cd into dirs by just typing their name
+shopt -s extglob		# allow some globs like !(foo)
+##shopt -s dotglob		# make * match dotfiles too
+shopt -s globstar		# make ** work recursively
 # don't assume literal * if there's nothing to expand (but breaks bash-completion on old versions)
 [[ ( ${BASH_COMPLETION_VERSINFO[0]} -eq 2 && ${BASH_COMPLETION_VERSINFO[1]} -ge 8 ) || ${BASH_COMPLETION_VERSINFO[0]} -ge 3 ]] && \
 	shopt -s nullglob
 export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
 shopt -s no_empty_cmd_completion	# TAB with empty prompt does nothing
-##set -o noclobber	# don't allow > to clobber files (use >| to force)
-shopt -s cdspell	# correct typoes while cding
+##set -o noclobber		# don't allow > to clobber files (use >| to force)
+shopt -s cdspell		# correct typoes while cding
 
 ## Shell history options
 # save more history, don't put duplicate lines in history, add timestamps
