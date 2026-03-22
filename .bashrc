@@ -52,7 +52,6 @@ done; unset _dir
 ## Colors! Formatting!
 # https://en.wikipedia.org/wiki/ANSI_escape_code https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # also useful: x11-apps/rgb or x11-server-utils
-# TODO: 58,59 underline color
 # formatting
 declare -A f=(
 	[reset]=$'\e[0m'
@@ -76,6 +75,14 @@ declare -A bg=(
 	[Black]=$'\e[100m' [Red]=$'\e[101m' [Green]=$'\e[102m' [Yellow]=$'\e[103m'
 	[Blue]=$'\e[104m' [Magenta]=$'\e[105m' [Cyan]=$'\e[106m' [White]=$'\e[107m'
 	[reset]=$'\e[49m' [BLACK]=$'\e[48;5;232m'
+)
+# underline colors for use w/ f[uline]
+declare -A ul=(
+	[black]=$'\e[58;5;0m' [red]=$'\e[58;5;1m' [green]=$'\e[58;5;2m' [yellow]=$'\e[58;5;3m'
+	[blue]=$'\e[58;5;4m' [magenta]=$'\e[58;5;5m' [cyan]=$'\e[58;5;6m' [white]=$'\e[58;5;7m'
+	[Black]=$'\e[58;5;8m' [Red]=$'\e[58;5;9m' [Green]=$'\e[58;5;10m' [Yellow]=$'\e[58;5;11m'
+	[Blue]=$'\e[58;5;12m' [Magenta]=$'\e[58;5;13m' [Cyan]=$'\e[58;5;14m' [White]=$'\e[58;5;15m'
+	[reset]=$'\e[59m'
 )
 
 
