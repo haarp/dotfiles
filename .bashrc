@@ -412,6 +412,7 @@ export LESS="$LESS -RiKMQ --follow-name"
 export SYSTEMD_LESS="$LESS -F"
 # Syntax highlighting for less
 # TODO: re-investigate `|-` to trigger when piping into less (pygmentize needs `-s` to not block until EOF and can't guess lexer then)
+# FIXME: pygmentize w/ `-g` takes 0.25s to finish
 if command -v lesspipe >/dev/null && grep -q "# Preprocessor for 'less'." "$(which "lesspipe")"; then
 	# Gentoo's app-text/lesspipe will do syntax highlighting
 	export LESSOPEN='|lesspipe %s'
