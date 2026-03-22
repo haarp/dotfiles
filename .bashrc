@@ -307,7 +307,7 @@ bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
 bind "set colored-completion-prefix on"		# color common elements in list on completing
 bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
 ##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
-bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion
+##bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion (but breaks all colors...)
 bind "set completion-query-items 1024"
 ##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
 bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
