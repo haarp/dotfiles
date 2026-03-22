@@ -50,7 +50,7 @@ multiplier = 8
 [font]
 normal.family = "Terminus"
 {% if yadm.class == "home" %}
-size = 6.0
+size = 6.5
 {% endif %}
 {% if yadm.class == "work" %}
 size = 10.0
