@@ -827,7 +827,7 @@ function mv() {
 	fi
 }
 
-# Edit symlinks quickly and interactively
+# Edit symlinks quickly (and optionally interactively)
 function editln() {
 	if [[ $# -eq 0 || $# -gt 2 ]]; then
 		echo "Usage: $FUNCNAME <symlink> [target]"
