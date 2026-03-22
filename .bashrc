@@ -300,26 +300,25 @@ bind '"\eqw":"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b"'
 bind '"\eqf":"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b"'
 
 ## Readline options
-bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
-bind "set active-region-start-color ${f[uline]}${ul[Red]}"	# colors for above
+bind "set active-region-start-color ${f[uline]}${ul[Red]}"	# colors for bracketed paste
 bind "set active-region-end-color ${f[~uline]}${ul[reset]}"
-##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
-##bind "set bell-style visible"				# turn the bell into visible flash (but blocks shell whilst doing so...)
 bind "set bell-style none"
-##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
-bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
-bind "set completion-query-items 1024"
-bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
 bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
-bind "set visible-stats on"					# show character denoting file type in completions
 bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
 bind "set colored-completion-prefix on"		# color common elements in list on completing
-bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion
 bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
 ##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
+bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion
+bind "set completion-query-items 1024"
+##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
+bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
 bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
+bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
+bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
 bind "set revert-all-at-newline on"			# revert modified history lines on enter
+##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
 bind "set skip-completed-text on"			# less annoying completion in the middle of a word
+bind "set visible-stats on"					# show character denoting file type in completions
 
 ## Shell options
 shopt -s histappend		# don't overwrite history
