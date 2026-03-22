@@ -372,6 +372,7 @@ export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:c
 export EDITOR="mcedit -d"	# see aliases below
 export VIEWER=less
 export PAGER=less
+tabs -4
 
 ## Colorful ls
 if command -v dircolors >/dev/null; then
