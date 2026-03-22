@@ -391,9 +391,8 @@ export WHOIS_OPTIONS="-H"
 export XZ_DEFAULTS="--threads=0"
 export ZSTD_NBTHREADS="0"
 
-## Interpet escape sequences, dynamic case on less search, allow signal kills, better prompt
-# -Q: don't ring the bell at EOF (edit: nope, it's blocking! fuck.)
-export LESS="$LESS -RiKM --follow-name"
+## Interpet escape sequences, dynamic case on less search, allow signal kills, better prompt, no bell (can block on older less!)
+export LESS="$LESS -RiKMQ --follow-name"
 # Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export SYSTEMD_LESS="$LESS -F"
 # Syntax highlighting for less
