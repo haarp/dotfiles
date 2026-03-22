@@ -257,7 +257,6 @@ PROMPT_DIRTRIM=3
 
 ## Readline binds
 #	press ctrl+v or run `read`, then the key to see codes
-#	"bind -p" to dump current binds, "bind -r" to unbind (might be necessary before adding new compose-style binds)
 # unbind Ctrl+s, don't make it freeze terminal
 stty -ixon
 # page up/down: cycle through history for commands that start with currently entered text
@@ -320,10 +319,11 @@ bind "set revert-all-at-newline on"			# revert modified history lines on enter
 bind "set skip-completed-text on"			# less annoying completion in the middle of a word
 bind "set visible-stats on"					# show character denoting file type in completions
 
-## Shell options
-export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
+## Shell flags
 set +o histexpand		# get rid off the fucking annoying `!!` expansion
 ##set -o noclobber		# don't allow > to clobber files (use >| to force)
+
+## Shell options
 ##shopt -s autocd		# cd into dirs by just typing their name
 shopt -s cdspell		# correct typoes while cding
 shopt -s checkwinsize	# update $LINES and $COLUMNS after each command
@@ -335,6 +335,9 @@ shopt -s no_empty_cmd_completion	# TAB with empty prompt does nothing
 # don't assume literal * if there's nothing to expand (but breaks bash-completion on old versions)
 [[ ( ${BASH_COMPLETION_VERSINFO[0]} -eq 2 && ${BASH_COMPLETION_VERSINFO[1]} -ge 8 ) || ${BASH_COMPLETION_VERSINFO[0]} -ge 3 ]] && \
 	shopt -s nullglob
+
+## Shell variables
+export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
 
 ## Shell history options
 # save more history, don't put duplicate lines in history, add timestamps
