@@ -55,10 +55,10 @@ done; unset _dir
 # formatting
 declare -A f=(
 	[reset]=$'\e[0m'
-	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [uline]=$'\e[4m' [blink]=$'\e[5m'
-	[inverse]=$'\e[7m' [hidden]=$'\e[8m' [strike]=$'\e[9m'
-	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~uline]=$'\e[24m' [~blink]=$'\e[25m'
-	[~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strike]=$'\e[29m'
+	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [uline]=$'\e[4m'
+	[blink]=$'\e[5m' [inverse]=$'\e[7m' [hidden]=$'\e[8m' [strike]=$'\e[9m'
+	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~uline]=$'\e[24m'
+	[~blink]=$'\e[25m' [~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strike]=$'\e[29m'
 )
 # normal/high-intensity foreground colors
 declare -A fg=(
