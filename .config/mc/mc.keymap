@@ -11,7 +11,7 @@ Search = alt-slash
 Select = equal
 Unselect = minus
 SelectInvert = plus; del
-PanelOtherSync = shift-tab
+PanelOtherSync = shift-tab; alt-i
 
 [editor]
 SyntaxOnOff =
