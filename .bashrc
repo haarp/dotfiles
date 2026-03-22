@@ -158,8 +158,8 @@ fi
 
 
 ## Reset locales that don't exist on a machine (make perl shut the fuck up, fix mc charset(LANG+LC_NUMERIC))
-_locales=$(locale -a 2>/dev/null) ##&& _locales="${_locales//utf8/UTF-8}"
-for _fallback in "en_US.utf8" "C.utf8" "C"; do
+_locales=$(locale -a 2>/dev/null) && _locales="${_locales//utf8/UTF-8}"
+for _fallback in "en_US.UTF-8" "C.UTF-8" "C"; do
 	[[ "$_locales" =~ "$_fallback" ]] && break
 done
 [[ "$LANG" && ! "$_locales" =~ "$LANG" ]] && export LANG="$_fallback"
