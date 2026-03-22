@@ -300,7 +300,9 @@ bind '"\eqw":"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b"'
 bind '"\eqf":"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b"'
 
 ## Readline options
-bind "set enable-bracketed-paste on"		# ignore special editing chars (during paste)
+bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
+bind "set active-region-start-color ${f[uline]}${ul[Red]}"	# colors for above
+bind "set active-region-end-color ${f[~uline]}${ul[reset]}"
 ##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
 ##bind "set bell-style visible"				# turn the bell into visible flash (but blocks shell whilst doing so...)
 bind "set bell-style none"
