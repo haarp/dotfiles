@@ -336,6 +336,7 @@ else
 	export HISTSIZE=999999		# old bash doesn't support -1
 fi
 export HISTFILESIZE=$HISTSIZE	# in lines
+declare -r HISTSIZE HISTFILESIZE
 export HISTTIMEFORMAT="%F %T "
 export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"
 # don't save history if HISTFILE is broken symlink (prevent its creation on unmounted ~/Private)
