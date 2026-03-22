@@ -663,6 +663,7 @@ function envy() {
 		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$USER.XXXXXX\" )\" &&
 		<<< \"$env\" base64 -d | tar xJf - -C \"\$ENV_HOME\" &&
 		echo '
+			SHELL=\"/bin/bash\"
 			trap -- \"rm -rf \\\"\$ENV_HOME\\\"\" EXIT
 			$ENV_COMMANDS
 		' >> \"\$ENV_HOME/.bashrc\" &&
