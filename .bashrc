@@ -312,7 +312,7 @@ bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer
 bind "set completion-query-items 1024"
 ##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
 bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
-bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
+##bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
 bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
 bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
 bind "set revert-all-at-newline on"			# revert modified history lines on enter
