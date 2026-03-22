@@ -298,6 +298,7 @@ bind '"\eqq": "\eb\"\ef\""'		# quote current word
 bind '"\eqn":">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b"'		# common phrases
 bind '"\eqw":"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b"'
 bind '"\eqf":"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b"'
+bind '"\eqF":"find . -iname \"**\"\C-b\C-b"'
 
 ## Readline options
 bind "set active-region-start-color ${f[uline]}${ul[Red]}"	# colors for bracketed paste
