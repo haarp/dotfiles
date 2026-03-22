@@ -676,7 +676,7 @@ function envy() {
 	local subcmd="$1"; shift; case "$subcmd" in
 		ssh)
 			##LC_ENV="$env" ssh -t -o SendEnv=LC_ENV -o RemoteCommand="$script" "$@"
-			ssh -t -o RemoteCommand="$script" "$@"
+			ssh -t -o RemoteCommand="${script//%/%%}" "$@"
 			;;
 		sudo|su)
 			local cmdfile="$(mktemp --suffix=.$FUNCNAME)"
