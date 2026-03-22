@@ -211,14 +211,14 @@ do
 		GIT_PS1_SHOWUNTRACKEDFILES=1
 		GIT_PS1_SHOWUPSTREAM="auto"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
-		PS1+='$(__git_ps1 "\[${bg[Magenta]}\]%s")'
+		PROMPT_COMMAND+=('_git_prompt=$(__git_ps1 "%s")')
 		break
 	fi
 done; unset _gp
-
+# show git prompt and adapt final triangle color
+PS1+='$( [[ "$_git_prompt" ]] && echo "\[${bg[Magenta]}\]$_git_prompt\[${bg[reset]}${fg[Magenta]}\]" || echo "\[${bg[reset]}${fg[Blue]}\]" )'
 # right-pointing triangle, and reset formatting
-# FIXME: can't get transparent background with inverse :<
-PS1+='\[${fg[BLACK]}${f[inverse]}\]\[${f[reset]}\]'
+PS1+='\[${f[reset]}\]'
 
 # Secondary prompt (e.g. missing closing quotes)
 PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
