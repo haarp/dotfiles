@@ -317,6 +317,9 @@ bind "set colored-completion-prefix on"		# color common elements in list on comp
 bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion
 bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
 ##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
+bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
+bind "set revert-all-at-newline on"			# revert modified history lines on enter
+bind "set skip-completed-text on"			# less annoying completion in the middle of a word
 
 ## Shell options
 shopt -s histappend		# don't overwrite history
