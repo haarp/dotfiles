@@ -815,12 +815,6 @@ function screen() {
 	script -q -c "screen $args" /dev/null
 }
 
-# Make a bash function runnable as a binary (use with nice, screen, etc.)
-function asbin() {
-	export -f "${1:?missing function name}" && \
-	echo "${f[strike]}$1${f[~strike]} → bash -c '$1'"
-}
-
 # Edit filenames quickly and interactively by calling mv with only one arg
 function mv() {
 	if [[ "$#" -eq 1 ]]; then
