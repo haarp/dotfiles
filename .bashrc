@@ -230,9 +230,9 @@ PS1+='\[${f[reset]}\]'
 PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
 
 # Terminal title used while idle (prompt-like)
-PST1='[\u@\h]: \w $( _show_time $(($SECONDS - ${_timer:-0})) )(\t)'
+PST1='[\u@\h]: \w $( _show_time $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
 # Terminal title used while running command (prompt-like)
-PST2='\c [@\h] (\t)'
+PST2='\c [@\h] (\t) {$BASHPID}'
 
 
 # Re-enable echo with each prompt (view term settings with stty -a)
