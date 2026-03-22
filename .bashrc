@@ -181,15 +181,16 @@ PS1=""
 PS1+='\[${f[reset]}${f[bold]}${fg[BLACK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
 PROMPT_COMMAND+=("_exit=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
-PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Yellow]}\]$_exit" )'
-# user/host depending on root or luser, darker color inside ssd ($EUID is bashism)
+PROMPT_COMMAND+=('[[ $_exit -gt 0 ]] && _start="" || _start=""')	# handle starting triangle in case of exit>0
+PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Yellow]}\]$_exit" )'
+# user/host depending on root or luser, darker color inside ssh ($EUID is bashism)
 if [[ $EUID == 0 ]]; then
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[red]}\]\h'
-	else							PS1+='\[${bg[Red]}\]\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[red]}\]${_start}\h'
+	else							PS1+='\[${bg[Red]}\]${_start}\h'
 	fi
 else
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[Green]}\]\u@\[${bg[green]}\]\h'
-	else							PS1+='\[${bg[Green]}\]\u@\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[Green]}\]${_start}\u@\[${bg[green]}\]\h'
+	else							PS1+='\[${bg[Green]}\]${_start}\u@\h'
 	fi
 fi
 # if screen sessions >0: session count
