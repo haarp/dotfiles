@@ -277,6 +277,10 @@ bind '"\C-g":glob-list-expansions'
 # ctrl + u
 bind "set bind-tty-special-chars off"
 bind '"\C-u": undo'
+# alt + z: go to OLDPWD ("undo cd")
+bind '"\ez":" cd -\n"'
+# alt + x: go up
+bind '"\ex":" cd ..\n"'
 # shift + tab: complete current string against EVERYTHING from history
 bind '"\e[Z": dynamic-complete-history'
 # F-keys: various nifty things
@@ -284,8 +288,6 @@ bind '"\eOQ": start-kbd-macro'		# F2
 bind '"\eOR": end-kbd-macro'		# F3
 bind '"\eOS": call-last-kbd-macro'	# F4
 ##bind -x '"\e[15~":" xdg-open . 2>/dev/null"'	# F5, already in Alacritty config
-bind '"\e[17~":" cd -\n"'	# F6
-bind '"\e[18~":" cd ..\n"'	# F7
 # alt + q followed by key ("quick snippets")
 bind '"\eq\"": "\"\"\C-b"'		# paired characters
 bind "\"\eq\'\": \"\'\'\C-b\""
