@@ -305,6 +305,8 @@ bind "set active-region-end-color ${f[~uline]}${ul[reset]}"
 bind "set bell-style none"
 bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
 bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
+											# FIXME: LS_COLORS is only read while initializing. would need a .inputrc >:(
+											# https://unix.stackexchange.com/a/741843/138699
 bind "set colored-completion-prefix on"		# color common elements in list on completing
 bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
 ##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
