@@ -506,6 +506,7 @@ else
 	alias lopri='ionice -c3 nice -n15'
 fi
 alias hs='echo "Saving history now!"; history -a'
+alias shist='history -a /dev/stdout | less'	# show session history only
 alias nh='echo "History saving disabled!"; unset HISTFILE'
 alias whoops='history -d -1; history -d -1'	# purge last command from history (and whoops itself)
 alias suicide='nh; exit'	# exit without saving history
