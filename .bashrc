@@ -673,7 +673,7 @@ function envy() {
 		exec bash --rcfile \"\$ENV_HOME/.bashrc\" \"\$@\"
 	" &&
 
-	local via="$1"; shift; case "$via" in
+	local subcmd="$1"; shift; case "$subcmd" in
 		ssh)
 			##LC_ENV="$env" ssh -t -o SendEnv=LC_ENV -o RemoteCommand="$script" "$@"
 			ssh -t -o RemoteCommand="$script" "$@"
@@ -685,7 +685,7 @@ function envy() {
 			echo "$script" >> "$cmdfile"
 			chmod +rx "$cmdfile"	# make executable; and world-readable for `sudo -u luser`
 
-			if [[ "$via" == "sudo" ]]; then
+			if [[ "$subcmd" == "sudo" ]]; then
 				SHELL="$cmdfile" sudo -s "$@"
 			else
 				su -s "$cmdfile" "$@"
