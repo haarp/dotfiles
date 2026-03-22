@@ -280,6 +280,10 @@ bind "set bind-tty-special-chars off"
 bind '"\C-u": undo'
 # shift + tab: complete current string against EVERYTHING from history
 bind '"\e[Z": dynamic-complete-history'
+# alt+2,3,4: start/end/play macro
+bind '"\e2" start-kbd-macro'
+bind '"\e3" end-kbd-macro'
+bind '"\e4" call-last-kbd-macro'
 # F-keys: various nifty things
 ##bind -x '"\e[15~":" xdg-open . 2>/dev/null"'	# F5, already in Alacritty config
 bind '"\e[17~":" cd -\n"'	# F6
