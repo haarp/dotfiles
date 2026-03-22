@@ -390,6 +390,14 @@ export LESS_TERMCAP_se="${bg[reset]}"								# end mode
 export LESS_TERMCAP_us="${f[uline]}${fg[magenta]}"					# begin underline
 export LESS_TERMCAP_ue="${f[~uline]}${fg[reset]}"					# end mode
 
+## Colorful mc, prefer Debian's thin skins
+if [[ $EUID -eq 0 ]]; then
+	export MC_SKIN="modarin256root-defbg"
+else
+	export MC_SKIN="modarin256-defbg"
+fi
+[[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
+
 ## Colorful GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
@@ -443,28 +451,41 @@ complete -F _comp_cmd_ssh salt-ssh
 
 ## Custom aliases
 alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
-#if cp --help | grep -q '\-\-progress-bar'; then	# progress bars with advcpmv, CoW
-#	alias cp='cp --progress-bar --reflink=auto'
-#else	# CoW only
-	alias cp='cp --reflink=auto'
-#fi
-alias ls='ls --human --color=auto --classify --group-directories-first'
-alias l="ls -la"; alias lt="ls --sort=time"
-_GREP_OPTIONS="--color=auto"
-alias grep="grep $_GREP_OPTIONS"; alias egrep="egrep $_GREP_OPTIONS"; alias fgrep="fgrep $_GREP_OPTIONS"
-unset _GREP_OPTIONS
-# mc: set theme, disable annoying mouse
-if [[ $EUID -eq 0 ]]; then	export MC_SKIN="modarin256root-defbg"
-else						export MC_SKIN="modarin256-defbg"
-fi
-[[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
-alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"
-alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
-##alias df='df -h'
+alias 7z7='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on'	# presets to create 7z/zip
+alias 7z7ns='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=off'	# no solid archive
+alias 7zz='7za a -mm=Deflate -mx=9'				# needs p7zip-full (otherwise only 7zr is installed)
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'	# from Debian bashrc, alert to be used with long-running commands
+function apt-belongs() { dpkg -S "$(realpath "$(which "$1")")"; }	# too retarded to resolve actual path itself
+alias apt-depends='apt-cache rdepends --installed'
+alias apt-depgraph='apt-cache depends'
+alias apt-files='dpkg -L'
+alias apt-info='COLUMNS=240 dpkg -l'
+alias apt-purgeremoved="dpkg -l | awk '/^rc/{print \$2}' | xargs dpkg --dry-run --purge"
+alias apt-purgeremoved!="dpkg -l | awk '/^rc/{print \$2}' | xargs dpkg --purge"
+alias apt-removeobsolete!='aptitude remove "~o"'
+alias apt-removeobsolete='aptitude search "~o"'
+alias apt-removeorphans='deborphan --guess-all | xargs dpkg --dry-run -r'
+alias apt-removeorphans!='deborphan --guess-all | xargs dpkg -r'
+alias apt-upgrade='apt install --only-upgrade'
+command -v beep >/dev/null || alias beep='echo -ne "\a"'
+alias cp='cp --reflink=auto'	# CoW (old advcpmv disables reflink, so screw em)
+alias dd='dd status=progress'	# interactively show progress
 alias df2='findmnt -D'
 alias df3='findmnt -D -t nosquashfs,notmpfs,nodevtmpfs'
-alias mount2='findmnt --invert --pseudo'
-alias umount.fuse='fusermount -u'
+##alias df='df -h'
+alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
+alias dl='wget -t0 --waitretry=5 -c -T5'
+alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
+alias ffmpeg='ffmpeg -hide_banner'; alias ffprobe='ffprobe -hide_banner'; alias gdb='gdb -q'
+alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
+alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m\n\e[5m5:blink\e[0m \e[7m7:reverse-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n22: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
+alias glxgears='vblank_mode=0 glxgears'	# no vsync
+alias grep="grep --color=auto"; alias egrep="grep -E"; alias fgrep="grep -F"
+alias zgrep='zgrep --color=auto';  alias zegrep="zgrep -E"; alias zfgrep="zgrep -F"
+alias hgrep='history | grep'	# history grep
+alias hexdump='hexdump -C'	# better display
+alias hexencode2='od -A none -t x2'
+alias hexencode='od -A none -t x1'
 if command -v schedtool >/dev/null && [[ $(</proc/version) =~ '-ck' ]]; then
 	# chrt also exists, is part of util-linux, but can't execute commands
 	# more info on classes/policies: https://lwn.net/Articles/805317/
@@ -484,102 +505,77 @@ else
 	fi
 	alias lopri='ionice -c3 nice -n15'
 fi
-alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
-alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
-command -v beep >/dev/null || alias beep='echo -ne "\a"'
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'	# from Debian bashrc, alert to be used with long-running commands
-alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
-complete -o filenames -F _emerge xemerge demerge
-alias xorgmerge='emerge -av1 --jobs=4 @x11-module-rebuild'
-alias ffmpeg='ffmpeg -hide_banner'; alias ffprobe='ffprobe -hide_banner'; alias gdb='gdb -q'
-# also check out https://www.reddit.com/r/bash/comments/19839z9/curl_geofindme/
-command -v external-ip >/dev/null && alias ipa='external-ip' || alias ipa='ipi'
-alias ipi='curl -s https://icanhazip.com'; alias ipi4='curl -s https://ipv4.icanhazip.com'; alias ipi6='curl -s https://ipv6.icanhazip.com'
-alias ipg='dig @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg4='dig -4 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg6='dig -6 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'
-alias iperppc='curl -s https://erppc.net/ip.php'
-alias resolve='getent hosts'; alias resolve4='getent ahostsv4'; alias resolve6='getent ahostsv6'	# resolve name like libc
-complete -F _ping resolve resolve4 resolve6
-##alias nmap='nmap -PE'			# use ICMP ping for host discovery
-alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (potentially misleadingly slow) reverse DNS lookups on each reply
-alias traceroute='traceroute -n'	# also don't do misleading rDNS queries
-alias nh='echo "History saving disabled!"; unset HISTFILE'
 alias hs='echo "Saving history now!"; history -a'
-alias suicide='nh; exit'	# exit without saving history
-alias hgrep='history | grep'	# history grep
+alias nh='echo "History saving disabled!"; unset HISTFILE'
 alias whoops='history -d -1; history -d -1'	# purge last command from history (and whoops itself)
-alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
-complete -F _comp_cmd_killall stopall contall
-alias winedesktop='wine explorer /desktop=Wine,1024x768'
-alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
-	"$XDG_DATA_HOME"/applications/wine* \
-	"$XDG_DATA_HOME"/desktop-directories/wine* \
-	"$XDG_DATA_HOME"/icons/????_*.xpm \
-	"$XDG_DATA_HOME"/mime/{application,packages}/x-wine-extension-*'
-# wine temp replacer can be found in .profile
-alias rng='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" | head -c80; echo'		# alphanumeric w/o [lI1O0] ([:alnum:] otherwise)
-alias rmg='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 ~!@#$%^&*()_+-=\[\]{}|;\:,./<>?" | head -c80; echo'	# more chars
-alias ssh-add='</dev/null ssh-add'	# "disable" terminal to force ssh-add to use ssh-askpass (https://unix.stackexchange.com/a/352492/138699)
-alias sshnokey='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
-complete -F _comp_cmd_ssh sshnokey
-alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
-complete -F _comp_cmd_scp scpnokey
-alias scp-resume='rsync --partial --progress --rsh=ssh'
-alias glxgears='vblank_mode=0 glxgears'	# no vsync
-alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex mode
-alias hexdump='hexdump -C'	# better display
-#####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
+alias suicide='nh; exit'	# exit without saving history
 if [[ $(<<< $'Python 3.8\n'"$(python --version 2>&1)" sort -V | head -n1) == "Python 3.8" ]]; then
 	# https://stackoverflow.com/a/55501674/5424487
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3.8 -m http.server 8000 --bind ::'
 else
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000'	## [--bind 127.0.0.1]
 fi
+alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
+alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
 alias intercept='strace -ff -e trace=write -e write=1,2 -p'	# show some process' stdout/stderr
-alias 7z7='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on'	# presets to create 7z/zip
-alias 7z7ns='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=off'	# no solid archive
-alias 7zz='7za a -mm=Deflate -mx=9'				# needs p7zip-full (otherwise only 7zr is installed)
-alias dd='dd status=progress'	# interactively show progress
-alias xev2='xev -event keyboard -event button | egrep --line-buffered -o "^ButtonPress|^ButtonRelease|^KeyPress|^KeyRelease|\(keysym.*\)|button [0-9]+" | sed -e "/Press/{N;s/\n/ /;}" -e "/Release/{N;s/\n/ /;}"'	# far less spammy
+command -v external-ip >/dev/null && alias ipa='external-ip' || alias ipa='ipi' # also check out https://www.reddit.com/r/bash/comments/19839z9/curl_geofindme/
+alias iperppc='curl -s https://erppc.net/ip.php'
+alias ipg='dig @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg4='dig -4 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg6='dig -6 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'
+alias ipi='curl -s https://icanhazip.com'; alias ipi4='curl -s https://ipv4.icanhazip.com'; alias ipi6='curl -s https://ipv6.icanhazip.com'
+alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex mode
+alias l="ls -la"; alias lt="ls --sort=time"
+alias ls='ls --human --color=auto --classify --group-directories-first'
 alias lspci2='lspci -nnk'
-alias apt-removeobsolete='aptitude search "~o"'
-alias apt-removeobsolete!='aptitude remove "~o"'
-alias apt-removeorphans='deborphan --guess-all | xargs dpkg --dry-run -r'
-alias apt-removeorphans!='deborphan --guess-all | xargs dpkg -r'
-alias apt-purgeremoved="dpkg -l | awk '/^rc/{print \$2}' | xargs dpkg --dry-run --purge"
-alias apt-purgeremoved!="dpkg -l | awk '/^rc/{print \$2}' | xargs dpkg --purge"
-alias apt-info='COLUMNS=240 dpkg -l'
-alias apt-files='dpkg -L'
-function apt-belongs() { dpkg -S "$(realpath "$(which "$1")")"; }	# too retarded to resolve actual path itself
-alias apt-depgraph='apt-cache depends'
-alias apt-depends='apt-cache rdepends --installed'
-alias apt-upgrade='apt install --only-upgrade'
-alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites) FIXME: doesn't work for gui apps, of course
-alias dl='wget -t0 --waitretry=5 -c -T5'
+# mc: disable annoying mouse
+alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"
+alias mount2='findmnt --invert --pseudo'
+##alias nmap='nmap -PE'			# use ICMP ping for host discovery
+alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
+#####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
+alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (misleadingly slow) reverse DNS lookups on each reply
+alias traceroute='traceroute -n'	# also don't do misleading rDNS queries
+alias prettyjson='python -m json.tool'	# alternative to `jq`
+alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
+alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
+alias resolve='getent hosts'; alias resolve4='getent ahostsv4'; alias resolve6='getent ahostsv6'	# resolve name like libc
+complete -F _ping resolve resolve4 resolve6
+alias rng='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" | head -c80; echo'		# alphanumeric w/o [lI1O0] ([:alnum:] otherwise)
+alias rng2='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 ~!@#$%^&*()_+-=\[\]{}|;\:,./<>?" | head -c80; echo'	# more chars
+alias scp-resume='rsync --partial --progress --rsh=ssh'
+alias ssh-add='</dev/null ssh-add'	# "disable" terminal to force ssh-add to use ssh-askpass (https://unix.stackexchange.com/a/352492/138699)
+alias sshnokey='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
+alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
+complete -F _comp_cmd_ssh sshnokey; complete -F _comp_cmd_scp scpnokey
+alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
+complete -F _comp_cmd_killall stopall contall
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
+alias umount.fuse='fusermount -u'
+alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
+alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
 alias weather='curl -s https://wttr.in/Augsburg | nowrap'
-alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
-alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
-alias hexencode='od -A none -t x1'
-alias hexencode2='od -A none -t x2'
+alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites) FIXME: doesn't work for gui apps, of course
+# wine temp replacer can be found in .profile
+alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
+	"$XDG_DATA_HOME"/applications/wine* \
+	"$XDG_DATA_HOME"/desktop-directories/wine* \
+	"$XDG_DATA_HOME"/icons/????_*.xpm \
+	"$XDG_DATA_HOME"/mime/{application,packages}/x-wine-extension-*'
+alias winedesktop='wine explorer /desktop=Wine,1024x768'
+alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
+complete -o filenames -F _emerge xemerge demerge
+alias xorgmerge='emerge -av1 --jobs=4 @x11-module-rebuild'
+alias xev2='xev -event keyboard -event button | egrep --line-buffered -o "^ButtonPress|^ButtonRelease|^KeyPress|^KeyRelease|\(keysym.*\)|button [0-9]+" | sed -e "/Press/{N;s/\n/ /;}" -e "/Release/{N;s/\n/ /;}"'	# far less spammy
 alias yt-dlp='yt-dlp -o "%(title)s.%(ext)s" --embed-metadata'	# cleaner filename, chapter info and stuff
-alias yt-dlp-subs='yt-dlp --all-subs'
 alias yt-dlp-audio='yt-dlp -xf "(bestaudio/best)[ext=m4a][abr>240]/(bestaudio/best)[ext=mp4][abr>240]/
 	mp3-320/(bestaudio/best)[ext=mp3][abr=320]/
 	aac-hi/22/(bestaudio/best)[ext=m4a]/(bestaudio/best)[ext=mp4]/
 	(bestaudio/best)[ext=mp3]/
-	(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]"
-'
-alias yt-dlp-audio-thumb='yt-dlp-audio --embed-thumbnail'	# only use when thumb not already included! (needs atomicparsley for mp4)
+	(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]"'
 alias yt-dlp-audio-index='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s"'	# index albums/playlists
+alias yt-dlp-audio-thumb='yt-dlp-audio --embed-thumbnail'	# only use when thumb not already included! (needs atomicparsley for mp4)
 alias yt-dlp-audio-index-thumb='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s" --embed-thumbnail'
-alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
-alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m\n\e[5m5:blink\e[0m \e[7m7:reverse-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n22: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
-alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
-alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
-alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
-alias prettyjson='python -m json.tool'	# alternative to `jq`
-alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
+alias yt-dlp-subs='yt-dlp --all-subs'
 
 
 ## Custom functions
