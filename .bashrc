@@ -676,7 +676,7 @@ function envy() {
 	local script="
 		set -e
 		export SHELL=\"/bin/bash\"
-		export ENV_HOME=\"\$( mktemp -d -p \"/var/tmp\" -t \"env-\$USER.XXXXXX\" )\"
+		export ENV_HOME=\"\$( mktemp -d -p \"\${TMPDIR:-/tmp}\" -t \"env-\$USER.XXXXXX\" )\"
 		<<< \"$env\" base64 -d | tar xJf - -C \"\$ENV_HOME\"
 		$ENV_COMMANDS
 		echo 'trap -- \"rm -rf \\\"\$ENV_HOME\\\"\" EXIT' >> \"\$ENV_HOME/.bashrc\"
