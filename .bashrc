@@ -263,49 +263,48 @@ PROMPT_DIRTRIM=3
 
 
 ## Readline binds
-#	press ctrl+v or run `read`, then the key to see codes
-# unbind Ctrl+s, don't make it freeze terminal
-stty -ixon
+# press ctrl+v or run `read`, then the key to see codes
+stty -ixon								# unbind Ctrl+[sq], don't make it freeze/thaw buffer
+bind "set bind-tty-special-chars off"	# unbind some other defaults (see `stty -a`)
 # page up/down: cycle through history for commands that start with currently entered text
-bind '"\e[5~": history-search-backward'
-bind '"\e[6~": history-search-forward'
+bind ' "\e[5~":		history-search-backward '
+bind ' "\e[6~":		history-search-forward '
 # ctrl + arrow up/down: cycle through history yanking the last argument of the entry
-bind '"\e[1;5A": yank-last-arg'
-bind '"\e[1;5B": "\e-1\e."'
+bind ' "\e[1;5A":	yank-last-arg '
+bind ' "\e[1;5B":	"\e-1\e." '
 # ctrl + arrow left/right
-bind '"\e[1;5D": backward-word'
-bind '"\e[1;5C": forward-word'
+bind ' "\e[1;5D":	backward-word '
+bind ' "\e[1;5C":	forward-word '
 # ctrl + backspace
-bind '"\b": backward-kill-word'
+bind ' "\b":		backward-kill-word '
 # ctrl + del
-bind '"\e[3;5~": kill-word'
+bind ' "\e[3;5~":	kill-word '
 # ctrl + g: list elements of glob behind cursor
-bind '"\C-g":glob-list-expansions'
+bind ' "\C-g":		glob-list-expansions '
 # ctrl + u
-bind "set bind-tty-special-chars off"
-bind '"\C-u": undo'
+bind ' "\C-u":		undo '
 # alt + z: go to OLDPWD ("undo cd")
-bind '"\ez":" cd -\n"'
+bind ' "\ez":		" cd - >/dev/null\n" '
 # alt + x: go up
-bind '"\ex":" cd ..\n"'
+bind ' "\ex":		" cd ..\n" '
 # shift + tab: complete current string against EVERYTHING from history
-bind '"\e[Z": dynamic-complete-history'
+bind ' "\e[Z":		dynamic-complete-history '
 # F-keys: various nifty things
-bind '"\eOQ": start-kbd-macro'		# F2
-bind '"\eOR": end-kbd-macro'		# F3
-bind '"\eOS": call-last-kbd-macro'	# F4
-##bind -x '"\e[15~":" xdg-open . 2>/dev/null"'	# F5, already in Alacritty config
+bind ' "\eOQ":		start-kbd-macro '		# F2
+bind ' "\eOR":		end-kbd-macro '			# F3
+bind ' "\eOS":		call-last-kbd-macro '	# F4
+##bind -x ' "\e[15~":	" xdg-open . 2>/dev/null" '	# F5, already in Alacritty config
 # alt + q followed by key ("quick snippets")
-bind '"\eq\"": "\"\"\C-b"'		# paired characters
-bind "\"\eq\'\": \"\'\'\C-b\""
-bind '"\eq[": "[]\C-b"'
-bind '"\eq{": "{}\C-b"'
-bind '"\eq(": "()\C-b"'
-bind '"\eqq": "\eb\"\ef\""'		# quote current word
-bind '"\eqn":">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b"'		# common phrases
-bind '"\eqw":"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b"'
-bind '"\eqf":"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b"'
-bind '"\eqF":"find . -iname \"**\"\C-b\C-b"'
+bind ' "\eq\"":		"\"\"\C-b" '	# paired characters
+bind " \"\eq'\":	\"''\C-b\" "
+bind ' "\eq[":		"[]\C-b" '
+bind ' "\eq{":		"{}\C-b" '
+bind ' "\eq(":		"()\C-b" '
+bind ' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor (uses `backward-word`, only letters and digits. `shell-backward-word is too janky)
+bind ' "\eqn":		">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '		# common phrases
+bind ' "\eqw":		"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b" '
+bind ' "\eqf":		"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '
+bind ' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
 
 ## Readline options
 bind "set active-region-start-color ${f[u]}${u[R]}"	# colors for bracketed paste
