@@ -370,10 +370,14 @@ export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:c
 ##PROMPT_COMMAND+=('history -a; history -n')
 
 ## HSTR stuff
-##export HH_CONFIG=hicolor
-##bind '"\C-[[24~": "\C-ahh\C-j"'	# bind to F12
-##HISTIGNORE="$HISTIGNORE:hh"
-
+# workaround https://github.com/dvorka/hstr/issues/531 (needs `dev.tty.legacy_tiocsti=1`)
+function hstrnotiocsti() {
+	{ READLINE_LINE="$( { </dev/tty hstr ${READLINE_LINE}; } 2>&1 1>&3 3>&- )"; } 3>&1;
+	READLINE_POINT=${#READLINE_LINE}
+}
+bind -x '"\C-r": "hstrnotiocsti"'	# bind to ctrl-r and F12
+bind -x '"\C-[[24~": "hstrnotiocsti"'
+export HSTR_CONFIG='prompt-bottom,hicolor,hide-basic-help'
 
 ## Personal preferences
 export EDITOR="mcedit -d"	# see aliases below
