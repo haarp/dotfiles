@@ -52,37 +52,44 @@ done; unset _dir
 ## Colors! Formatting!
 # https://en.wikipedia.org/wiki/ANSI_escape_code https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # also useful: x11-apps/rgb or x11-server-utils
-# formatting
-declare -A f=(
-	[reset]=$'\e[0m'
-	[bold]=$'\e[1m' [dim]=$'\e[2m' [italic]=$'\e[3m' [uline]=$'\e[4m'
-	[blink]=$'\e[5m' [inverse]=$'\e[7m' [hidden]=$'\e[8m' [strike]=$'\e[9m'
-	[~bolddim]=$'\e[22m' [~italic]=$'\e[23m' [~uline]=$'\e[24m'
-	[~blink]=$'\e[25m' [~inverse]=$'\e[27m' [~hidden]=$'\e[28m' [~strike]=$'\e[29m'
+declare -A f=(	# formatting
+	# reset
+	[x]=$'\e[0m'
+	# bold, italic, underline, strikethrough
+	[b]=$'\e[1m' [i]=$'\e[3m' [u]=$'\e[4m'  [s]=$'\e[9m'
+	# dim, blinking, inverse, hidden
+	[dim]=$'\e[2m' [bl]=$'\e[5m' [inv]=$'\e[7m' [hid]=$'\e[8m'
+	# switch off above (`~bd` handles both `b` and `dim`)
+	[~bd]=$'\e[22m' [~i]=$'\e[23m' [~u]=$'\e[24m' [~s]=$'\e[29m'
+					[~bl]=$'\e[25m' [~inv]=$'\e[27m' [~hid]=$'\e[28m'
 )
-# normal/high-intensity foreground colors
-declare -A fg=(
-	[black]=$'\e[30m' [red]=$'\e[31m' [green]=$'\e[32m' [yellow]=$'\e[33m'
-	[blue]=$'\e[34m' [magenta]=$'\e[35m' [cyan]=$'\e[36m' [white]=$'\e[37m'
-	[Black]=$'\e[90m' [Red]=$'\e[91m' [Green]=$'\e[92m' [Yellow]=$'\e[93m'
-	[Blue]=$'\e[94m' [Magenta]=$'\e[95m' [Cyan]=$'\e[96m' [White]=$'\e[97m'
-	[reset]=$'\e[39m' [BLACK]=$'\e[38;5;232m'
+declare -A fg=(	# foreground colors
+	# black, red, green, yellow
+	[k]=$'\e[30m' [r]=$'\e[31m' [g]=$'\e[32m' [y]=$'\e[33m'
+	# blue, magenta, cyan, white
+	[b]=$'\e[34m' [m]=$'\e[35m' [c]=$'\e[36m' [w]=$'\e[37m'
+	# high-intensity versions
+	[K]=$'\e[90m' [R]=$'\e[91m' [G]=$'\e[92m' [Y]=$'\e[93m'
+	[B]=$'\e[94m' [M]=$'\e[95m' [C]=$'\e[96m' [W]=$'\e[97m'
+	# pure black
+	[KK]=$'\e[38;5;232m'
+	# reset
+	[x]=$'\e[39m'
 )
-# normal/high-intensity background colors
-declare -A bg=(
-	[black]=$'\e[40m' [red]=$'\e[41m' [green]=$'\e[42m' [yellow]=$'\e[43m'
-	[blue]=$'\e[44m' [magenta]=$'\e[45m' [cyan]=$'\e[46m' [white]=$'\e[47m'
-	[Black]=$'\e[100m' [Red]=$'\e[101m' [Green]=$'\e[102m' [Yellow]=$'\e[103m'
-	[Blue]=$'\e[104m' [Magenta]=$'\e[105m' [Cyan]=$'\e[106m' [White]=$'\e[107m'
-	[reset]=$'\e[49m' [BLACK]=$'\e[48;5;232m'
+declare -A bg=( # background colors
+	[k]=$'\e[40m' [r]=$'\e[41m' [g]=$'\e[42m' [y]=$'\e[43m'
+	[b]=$'\e[44m' [m]=$'\e[45m' [c]=$'\e[46m' [w]=$'\e[47m'
+	[K]=$'\e[100m' [R]=$'\e[101m' [G]=$'\e[102m' [Y]=$'\e[103m'
+	[B]=$'\e[104m' [M]=$'\e[105m' [C]=$'\e[106m' [W]=$'\e[107m'
+	[KK]=$'\e[48;5;232m'
+	[x]=$'\e[49m'
 )
-# underline colors for use w/ f[uline]
-declare -A ul=(
-	[black]=$'\e[58;5;0m' [red]=$'\e[58;5;1m' [green]=$'\e[58;5;2m' [yellow]=$'\e[58;5;3m'
-	[blue]=$'\e[58;5;4m' [magenta]=$'\e[58;5;5m' [cyan]=$'\e[58;5;6m' [white]=$'\e[58;5;7m'
-	[Black]=$'\e[58;5;8m' [Red]=$'\e[58;5;9m' [Green]=$'\e[58;5;10m' [Yellow]=$'\e[58;5;11m'
-	[Blue]=$'\e[58;5;12m' [Magenta]=$'\e[58;5;13m' [Cyan]=$'\e[58;5;14m' [White]=$'\e[58;5;15m'
-	[reset]=$'\e[59m'
+declare -A u=(	# underline colors for use w/ f[u]
+	[k]=$'\e[58;5;0m' [r]=$'\e[58;5;1m' [g]=$'\e[58;5;2m' [y]=$'\e[58;5;3m'
+	[b]=$'\e[58;5;4m' [m]=$'\e[58;5;5m' [c]=$'\e[58;5;6m' [w]=$'\e[58;5;7m'
+	[K]=$'\e[58;5;8m' [R]=$'\e[58;5;9m' [G]=$'\e[58;5;10m' [Y]=$'\e[58;5;11m'
+	[B]=$'\e[58;5;12m' [M]=$'\e[58;5;13m' [C]=$'\e[58;5;14m' [W]=$'\e[58;5;15m'
+	[x]=$'\e[59m'
 )
 
 
@@ -139,7 +146,7 @@ else
 	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
 	# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
 	if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-		echo -e "${bg[cyan]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[reset]}"
+		echo -e "${bg[c]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
 		_last=$(last -n 2 --fullnames --time-format iso $USER)
 		read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
 		echo "Last login: $_start from $_addr on $_tty"
@@ -185,26 +192,26 @@ PS1=""
 ###PS1+="\033[0;$((LINES-1))r"	# reserve bottom line
 ###PS1+='\033[u'			# restore cursor position
 # reset to all bold black text
-PS1+='\[${f[reset]}${f[bold]}${fg[BLACK]}\]'
+PS1+='\[${f[x]}${f[b]}${fg[KK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
 PROMPT_COMMAND+=("_exit=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
-PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Yellow]}\]$_exit" )'
+PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Y]}\]$_exit" )'
 # user/host depending on root or luser, darker color inside ssh ($EUID is bashism)
 if [[ $EUID == 0 ]]; then
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[red]}\]\h'
-	else							PS1+='\[${bg[Red]}\]\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[r]}\]\h'
+	else							PS1+='\[${bg[R]}\]\h'
 	fi
 else
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[Green]}\]\u@\[${bg[green]}\]\h'
-	else							PS1+='\[${bg[Green]}\]\u@\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[G]}\]\u@\[${bg[g]}\]\h'
+	else							PS1+='\[${bg[G]}\]\u@\h'
 	fi
 fi
 # if screen sessions >0: session count
-PS1+='$( shopt -s nullglob; sess=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*); [[ $sess ]] && echo -n "\[${bg[White]}\]${#sess[@]}" )'
+PS1+='$( shopt -s nullglob; sess=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*); [[ $sess ]] && echo -n "\[${bg[W]}\]${#sess[@]}" )'
 # if jobs >0: job count
-PS1+='$( [[ \j -gt 0 ]] && echo -n "\[${bg[Cyan]}\]\j" )'
+PS1+='$( [[ \j -gt 0 ]] && echo -n "\[${bg[C]}\]\j" )'
 # pwd; darker color if not writable
-PS1+='\[$( [[ -w . ]] && echo -n "${bg[Blue]}" || echo -n "${bg[blue]}" )\]\W'
+PS1+='\[$( [[ -w . ]] && echo -n "${bg[B]}" || echo -n "${bg[b]}" )\]\W'
 # git prompt Mk.2
 for _gp in	/usr/share/git/git-prompt.sh /usr/lib/git-core/git-sh-prompt
 do
@@ -222,12 +229,12 @@ do
 	fi
 done; unset _gp
 # show git prompt and adapt final triangle color
-PS1+='$( [[ "$_git_prompt" ]] && echo "\[${bg[Magenta]}\]$_git_prompt\[${bg[reset]}${fg[Magenta]}\]" || echo "\[${bg[reset]}${fg[Blue]}\]" )'
+PS1+='$( [[ "$_git_prompt" ]] && echo "\[${bg[M]}\]$_git_prompt\[${bg[x]}${fg[M]}\]" || echo "\[${bg[x]}${fg[B]}\]" )'
 # right-pointing triangle, and reset formatting
-PS1+='\[${f[reset]}\]'
+PS1+='\[${f[x]}\]'
 
 # Secondary prompt (e.g. missing closing quotes)
-PS2='\[${fg[Yellow]}\]\[${fg[reset]}\]'
+PS2='\[${fg[Y]}\]\[${fg[x]}\]'
 
 # Terminal title used while idle (prompt-like)
 PST1='[\u@\h]: \w $( _show_time $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
@@ -244,7 +251,7 @@ PST2='\c [@\h] (\t) {$BASHPID}'
 # Add final newline when running command missed it
 # https://news.ycombinator.com/item?id=23520240 https://www.vidarholen.net/contents/blog/?p=878
 ##PROMPT_COMMAND+=('printf "⏎%$((COLUMNS-1))s\\r\\033[K"')
-PROMPT_COMMAND+=('printf "${bg[Black]}↵${bg[reset]}%$((COLUMNS-1))s\\r"')
+PROMPT_COMMAND+=('printf "${bg[K]}↵${bg[x]}%$((COLUMNS-1))s\\r"')
 
 # Trim dirs displayed with `\w`
 PROMPT_DIRTRIM=3
@@ -301,8 +308,8 @@ bind '"\eqf":"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C
 bind '"\eqF":"find . -iname \"**\"\C-b\C-b"'
 
 ## Readline options
-bind "set active-region-start-color ${f[uline]}${ul[Red]}"	# colors for bracketed paste
-bind "set active-region-end-color ${f[~uline]}${ul[reset]}"
+bind "set active-region-start-color ${f[u]}${u[R]}"	# colors for bracketed paste
+bind "set active-region-end-color ${f[~u]}${u[x]}"
 bind "set bell-style none"
 bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
 bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
@@ -383,13 +390,13 @@ fi
 
 ## Colorful less and manpages (https://unix.stackexchange.com/a/108840)
 export GROFF_NO_SGR=1
-export LESS_TERMCAP_md="${f[bold]}${fg[blue]}"						# begin bold
-export LESS_TERMCAP_mb="${f[blink]}${f[bold]}${fg[red]}"			# begin blinking
-export LESS_TERMCAP_me="${f[~blink]}${f[~bolddim]}${fg[reset]}"		# end mode
-export LESS_TERMCAP_so="${bg[yellow]}"								# begin standout (status line, search terms)
-export LESS_TERMCAP_se="${bg[reset]}"								# end mode
-export LESS_TERMCAP_us="${f[uline]}${fg[magenta]}"					# begin underline
-export LESS_TERMCAP_ue="${f[~uline]}${fg[reset]}"					# end mode
+export LESS_TERMCAP_md="${f[b]}${fg[b]}"			# begin bold
+export LESS_TERMCAP_mb="${f[bl]}${f[b]}${fg[r]}"	# begin blinking
+export LESS_TERMCAP_me="${f[~bl]}${f[~bd]}${fg[x]}"	# end mode
+export LESS_TERMCAP_so="${bg[y]}"					# begin standout (status line, search terms)
+export LESS_TERMCAP_se="${bg[x]}"					# end mode
+export LESS_TERMCAP_us="${f[u]}${fg[m]}"			# begin underline
+export LESS_TERMCAP_ue="${f[~u]}${fg[x]}"			# end mode
 
 ## Colorful mc, prefer Debian's thin skins
 if [[ $EUID -eq 0 ]]; then
@@ -654,8 +661,8 @@ function envy() {
 	case "$1" in
 		ssh|sudo|su) ;;
 		*)
-			echo "Wrapper around ssh|sudo|su that brings our environment! ${fg[Magenta]}:3${fg[reset]}" >&2
-			echo "Usage: ${f[bold]}${fg[Magenta]}$FUNCNAME ${fg[blue]}<ssh|sudo|su>${fg[reset]} ${f[~bolddim]}${f[dim]}[args...]${f[~bolddim]}" >&2
+			echo "Wrapper around ssh|sudo|su that brings our environment! ${f[b]}${fg[M]}:3${f[~bd]}${fg[x]}" >&2
+			echo "Usage: ${f[b]}${fg[m]}$FUNCNAME ${fg[b]}<ssh|sudo|su>${fg[x]} ${f[~bd]}${f[dim]}[args...]${f[~bd]}" >&2
 			echo "accepts no commands in ssh mode, interactive sessions only!" >&2
 			return 1
 			;;
@@ -882,13 +889,13 @@ function wtf() {
 # Highlight a phrase, now with multiple parameters/colors!
 # FIXME: still buffering a lot before showing
 function hilite() {
-	local palette=(red green yellow blue magenta cyan Red Green Yellow Blue Magenta Cyan)
+	local palette=(r g y b m c R G Y B M C)
 	local phrase code cmd
 	local sep=$'\037'	# separator for sed
 	local i=0
 	for phrase in "${@:?missing arg}"; do
 		color="${palette[$i]}"
-		cmd+="s${sep}\($phrase\)${sep}${bg[$color]}&${bg[reset]}${sep}g;"
+		cmd+="s${sep}\($phrase\)${sep}${bg[$color]}&${bg[x]}${sep}g;"
 		((i++))
 	done
 	sed -u "$cmd"
@@ -1005,9 +1012,9 @@ function diff() {
 	fi
 
 	if [[ -t 1 ]]; then	# stdout a terminal?
-		command diff "$@" | "$dh" | sed -e "s/\$/${fg[reset]}/" \
-			-e "s/^@@/${fg[cyan]}&/" -e "s/^-/${fg[red]}&/" -e "s/^+/${fg[green]}&/" \
-			-e "s/^[0-9]/${fg[cyan]}&/" -e "s/^</${fg[red]}&/" -e "s/^>/${fg[green]}&/"
+		command diff "$@" | "$dh" | sed -e "s/\$/${fg[x]}/" \
+			-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
+			-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
 		local exit=${PIPESTATUS[0]}
 		[[ "$dh" == "/tmp/diff-highlight-$$/diff-highlight" ]] && rm -r "/tmp/diff-highlight-$$"
 		return $exit
