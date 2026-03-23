@@ -523,12 +523,11 @@ alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex
 alias l="ls -la"; alias lt="ls --sort=time"
 alias ls='ls --human --color=auto --classify --group-directories-first'
 alias lspci2='lspci -nnk'
-# mc: disable annoying mouse
-alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"
+alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# mc: disable annoying mouse
 alias mount2='findmnt --invert --pseudo'
 ##alias nmap='nmap -PE'			# use ICMP ping for host discovery
 alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
-#####alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
+##alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
 alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (misleadingly slow) reverse DNS lookups on each reply
 alias traceroute='traceroute -n'	# also don't do misleading rDNS queries
 alias prettyjson='python -m json.tool'	# alternative to `jq`
