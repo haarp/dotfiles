@@ -120,6 +120,11 @@ if [[ ! "$ENV_HOME" ]]; then
 		TMOUT=1800			# log out after 30 min inactivity
 	fi
 
+	## Empty (not remove!) mc histories/filepos on login
+	# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
+	[[ -e "$XDG_DATA_HOME/mc/history" ]] && > "$XDG_DATA_HOME/mc/history"
+	[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && > "$XDG_DATA_HOME/mc/filepos"
+
 else
 	## Slave Shells
 	# Source user bashrc too, if it isn't the same as us (loops!)
@@ -255,11 +260,6 @@ PROMPT_COMMAND+=('printf "${bg[K]}↵${bg[x]}%$((COLUMNS-1))s\\r"')
 
 # Trim dirs displayed with `\w`
 PROMPT_DIRTRIM=3
-
-## Empty (not remove!) mc histories/filepos on login
-# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
-[[ -e "$XDG_DATA_HOME/mc/history" ]] && > "$XDG_DATA_HOME/mc/history"
-[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && > "$XDG_DATA_HOME/mc/filepos"
 
 
 ## Readline binds
