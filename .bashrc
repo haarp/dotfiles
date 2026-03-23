@@ -624,7 +624,7 @@ function _show_time() {
 # Environment-providing wrapper :3
 # creates a temporary ENV_HOME on the target system to place ENV_FILES into
 # inspired partially by my old LC_BASHRC and by sshrc
-# FIXME: non-interactive bash behind su/sudo won't source bashrc, leading to lots of missing vars
+# FIXME: non-interactive bash won't source bashrc, leading to lots of missing vars (duh)
 # TODO: minify bashrc?
 # strip leading whitespace, empty lines and comments
 #sed -e 's/^[\t ]*//' -e '/^$/d' -e 's/[\t ]\+#.*$//' -e '/^#/d' ~/.bashrc
