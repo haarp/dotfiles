@@ -253,7 +253,7 @@ PST2='\c [@\h] (\t) {$BASHPID}'
 # FIXME: this breaks RET?
 ##PROMPT_COMMAND+='stty echo;'
 
-# Add final newline when running command missed it
+# Add final newline when running command missed it (if you don't change terminal width afterwards)
 # https://news.ycombinator.com/item?id=23520240 https://www.vidarholen.net/contents/blog/?p=878
 ##PROMPT_COMMAND+=('printf "⏎%$((COLUMNS-1))s\\r\\033[K"')
 PROMPT_COMMAND+=('printf "${bg[K]}↵${bg[x]}%$((COLUMNS-1))s\\r"')
