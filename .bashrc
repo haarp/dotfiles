@@ -147,7 +147,7 @@ else
 				export SSH_CONNECTION=1
 				break
 			}
-		done; unset _pid _name _junk _ppid _junk
+		done; unset _pid _name _ppid _junk
 	fi
 
 	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
