@@ -179,4 +179,4 @@ export WINEDLLOVERRIDES=winemenubuilder.exe=d
 # also chattr +i the fucking Nextcloud_sync.log, QT_LOGGING_RULES doesn't affect it
 export QT_LOGGING_RULES='*=false'
 
-# vim: set filetype=sh: noexpandtab tabstop=4 shiftwidth=4
+# vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4
