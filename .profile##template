@@ -48,13 +48,13 @@ fi
 # steal list from https://github.com/danisztls/ephemeral/blob/main/ephemeral
 # FIXME: apps don't use the symlinks and even reset Dawn{Graphite,WebGPU}Cache, GPUCache on start :|
 shopt -s extglob
-for _app in \
+( for app in \
 	"$XDG_CONFIG_HOME/discord" \
 	"$XDG_CONFIG_HOME/Signal" \
 	"$XDG_CONFIG_HOME/SideQuest" \
 	"$HOME/snap/slack/"!(current)"/.config/Slack"
 do
-	for _temp in \
+	for temp in \
 		Cache \
 		CachedData \
 		CachedExtensions \
@@ -64,14 +64,13 @@ do
 		DawnWebGPUCache \
 		GPUCache
 	do
-		if [[ ! -L "$_app/$_temp" && -d "$_app/$_temp" ]]; then
-			mkdir -p -m 700 "$XDG_CACHE_HOME/$(basename "$_app")/$_temp/"
-			rm -rf "$_app/$_temp/"
-			ln -s "$XDG_CACHE_HOME/$(basename "$_app")/$_temp/" "$_app/$_temp"
+		if [[ ! -L "$app/$temp" && -d "$app/$temp" ]]; then
+			mkdir -p -m 700 "$XDG_CACHE_HOME/$(basename "$app")/$temp/"
+			rm -rf "$app/$temp/"
+			ln -s "$XDG_CACHE_HOME/$(basename "$app")/$temp/" "$app/$temp"
 		fi
 	done
-done
-unset _app _temp
+done )
 
 {% if yadm.class == "home" %}
 if [[ $DISPLAY ]]; then
