@@ -109,9 +109,9 @@ if [[ ! "$ENV_HOME" ]]; then
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
-	for _pid in $(pgrep -u $USER -x gvfsd); do
-		gdb -batch -ex "attach $_pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null
-	done & disown; unset _pid
+	( for pid in $(pgrep -u $USER -x gvfsd); do
+		gdb -batch -ex "attach $pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null
+	done & disown )
 
 	## Do some things on a Linux console
 	if [[ $TERM == linux ]]; then
@@ -140,28 +140,27 @@ else
 	# Detect if we are an SSH session
 	if [[ ! $SSH_CONNECTION ]]; then
 		until [[ ${_ppid:-$PPID} == 1 ]]; do
-			read _pid _name __x _ppid _y < /proc/${_ppid:-$PPID}/stat
+			read _pid _name _junk _ppid _junk < /proc/${_ppid:-$PPID}/stat
 			[[ $_name =~ sshd|dropbear ]] && {
 				export SSH_CONNECTION=1
 				break
 			}
-		done; unset _pid _name _x _ppid _y
+		done; unset _pid _name _junk _ppid _junk
 	fi
 
 	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
 	# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
-	if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
+	( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 		echo -e "${bg[c]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
-		_last=$(last -n 2 --fullnames --time-format iso $USER)
-		read _user _tty _addr _start _junk _end _dur <<< "${_last#*$'\n'}"	# skip first line (it's us!)
-		echo "Last login: $_start from $_addr on $_tty"
-		unset _read _user _tty _addr _start _ _end _dur
+		last=$(last -n 2 --fullnames --time-format iso $USER)
+		read user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
+		echo "Last login: $start from $addr on $tty"
 		uptime
-		ip -o addr show scope global primary | while read _junk _iface _junk _ip _junk; do
-			[[ "$_iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
-			echo "$_iface $_ip"
-		done; unset _junk _iface _ip
-	fi
+		ip -o addr show scope global primary | while read num iface type ip junk; do
+			[[ "$iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
+			echo "$iface $ip"
+		done;
+	fi )
 
 	# Mail notification isn't shown because we aren't considered an "interactive" shell anymore
 	[[ "$MAILPATH" ]] || MAILPATH="/var/mail/$USER"
