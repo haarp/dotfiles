@@ -212,7 +212,7 @@
 	<name>Download clipboard URL here</name>
 	<submenu></submenu>
 	<unique-id>1472803200891713-1</unique-id>
-	<command>wget -q --content-disposition --no-clobber -P %f -- &quot;$(xclip -o -selection clipboard)&quot;</command>
+	<command>bash -i -c &apos;wget -q --content-disposition --no-clobber -P %f -- &quot;$(xclip -o -selection clipboard)&quot;; #interactive shell for aliases (https://stackoverflow.com/a/1615973)&apos;</command>
 	<description>Download the current clipboard URL into the directory</description>
 	<range>1</range>
 	<patterns>*</patterns>
