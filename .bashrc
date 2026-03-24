@@ -888,16 +888,16 @@ function wtf() {
 	fi
 }
 
-# Highlight a phrase, now with multiple parameters/colors!
+# Highlight phrase(s) with (multiple) colors!
 # FIXME: still buffering a lot before showing
 function hilite() {
 	local palette=(r g y b m c R G Y B M C)
-	local phrase code cmd
+	local phrase cmd
 	local sep=$'\037'	# separator for sed
 	local i=0
 	for phrase in "${@:?missing arg}"; do
-		color="${palette[$i]}"
-		cmd+="s${sep}\($phrase\)${sep}${bg[$color]}&${bg[x]}${sep}g;"
+		color=""
+		cmd+="s${sep}\($phrase\)${sep}${bg[${palette[$i]}]}&${bg[x]}${sep}g;"
 		((i++))
 	done
 	sed -u "$cmd"
