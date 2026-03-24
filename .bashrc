@@ -213,7 +213,7 @@ else
 	fi
 fi
 # if screen sessions >0: session count
-PS1+='$( shopt -s nullglob; sess=(/tmp/screen/S-$USER/* /run/screen/S-$USER/*); [[ $sess ]] && echo -n "\[${bg[W]}\]${#sess[@]}" )'
+PS1+='$( shopt -s nullglob; sess=("${TMPDIR:-/tmp}/screen/S-$USER"/* "/run/screen/S-$USER"/*); [[ $sess ]] && echo -n "\[${bg[W]}\]${#sess[@]}" )'
 # if jobs >0: job count
 PS1+='$( [[ \j -gt 0 ]] && echo -n "\[${bg[C]}\]\j" )'
 # pwd; darker color if not writable
