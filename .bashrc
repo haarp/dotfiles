@@ -387,6 +387,7 @@ export HSTR_CONFIG='prompt-bottom,hicolor,hide-basic-help'
 ## Personal preferences
 tabs -4
 export EDITOR="mcedit -d"	# see aliases below
+# FIXME: viewer in mc shows previous dir's terminal title
 export VIEWER=less
 export PAGER=less
 
