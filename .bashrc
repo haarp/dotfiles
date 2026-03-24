@@ -57,6 +57,8 @@ declare -A f=(	# formatting
 	[x]=$'\e[0m'
 	# bold, italic, underline, strikethrough
 	[b]=$'\e[1m' [i]=$'\e[3m' [u]=$'\e[4m'  [s]=$'\e[9m'
+	# underlines: double, curly, dotted, dashed (https://sw.kovidgoyal.net/kitty/underlines/)
+	[u2]=$'\e[4:2m' [uc]=$'\e[4:3m' [udo]=$'\e[4:4m' [uda]=$'\e[4:5m'
 	# dim, blinking, inverse, hidden
 	[dim]=$'\e[2m' [bl]=$'\e[5m' [inv]=$'\e[7m' [hid]=$'\e[8m'
 	# switch off above (`~bd` does both `~b` and `~dim`)
