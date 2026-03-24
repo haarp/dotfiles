@@ -263,6 +263,10 @@ PROMPT_COMMAND+=('printf "${bg[K]}↵${bg[x]}%$((COLUMNS-1))s\\r"')
 PROMPT_DIRTRIM=3
 
 
+## Version compare (returns 0 if $1 ≥ $2 )
+function vercmp() {	<<< "$2"$'\n'"$1" sort --check=quiet --version-sort && return 0 || return 1; }
+
+
 ## Readline binds
 # press ctrl+v or run `read`, then the key to see codes
 stty -ixon								# unbind Ctrl+[sq], don't make it freeze/thaw buffer
@@ -344,8 +348,7 @@ shopt -s globstar		# make ** work recursively
 shopt -s histappend		# don't overwrite history
 shopt -s no_empty_cmd_completion	# TAB with empty prompt does nothing
 # don't assume literal * if there's nothing to expand (but breaks bash-completion on old versions)
-[[ ( ${BASH_COMPLETION_VERSINFO[0]} -eq 2 && ${BASH_COMPLETION_VERSINFO[1]} -ge 8 ) || ${BASH_COMPLETION_VERSINFO[0]} -ge 3 ]] && \
-	shopt -s nullglob
+vercmp "${BASH_COMPLETION_VERSINFO[*]}" '2 8' && shopt -s nullglob
 
 ## Shell variables
 export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
@@ -355,7 +358,7 @@ export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with da
 # also ignore some commands in history (https://gist.github.com/Angles/3273505)
 # use export!! subshells, screen sessions, etc. MUST inherit these settings! (https://superuser.com/a/664061/476871)
 export HISTCONTROL=ignoreboth
-if [[ ( ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -ge 3 ) || ${BASH_VERSINFO[0]} -ge 5 ]]; then
+if vercmp "$BASH_VERSION" "4.3"; then
 	export HISTSIZE=-1		# number of commands in memory
 else
 	export HISTSIZE=999999		# old bash doesn't support -1
@@ -517,9 +520,9 @@ alias shist='history -a /dev/stdout | less'	# show session history only
 alias nh='echo "History saving disabled!"; unset HISTFILE'
 alias whoops='history -d -1; history -d -1'	# purge last command from history (and whoops itself)
 alias suicide='nh; exit'	# exit without saving history
-if [[ $(<<< $'Python 3.8\n'"$(python --version 2>&1)" sort -V | head -n1) == "Python 3.8" ]]; then
+if vercmp "$(python3 --version 2>/dev/null)" "Python 3.8"; then
 	# https://stackoverflow.com/a/55501674/5424487
-	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3.8 -m http.server 8000 --bind ::'
+	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000 --bind ::'
 else
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000'	## [--bind 127.0.0.1]
 fi
