@@ -26,7 +26,10 @@ done; unset _dir
 
 # Create cache/temp dirs
 # NOTE: some early starters (gnome-keyring) need ~/.cache earlier → handled by /etc/local.d
-mkdir -p -m 700 "/tmp/cache-$USER" "/tmp/.wine-$UID" "/tmp/.wine-$UID/temp"
+( if [[ -L "$XDG_CACHE_HOME" ]]; then
+	target="$(readlink "$XDG_CACHE_HOME")"
+	mkdir -p -m 700 "$target"
+fi )
 # Wine temp
 for _temp in \
 	$HOME/.wine*/drive_c/windows/temp \
