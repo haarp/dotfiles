@@ -4,6 +4,9 @@
 export HISTSIZE=-1
 export HISTFILESIZE=$HISTSIZE
 
+# Don't bother inside screen
+[[ $STY ]] && return
+
 # Source user files if they exist
 for _file in ~/.bashrcNOPE ~/.rbenvrc
 do
