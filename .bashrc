@@ -670,7 +670,8 @@ function envy() {
 			;;
 	esac
 
-	local env=$( tar cJf - -h -C "${ENV_HOME:-$HOME}" -- ".bashrc" "${ENV_FILES[@]}" | base64 ) &&
+	local env
+	env=$( tar cJf - -h -C "${ENV_HOME:-$HOME}" -- ".bashrc" "${ENV_FILES[@]}" | base64 ) &&
 	local script="
 		set -e
 		export SHELL=\"/bin/bash\"
@@ -687,11 +688,12 @@ function envy() {
 			ssh -t -o RemoteCommand="${script//%/%%}" "$@"
 			;;
 		sudo|su)
-			local cmdfile="$(mktemp --suffix=.$FUNCNAME)"
-			echo '#!/bin/bash' > "$cmdfile"
-			echo "rm -f \"$cmdfile\"" >> "$cmdfile"
-			echo "$script" >> "$cmdfile"
-			chmod +rx "$cmdfile"	# make executable; and world-readable for `sudo -u luser`
+			local cmdfile
+			cmdfile="$(mktemp --suffix=.$FUNCNAME)" &&
+			echo '#!/bin/bash' > "$cmdfile" &&
+			echo "rm -f \"$cmdfile\"" >> "$cmdfile" &&
+			echo "$script" >> "$cmdfile" &&
+			chmod +rx "$cmdfile" &&	# make executable; and world-readable for `sudo -u luser`
 
 			if [[ "$subcmd" == "sudo" ]]; then
 				SHELL="$cmdfile" sudo -s "$@"
