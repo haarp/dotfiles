@@ -992,11 +992,13 @@ function ss() {
 	command ss "$@" | cat
 }
 
-# Add colors to diff -u
+# Add colors to diff
 function diff() {
 	# diff-highlight is part of git and generates intra-line highlights
-	# we also additionally colorize the entire lines
+	# we also additionally colorize the entire line
 	# also see git config
+
+	[[ -t 1 ]] || { command diff "$@"; return $?; }
 
 	local dh="cat"	# if below fails
 
@@ -1005,24 +1007,19 @@ function diff() {
 	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then		# Debian 9
 		dh="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
 	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; then	# Debian 10+
-		if ( cp -r "/usr/share/doc/git/contrib/diff-highlight" "/tmp/diff-highlight-$$" &&
-			cd "/tmp/diff-highlight-$$" &&
+		if ( cp -rT "/usr/share/doc/git/contrib/diff-highlight" "${TMPDIR:-/tmp}/diff-highlight-$$" &&
+			cd "${TMPDIR:-/tmp}/diff-highlight-$$" &&
 			make >/dev/null )
 		then
-			dh="/tmp/diff-highlight-$$/diff-highlight"
+			trap 'trap - RETURN; rm -rf "${TMPDIR:-/tmp}/diff-highlight-$$"' RETURN
+			dh="${TMPDIR:-/tmp}/diff-highlight-$$/diff-highlight"
 		fi
 	fi
 
-	if [[ -t 1 ]]; then	# stdout a terminal?
-		command diff "$@" | "$dh" | sed -e "s/\$/${fg[x]}/" \
-			-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
-			-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
-		local exit=${PIPESTATUS[0]}
-		[[ "$dh" == "/tmp/diff-highlight-$$/diff-highlight" ]] && rm -r "/tmp/diff-highlight-$$"
-		return $exit
-	else
-		command diff "$@"
-	fi
+	command diff "$@" | "$dh" | sed -e "s/\$/${fg[x]}/" \
+		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
+		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
+	return${PIPESTATUS[0]}
 }
 
 # sort sensor chips
