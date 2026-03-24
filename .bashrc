@@ -288,10 +288,12 @@ bind	' "\e[3;5~":	kill-word '
 bind	' "\C-g":		glob-list-expansions '
 # ctrl + u
 bind	' "\C-u":		undo '
-# alt + z: go to OLDPWD ("undo cd")
-bind	' "\ez":		" cd - >/dev/null\n" '
+# alt + z: go back ("undo cd") (indirect to not print command)
+bind -x	' "\201":		"cd - >/dev/null" '
+bind	' "\ez":		"\201\C-m" '
 # alt + x: go up
-bind	' "\ex":		" cd ..\n" '
+bind -x	' "\202":		"cd .." '
+bind	' "\ex":		"\202\C-m" '
 # shift + tab: complete current string against EVERYTHING from history
 bind	' "\e[Z":		dynamic-complete-history '
 # F-keys: various nifty things
