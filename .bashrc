@@ -308,7 +308,7 @@ bind ' "\eqf":		"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-
 bind ' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
 
 ## Readline options
-bind "set active-region-start-color ${f[u]}${u[R]}"	# colors for bracketed paste
+bind "set active-region-start-color ${f[uda]}${u[R]}"	# colors for bracketed paste
 bind "set active-region-end-color ${f[~u]}${u[x]}"
 bind "set bell-style none"
 bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
