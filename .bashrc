@@ -300,14 +300,14 @@ bind	' "\e[Z":		dynamic-complete-history '
 bind	' "\eOQ":		start-kbd-macro '		# F2
 bind	' "\eOR":		end-kbd-macro '			# F3
 bind	' "\eOS":		call-last-kbd-macro '	# F4
-##bind -x ' "\e[15~":	" xdg-open . 2>/dev/null" '	# F5, already in Alacritty config
+##bind -x	' "\e[15~":		" xdg-open . 2>/dev/null" '	# F5, already in Alacritty config
 # alt + q followed by key ("quick snippets")
 bind	' "\eq\"":		"\"\"\C-b" '	# paired characters
 bind	" \"\eq'\":		\"''\C-b\" "
 bind	' "\eq[":		"[]\C-b" '
 bind	' "\eq{":		"{}\C-b" '
 bind	' "\eq(":		"()\C-b" '
-bind	' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor (uses `backward-word`, only letters and digits. `shell-backward-word is too janky)
+bind	' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor (uses `backward-word`, letters/digits only. `shell-backward-word is too janky)
 bind	' "\eqn":		">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '		# common phrases
 bind	' "\eqw":		"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b" '
 bind	' "\eqf":		"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '
