@@ -904,7 +904,6 @@ function hilite() {
 	local sep=$'\037'	# separator for sed
 	local i=0
 	for phrase in "${@:?missing arg}"; do
-		color=""
 		cmd+="s${sep}\($phrase\)${sep}${bg[${palette[$i]}]}&${bg[x]}${sep}g;"
 		((i++))
 	done
