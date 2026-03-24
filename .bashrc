@@ -59,7 +59,7 @@ declare -A f=(	# formatting
 	[b]=$'\e[1m' [i]=$'\e[3m' [u]=$'\e[4m'  [s]=$'\e[9m'
 	# dim, blinking, inverse, hidden
 	[dim]=$'\e[2m' [bl]=$'\e[5m' [inv]=$'\e[7m' [hid]=$'\e[8m'
-	# switch off above (`~bd` handles both `b` and `dim`)
+	# switch off above (`~bd` does both `~b` and `~dim`)
 	[~bd]=$'\e[22m' [~i]=$'\e[23m' [~u]=$'\e[24m' [~s]=$'\e[29m'
 					[~bl]=$'\e[25m' [~inv]=$'\e[27m' [~hid]=$'\e[28m'
 )
