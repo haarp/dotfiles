@@ -186,7 +186,7 @@ unset _locales _fallback _cat
 
 ## Colorful bash prompt with goodies
 ## wrap in \[ \] to prevent char offset
-## note: some weird unicode chars only work correctly with terminus-font
+## NOTE: some weird unicode chars only work correctly with terminus-font or nerd-fonts
 # Get started
 PROMPT_COMMAND=()
 PS1=""
