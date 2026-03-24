@@ -378,10 +378,10 @@ bind -x '"\C-[[24~": "hstrnotiocsti"'
 export HSTR_CONFIG='prompt-bottom,hicolor,hide-basic-help'
 
 ## Personal preferences
+tabs -4
 export EDITOR="mcedit -d"	# see aliases below
 export VIEWER=less
 export PAGER=less
-tabs -4
 
 ## Colorful ls
 if command -v dircolors >/dev/null; then
@@ -489,8 +489,8 @@ alias grep="grep --color=auto"; alias egrep="grep -E"; alias fgrep="grep -F"
 alias zgrep='zgrep --color=auto';  alias zegrep="zgrep -E"; alias zfgrep="zgrep -F"
 alias hgrep='history | grep'	# history grep
 alias hexdump='hexdump -C'	# better display
-alias hexencode2='od -A none -t x2'
 alias hexencode='od -A none -t x1'
+alias hexencode2='od -A none -t x2'
 if command -v schedtool >/dev/null && [[ $(</proc/version) =~ '-ck' ]]; then
 	# chrt also exists, is part of util-linux, but can't execute commands
 	# more info on classes/policies: https://lwn.net/Articles/805317/
