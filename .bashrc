@@ -879,6 +879,7 @@ function editvar() {
 }
 
 # Give information about arg command
+# TODO: tab completion
 function wtf() {
 	whatis "$1" | tr -s ' '
 	local path="$(which "$1" 2>/dev/null)"
