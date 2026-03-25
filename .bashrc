@@ -663,7 +663,7 @@ function envy() {
 		export MC_HOME="$MC_PROFILE_ROOT"	# needed by older mc before 4.8.19 (239a8d0117)
 		export SCREENRC="$ENV_HOME/.config/screen/screenrc"
 	'"
-		export EDITOR=\"$EDITOR\" VIEWER=\"$VIEWER\" PAGER=\"$PAGER\"	# workarounds cuz bashrc might not be read
+		export EDITOR=\"$EDITOR\" PAGER=\"$PAGER\"	# workarounds cuz bashrc might not be read
 		export LESS=\"$LESS\" LESSOPEN=\"$LESSOPEN\" LESSCOLORIZER=\"$LESSCOLORIZER\"
 	"
 
