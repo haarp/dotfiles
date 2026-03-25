@@ -95,6 +95,13 @@ declare -A u=(	# underline colors for use w/ f[u]
 	[B]=$'\e[58;5;12m' [M]=$'\e[58;5;13m' [C]=$'\e[58;5;14m' [W]=$'\e[58;5;15m'
 	[x]=$'\e[59m'
 )
+declare -A c=(	# cursor styles
+	# block blink, block, underline blink, underline, I-beam blink, I-beam
+	[bb]=$'\e[1 q' [b]=$'\e[2 q' [ub]=$'\e[3 q' [u]=$'\e[4 q' [ib]=$'\e[5 q' [i]=$'\e[6 q'
+	[x]=$'\e[0 q'
+)
+# Set the cursor color. $1: `#rrbbgg` OR `rgb:rr/gg/bb` (man xparsecolor)
+function setcursorcolor() { echo -ne "\e]12;${1:?missing arg}\a"; }
 
 
 if [[ ! "$ENV_HOME" ]]; then
