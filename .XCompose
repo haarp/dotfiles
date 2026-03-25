@@ -233,7 +233,9 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <6> <6> <6>						: "⛧"
 <Multi_key> <o> <minus> <plus>				: "♀"
 <Multi_key> <o> <t>							: "♀"
+<Multi_key> <f> <e> <m>						: "♀"
 <Multi_key> <o> <minus> <greater>			: "♂"
+<Multi_key> <m> <a> <s> <c>					: "♂"
 <Multi_key> <n> <o> <t> <e>					: "♪"
 <Multi_key> <c> <h> <e> <c> <k>				: "✓"	# ☑
 <Multi_key> <exclam> <c> <h> <e> <c>		: "☐"
