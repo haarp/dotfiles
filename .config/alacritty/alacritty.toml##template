@@ -49,7 +49,7 @@ history = 100000
 multiplier = 8
 
 [font]
-normal.family = "Terminus"
+normal.family = "Terminess Powerline"
 {% if yadm.class == "home" %}
 size = 6.5
 {% endif %}
