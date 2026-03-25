@@ -53,7 +53,7 @@ done; unset _dir
 # https://en.wikipedia.org/wiki/ANSI_escape_code https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # also useful: x11-apps/rgb or x11-server-utils
 declare -A f=(	# formatting
-	# reset
+	# reset everything
 	[x]=$'\e[0m'
 	# bold, italic, underline, strikethrough
 	[b]=$'\e[1m' [i]=$'\e[3m' [u]=$'\e[4m'  [s]=$'\e[9m'
