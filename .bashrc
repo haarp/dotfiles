@@ -1015,7 +1015,7 @@ function diff() {
 	# we also additionally colorize the entire line
 	# also see git config
 
-	[[ -t 1 ]] || { command diff "$@"; return $?; }
+	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
 
 	local dh="cat"	# if below fails
 
