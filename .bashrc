@@ -50,7 +50,9 @@ done; unset _dir
 
 
 ## Colors! Formatting!
-# https://en.wikipedia.org/wiki/ANSI_escape_code https://misc.flogisoft.com/bash/tip_colors_and_formatting
+# https://en.wikipedia.org/wiki/ANSI_escape_code
+# https://misc.flogisoft.com/bash/tip_colors_and_formatting
+# https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 # also useful: x11-apps/rgb or x11-server-utils
 declare -A f=(	# formatting
 	# reset everything
