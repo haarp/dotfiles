@@ -545,7 +545,6 @@ alias mount2='findmnt --invert --pseudo'
 alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
 ##alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
 alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (misleadingly slow) reverse DNS lookups on each reply
-alias traceroute='traceroute -n'	# also don't do misleading rDNS queries
 alias prettyjson='python -m json.tool'	# alternative to `jq`
 alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
 alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
