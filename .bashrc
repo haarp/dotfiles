@@ -1028,7 +1028,7 @@ function diff() {
 	command diff "$@" | "$dh" | sed -e "s/\$/${fg[x]}/" \
 		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
 		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
-	return${PIPESTATUS[0]}
+	return ${PIPESTATUS[0]}
 }
 
 # sort sensor chips
