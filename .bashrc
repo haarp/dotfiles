@@ -209,7 +209,7 @@ PS1=""
 # reset to all bold black text
 PS1+='\[${f[x]}${f[b]}${fg[KK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
-PROMPT_COMMAND+=("_exit=\$?")	#this needs to be the first cmd in PROMPT_COMMAND
+PROMPT_COMMAND+=('_exit=$?')	# this needs to be the first cmd in PROMPT_COMMAND
 PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Y]}\]$_exit" )'
 # user/host depending on root or luser, darker color inside ssh ($EUID is bashism)
 if [[ $EUID == 0 ]]; then
