@@ -402,8 +402,8 @@ export GROFF_NO_SGR=1
 export LESS_TERMCAP_md="${f[b]}${fg[b]}"			# begin bold
 export LESS_TERMCAP_mb="${f[bl]}${f[b]}${fg[r]}"	# begin blinking
 export LESS_TERMCAP_me="${f[~bl]}${f[~bd]}${fg[x]}"	# end mode
-export LESS_TERMCAP_so="${bg[y]}"					# begin standout (status line, search terms)
-export LESS_TERMCAP_se="${bg[x]}"					# end mode
+export LESS_TERMCAP_so="${bg[y]}${fg[k]}"			# begin standout (status line, search terms)
+export LESS_TERMCAP_se="${bg[x]}${fg[x]}"			# end mode
 export LESS_TERMCAP_us="${f[u]}${fg[m]}"			# begin underline
 export LESS_TERMCAP_ue="${f[~u]}${fg[x]}"			# end mode
 
