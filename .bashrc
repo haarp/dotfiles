@@ -208,7 +208,7 @@ if [[ $EUID == 0 ]]; then
 	else							PS1+='\[${bg[R]}\]\h'
 	fi
 else
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[G]}\]\u@\[${bg[g]}\]\h'
+	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[G]}\]\u\[${bg[g]}\]@\h'
 	else							PS1+='\[${bg[G]}\]\u@\h'
 	fi
 fi
