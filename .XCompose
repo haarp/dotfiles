@@ -218,8 +218,10 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <B> <bar>				: "₿"
 <Multi_key> <bar> <B>				: "₿"
 
-# Misc
-<Multi_key> <i> <n> <v> <i> <s>		: "​"	# Zero-width space
+# Spaces
+<Multi_key> <n> <b> <s> <p>			: " "	# Non-breaking space
+<Multi_key> <space> <0>				: "​"	# Zero-width space
+<Multi_key> <minus> <space>			: "­"	# Soft hyphen
 
 # Symbols
 <Multi_key> <slash> <exclam> <backslash>	: "⚠"
@@ -238,7 +240,9 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <m> <a> <s> <c>					: "♂"
 <Multi_key> <n> <o> <t> <e>					: "♪"
 <Multi_key> <c> <h> <e> <c> <k>				: "✓"	# ☑
+<Multi_key> <v> <v>							: "✓"
 <Multi_key> <exclam> <c> <h> <e> <c>		: "☐"
+<Multi_key> <X> <X>							: "✗"	# <x> <x> take by Corg for multiply
 <Multi_key> <question> <i>					: "⸮"	# irony
 <Multi_key> <i> <question>					: "⸮"
 
