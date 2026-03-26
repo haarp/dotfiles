@@ -436,14 +436,12 @@ export ZSTD_NBTHREADS="0"
 # Syntax highlighting for less
 # TODO: re-investigate `|-` to trigger when piping into less (pygmentize needs `-s` to not block until EOF and can't guess lexer then)
 # FIXME: pygmentize w/ `-g` takes 0.25s to finish
-if command -v lesspipe >/dev/null && grep -q "# Preprocessor for 'less'." "$(which "lesspipe")"; then
-	# Gentoo's app-text/lesspipe will do syntax highlighting
-	export LESSOPEN='|lesspipe %s'
-	export LESSCOLORIZER='pygmentize -g -O style=emacs'	# look at file contents, less awful color scheme
-elif command -v pygmentize >/dev/null; then
-	# Debian's lesspipe will not; manually plug in pygmentize
+if command -v pygmentize >/dev/null; then
+	# Debian's lesspipe won't do syntax highlighting, Gentoo's is incomplete; monkey-wrench in pygmentize
 	# based on https://unix.stackexchange.com/q/191487/138699
 	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; if [[ "$lp" ]]; then echo "$lp"; else pygmentize -g -O style=emacs "$s"; fi'
+else
+	export LESSOPEN='|lesspipe %s'
 fi
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
