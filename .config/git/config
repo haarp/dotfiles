@@ -1,18 +1,26 @@
-[init]
-	defaultBranch = master
-
 [user]
 	name = haarp
 	email = main.haarp@gmail.com
-[credential]
-	helper = cache
-[push]
-	default = current
-	followTags = true
+
+
 [core]
 	compression = 9
 	# parallelization
 	preloadindex = true
+
+[init]
+	defaultBranch = master
+
+[credential]
+	helper = cache
+
+[push]
+	default = current
+	followTags = true
+
+[pull]
+	# rebase by default
+	rebase = true
 
 [color]
 	ui = true
@@ -21,14 +29,17 @@
 	local = yellow
 	remote = green
 [color "diff"]
-	meta = yellow
+	meta = blue
 [color "status"]
 	added = yellow
 	changed = green
 	untracked = cyan
 
-# make diffs a bit more semantic (https://news.ycombinator.com/item?id=11057421)
+[merge]
+    conflictstyle = diff3
+
 [diff]
+	# make diffs a bit more semantic (https://news.ycombinator.com/item?id=11057421)
 	algorithm = patience
 
 # infra-line color highlighting (https://github.com/git/git/blob/master/contrib/diff-highlight/README)
@@ -39,11 +50,14 @@
 [interactive]
 	diffFilter = "if which diff-highlight >/dev/null; then df=diff-highlight; else df=cat; fi; $df"
 
-# rebase by default
-[pull]
-	rebase = true
-
 [alias]
+	# shortcuts
+	st = status
+	ci = commit
+	sw = switch
+	df = diff
+	lg = log --oneline --graph --decorate
+
 	# get lists
 	branches = branch -a
 	remotes = remote -v
