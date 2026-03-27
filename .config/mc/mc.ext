@@ -1,4 +1,0 @@
-default/*
-	Open=(xdg-open %f &)
-	View=
-	Edit=
