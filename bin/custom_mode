@@ -1,32 +1,44 @@
 #!/bin/sh
-# Add a custom xrandr mode to an output and print its name
 # keep compatible with `sh`
+# more customization: https://tomverbeure.github.io/video_timings_calculator
+# but X will not see the proper refresh rate for these...
 
-[ $# -eq 4 ] || {
-	echo "Usage: $(basename "$0") <output> <x> <y> <refresh>" >&2
+if [ $# -eq 5 -a "$1" = "-s" ]; then
+	switch=1
+	shift
+elif [ $# -eq 4 ]; then
+	switch=0
+else
+	echo "Add custom xrandr mode to an output, print its name, and optionally switch to it"
+	echo "Usage: $(basename "$0") [-s] <output> <X> <Y> <refresh>" >&2
+	echo "-s: Also switch output to new mode" >&2
 	exit 127
-}
-command -v cvt12 >/dev/null || {
-	# `cvt` doesn't support reduced blanking v2
-	echo "cvt12 not installed! Falling back to cvt and reduced blanking v1" >&2
-	oldcvt=1
-}
+fi
+
+if command -v cvt12 >/dev/null; then
+	rb=2
+elif [ $(( $4 % 60 )) -eq 0 ]; then
+	echo "cvt12 not installed! Falling back to reduced blanking v1." >&2
+	rb=1
+else
+	echo "cvt12 not installed, cvt only supports multiples of 60Hz! Falling back to no reduced blanking." >&2
+	rb=0
+fi
 
 # generate modeline (always with best "Reduced Blanking" available)
-# theoretically, more customization is possible with e.g. https://tomverbeure.github.io/video_timings_calculator
-# however, X will not see the proper refresh rate for those...
-if [ "$oldcvt" ]; then
-	modeline=$(cvt -r $2 $3 $4)
-else
-	modeline=$(cvt12 $2 $3 $4 --rb-v2)
-fi
+case $rb in
+	2)	modeline=$(cvt12 $2 $3 $4 --rb-v2);;
+	1)	modeline=$(cvt --reduced $2 $3 $4 | sed -e "s/R/_$(LC_NUMERIC=C printf "%.2f\n" "$4")_rb1/");;	# fix stupid name
+	0)	modeline=$(cvt $2 $3 $4);;
+esac
+
 modeline=$(echo "$modeline" | sed -e '1d' -e 's/Modeline //' -e 's/"//g')
 modename=$(echo "$modeline" | awk '{print $1}')
 
 [ "$modeline" ] || exit 1
 
 # create mode in mode pool if it doesn't already exist
-xrandr --current | grep -q "$modename" || {
+xrandr --current | grep -q "$modename " || {
 	xrandr --newmode $modeline || exit 2
 }
 
@@ -37,6 +49,6 @@ echo "$modename"
 
 # switch to mode
 # `if` to avoid polluting exit code
-if [ $SWITCH ]; then
-	xrandr --output "$1" --mode "$modename"
+if [ $switch ]; then
+	xrandr --output "$1" --mode "$modename" || exit 4
 fi
