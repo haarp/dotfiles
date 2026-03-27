@@ -1,5 +1,6 @@
 #!/bin/bash
 # Console login
+# and screen sessions on Gentoo (?!)
 
-[[ -f ~/.profile ]] && . ~/.profile
+[[ (! $STY) && -f ~/.profile ]] && . ~/.profile
 [[ -f ~/.bashrc ]] && . ~/.bashrc
