@@ -311,7 +311,7 @@ bind	' "\e[Z":		dynamic-complete-history '
 bind	' "\eOQ":		start-kbd-macro '		# F2
 bind	' "\eOR":		end-kbd-macro '			# F3
 bind	' "\eOS":		call-last-kbd-macro '	# F4
-##bind -x	' "\e[15~":		" xdg-open . 2>/dev/null" '	# F5, already in Alacritty config
+bind -x	' "\e[15~":		" xdg-open . &>/dev/null" '	# F5, already in Alacritty config
 # alt + q followed by key ("quick snippets")
 bind	' "\eq\"":		"\"\"\C-b" '	# paired characters
 bind	" \"\eq'\":		\"''\C-b\" "
