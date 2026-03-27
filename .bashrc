@@ -469,7 +469,7 @@ function complete_clone() {
 	local completion="$(complete -p "$oldcmd")"
 	shift
 
-	${completion%$src} "$@"
+	${completion%$oldcmd} "$@"
 }
 
 # misc additions
