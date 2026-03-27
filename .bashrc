@@ -886,6 +886,13 @@ function editvar() {
 	fi
 }
 
+# cd to dir by editing
+function cded() {
+	local newdir
+	read -e -i "$PWD" newdir
+	cd "$newdir"
+}
+
 # Give information about arg command
 # TODO: tab completion
 function wtf() {
