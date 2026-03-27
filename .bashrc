@@ -27,6 +27,7 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
+export ANDROID_USER_HOME="${GNUPGHOME:-$XDG_DATA_HOME/android}"
 export GNUPGHOME="${GNUPGHOME:-$XDG_DATA_HOME/gnupg}"
 export LESSHISTFILE="${LESSHISTFILE:-/dev/null}" # want no search history (but if I did: $XDG_STATE_HOME/lesshst)
 export MYSQL_HISTFILE="${MYSQL_HISTFILE:-$XDG_STATE_HOME/mysql_history}"
@@ -480,6 +481,7 @@ alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
 alias 7z7='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on'	# presets to create 7z/zip
 alias 7z7ns='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=off'	# no solid archive
 alias 7zz='7za a -mm=Deflate -mx=9'				# needs p7zip-full (otherwise only 7zr is installed)
+alias adb='HOME="$XDG_DATA_HOME/android" adb'	# XDG dir
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'	# from Debian bashrc, alert to be used with long-running commands
 function apt-belongs() { dpkg -S "$(realpath "$(which "$1")")"; }	# too retarded to resolve actual path itself
 alias apt-depends='apt-cache rdepends --installed'
