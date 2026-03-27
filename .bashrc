@@ -457,19 +457,22 @@ function command_not_found_handle {
 	return 127
 }
 
-## Source a few bash-completions non-dynamically so we can assign more commands to them later on
-# TODO: See if we can recreate /usr/share/bash-completion/completions in home so this works dynamically
-# See https://github.com/github/hub/issues/592#issuecomment-48856709 for some details
-for _bc in emerge killall make ping scp ssh sudo
-do
-	[[ -f "/usr/share/bash-completion/completions/$_bc" ]] && . "/usr/share/bash-completion/completions/$_bc"
-done; unset _bc
-# fix this shit in Debian 8
-if [[ ! -f "/usr/share/bash-completion/completions/apt" && -f "/usr/share/bash-completion/completions/apt-get" ]]; then
-	. "/usr/share/bash-completion/completions/apt-get" && complete -F _apt_get apt
-fi
+## custom completions
+# clone completions from command $1 to $2 [$3, $4, ...]
+function complete_clone() {
+	local oldcmd="$1"
+	command -v "$oldcmd" >/dev/null || return 1
+
+	__load_completion "$oldcmd" 2>/dev/null
+
+	local completion="$(complete -p "$oldcmd")"
+	shift
+
+	${completion%$src} "$@"
+}
+
 # misc additions
-complete -F _comp_cmd_ssh salt-ssh
+complete_clone ssh salt-ssh
 
 
 ## Custom aliases
@@ -560,16 +563,16 @@ alias prettyjson='python -m json.tool'	# alternative to `jq`
 alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
 alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
 alias resolve='getent hosts'; alias resolve4='getent ahostsv4'; alias resolve6='getent ahostsv6'	# resolve name like libc
-complete -F _ping resolve resolve4 resolve6
+complete_clone ping resolve resolve4 resolve6
 alias rng='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" | head -c80; echo'		# alphanumeric w/o [lI1O0] ([:alnum:] otherwise)
 alias rng2='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 ~!@#$%^&*()_+-=\[\]{}|;\:,./<>?" | head -c80; echo'	# more chars
 alias scp-resume='rsync --partial --progress --rsh=ssh'
 alias ssh-add='</dev/null ssh-add'	# "disable" terminal to force ssh-add to use ssh-askpass (https://unix.stackexchange.com/a/352492/138699)
 alias sshnokey='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
 alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
-complete -F _comp_cmd_ssh sshnokey; complete -F _comp_cmd_scp scpnokey
+complete_clone ssh sshnokey; complete_clone scp scpnokey
 alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
-complete -F _comp_cmd_killall stopall contall
+complete_clone killall stopall contall
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
 alias umount.fuse='fusermount -u'
@@ -585,7 +588,7 @@ alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* 
 	"$XDG_DATA_HOME"/mime/{application,packages}/x-wine-extension-*'
 alias winedesktop='wine explorer /desktop=Wine,1024x768'
 alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
-complete -o filenames -F _emerge xemerge demerge
+complete_clone emerge xemerge demerge
 alias xorgmerge='emerge -av1 --jobs=4 @x11-module-rebuild'
 alias xev2='xev -event keyboard -event button | egrep --line-buffered -o "^ButtonPress|^ButtonRelease|^KeyPress|^KeyRelease|\(keysym.*\)|button [0-9]+" | sed -e "/Press/{N;s/\n/ /;}" -e "/Release/{N;s/\n/ /;}"'	# far less spammy
 alias yt-dlp='yt-dlp -o "%(title)s.%(ext)s" --embed-metadata'	# cleaner filename, chapter info and stuff
@@ -1088,7 +1091,7 @@ function make2() { (
 	. /etc/portage/make.conf
 	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
 ) }
-complete -F _make make2
+complete_clone make make2
 
 # Configure kernel with menuconfig
 function confkernel() { (
@@ -1233,7 +1236,7 @@ function speedtest.ssh.up() {
 	fi
 	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
 }
-complete -F _comp_cmd_ssh speedtest.ssh.down speedtest.ssh.up
+complete_clone ssh speedtest.ssh.down speedtest.ssh.up
 function speedtest.nc.down() {
 	if [[ $# -ne 1 ]]; then
 		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
@@ -1251,7 +1254,7 @@ function speedtest.nc.up() {
 	read -p "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
 	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | nc "$1" 44444
 }
-complete -F _ping speedtest.nc.down speedtest.nc.up
+complete_clone ping speedtest.nc.down speedtest.nc.up
 
 # https://unix.stackexchange.com/a/254976/138699
 function wasteram() {
@@ -1270,7 +1273,7 @@ function remotescreen() {
 	fi
 	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'DISPLAY=:0 xwd -root | convert -resize 50% - -define png:compression-level=9 png:-' | display -
 }
-complete -F _comp_cmd_ssh remotescreen
+complete_clone ssh remotescreen
 
 # Sync portage tree and rebuild, etc.
 function sync-portage() {
