@@ -462,12 +462,11 @@ function command_not_found_handle {
 # clone completions from command $1 to $2 [$3, $4, ...]
 function complete_clone() {
 	local oldcmd="$1"
-	command -v "$oldcmd" >/dev/null || return 1
-
-	__load_completion "$oldcmd" 2>/dev/null
-
-	local completion="$(complete -p "$oldcmd")"
 	shift
+
+	command -v "$oldcmd" >/dev/null || return 1
+	__load_completion "$oldcmd" 2>/dev/null
+	local completion="$(complete -p "$oldcmd")"
 
 	${completion%$oldcmd} "$@"
 }
