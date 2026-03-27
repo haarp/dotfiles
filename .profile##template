@@ -15,10 +15,6 @@ export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
-# workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
-export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
-/usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps:\
-/usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/pixmaps/xorg-x11:/usr/share/icons:/usr/share/pixmaps"
 
 # Set PATH to include user dirs (bashrc also does it)
 for _dir in ~/bin ~/.local/bin
@@ -134,7 +130,13 @@ export SSH_ASKPASS_REQUIRE="force"
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
-export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"	# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
+# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
+export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
+# workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
+export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
+/usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps:\
+/usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/pixmaps/xorg-x11:/usr/share/icons:/usr/share/pixmaps"
+
 
 # Disable GTK+-3 CSD with gtk3-nocsd
 # EDIT: not needed anymore, recent Xfce allows disabling CSD
