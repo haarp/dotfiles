@@ -133,10 +133,11 @@ export SSH_ASKPASS="$HOME/bin/ssh-askpass-wrapper"
 export SSH_ASKPASS_REQUIRE="force"
 
 # Move some stuff to their proper XDG places
-# also see https://github.com/b3nj5m1n/xdg-ninja/tree/main/programs
+# also see https://github.com/b3nj5m1n/xdg-ninja
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
-###export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"	# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
+export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
+export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"	# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
 
 # Disable GTK+-3 CSD with gtk3-nocsd
 # EDIT: not needed anymore, recent Xfce allows disabling CSD

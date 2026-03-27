@@ -21,19 +21,21 @@ do
 	[[ -f "$_file" ]] && . "$_file"
 done; unset _file
 
-# XDG locations (duplicates from .profile)
+## XDG locations (partial duplicate from .profile, for use in master and slave shells)
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
-export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
+export GNUPGHOME="${GNUPGHOME:-$XDG_DATA_HOME/gnupg}"
 export LESSHISTFILE="${LESSHISTFILE:-/dev/null}" # want no search history (but if I did: $XDG_STATE_HOME/lesshst)
 export MYSQL_HISTFILE="${MYSQL_HISTFILE:-$XDG_STATE_HOME/mysql_history}"
 export PSQL_HISTORY="${PSQL_HISTORY:-$XDG_STATE_HOME/psql_history}"
 export PYTHON_HISTORY="${PYTHON_HISTORY:-$XDG_STATE_HOME/python_history}"
 export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}"
+export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
 export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
+export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_DIR/vagrant}"
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
 for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
