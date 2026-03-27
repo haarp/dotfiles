@@ -242,7 +242,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <c> <h> <e> <c> <k>				: "✓"	# ☑
 <Multi_key> <v> <v>							: "✓"
 <Multi_key> <exclam> <c> <h> <e> <c>		: "☐"
-<Multi_key> <X> <X>							: "✗"	# <x> <x> take by Corg for multiply
+<Multi_key> <X> <X>							: "✗"	# <x> <x> taken by Xorg for multiply
 <Multi_key> <question> <i>					: "⸮"	# irony
 <Multi_key> <i> <question>					: "⸮"
 
