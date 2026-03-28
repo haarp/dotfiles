@@ -125,7 +125,7 @@ xinput map-to-output "ELAN Touchscreen" eDP-1
 export SSH_ASKPASS="$HOME/bin/ssh-askpass-wrapper"
 export SSH_ASKPASS_REQUIRE="force"
 
-# Move some stuff to their proper XDG places
+# Move some stuff to their proper XDG places (those relevant to GUI apps)
 # also see https://github.com/b3nj5m1n/xdg-ninja
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
