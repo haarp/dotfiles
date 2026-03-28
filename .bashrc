@@ -14,7 +14,7 @@
 ## Source various files, if they exist, in given order
 for _file in /lib/systemd/user-environment-generators/30-systemd-environment-d-generator
 do
-	[[ -x "$_file" ]] && eval $("$_file")
+	[[ -x "$_file" ]] && eval "$("$_file")"
 done
 for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion ~/.rbenvrc
 do
@@ -112,9 +112,9 @@ if [[ ! "$ENV_HOME" ]]; then
 
 	# Start SSH agent if there isn't one already running (note: xfce4-session usually starts it)
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
-	if [[ $SSH_AUTH_SOCK ]] && kill -0 $SSH_AGENT_PID 2>/dev/null; then
+	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
 		:
-	elif kill -0 $(. "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID) 2>/dev/null; then
+	elif kill -0 "$(. "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID)" 2>/dev/null; then
 		. "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
 	else
 		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"
@@ -123,7 +123,7 @@ if [[ ! "$ENV_HOME" ]]; then
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
-	( for pid in $(pgrep -u $USER -x gvfsd); do
+	( for pid in $(pgrep -u "$USER" -x gvfsd); do
 		gdb -batch -ex "attach $pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null
 	done & disown )
 
@@ -136,8 +136,8 @@ if [[ ! "$ENV_HOME" ]]; then
 
 	## Empty (not remove!) mc histories/filepos on login
 	# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
-	[[ -e "$XDG_DATA_HOME/mc/history" ]] && > "$XDG_DATA_HOME/mc/history"
-	[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && > "$XDG_DATA_HOME/mc/filepos"
+	[[ -e "$XDG_DATA_HOME/mc/history" ]] && : > "$XDG_DATA_HOME/mc/history"
+	[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && : > "$XDG_DATA_HOME/mc/filepos"
 
 else
 	## Slave Shells
@@ -154,7 +154,7 @@ else
 	# Detect if we are an SSH session
 	if [[ ! $SSH_CONNECTION ]]; then
 		until [[ ${_ppid:-$PPID} == 1 ]]; do
-			read _pid _name _junk _ppid _junk < /proc/${_ppid:-$PPID}/stat
+			read -r _pid _name _junk _ppid _junk < "/proc/${_ppid:-$PPID}/stat"
 			[[ $_name =~ sshd|dropbear ]] && {
 				export SSH_CONNECTION=1
 				break
@@ -166,11 +166,11 @@ else
 	# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
 	( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 		echo -e "${bg[c]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
-		last=$(last -n 2 --fullnames --time-format iso $USER)
-		read user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
+		last=$(last -n 2 --fullnames --time-format iso "$USER")
+		read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 		echo "Last login: $start from $addr on $tty"
 		uptime
-		ip -o addr show scope global primary | while read num iface type ip junk; do
+		ip -o addr show scope global primary | while read -r num iface type ip junk; do
 			[[ "$iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
 			echo "$iface $ip"
 		done;
@@ -710,7 +710,7 @@ function envy() {
 			;;
 		sudo|su)
 			local cmdfile
-			cmdfile="$(mktemp --suffix=.$FUNCNAME)" &&
+			cmdfile="$(mktemp --suffix=".$FUNCNAME")" &&
 			echo '#!/bin/bash' > "$cmdfile" &&
 			echo "rm -f \"$cmdfile\"" >> "$cmdfile" &&
 			echo "$script" >> "$cmdfile" &&
@@ -765,7 +765,7 @@ function yubi() {
 	elif [[ $1 == "kill" ]]; then	# Restart scdaemon when it fucks up
 				# https://bugs.launchpad.net/serverguide/+bug/1569019/comments/6
 				# https://dev.gnupg.org/T1081
-		if pgrep -u $USER scdaemon >/dev/null; then
+		if pgrep -u "$USER" scdaemon >/dev/null; then
 			echo "Killing scdaemon..."
 			##gpg-connect-agent "SCD KILLSCD" "SCD BYE" /bye
 			gpg-connect-agent "SCD RESET" "SCD BYE" /bye
@@ -782,13 +782,13 @@ function yubi() {
 
 	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
 		echo "Killing ssh-less gpg-agent..."
-		pkill -u $USER gpg-agent
-		while pgrep -u $USER gpg-agent >/dev/null; do	# wait until really gone
+		pkill -u "$USER" gpg-agent
+		while pgrep -u "$USER" gpg-agent >/dev/null; do	# wait until really gone
 			sleep 0.1
 		done
 	}
 
-	pgrep -u $USER gpg-agent >/dev/null || {
+	pgrep -u "$USER" gpg-agent >/dev/null || {
 		echo "Starting gpg-agent..."
 		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
 	}
@@ -807,7 +807,7 @@ function schedule() {
 
 	local schedule
 	schedule=$(date "+%s" -d "$1") || return 2
-	if [[ $(( $schedule - $EPOCHSECONDS )) -lt 60 ]]; then
+	if [[ $(( schedule - EPOCHSECONDS )) -lt 60 ]]; then
 		echo "Scheduled date lies less than a minute ahead, aborting!"
 		return 3
 	fi
@@ -841,7 +841,7 @@ function schedule() {
 function screen() {
 	# fix screwy quoting with parameter transformation (bash-4.4+)
 	# edge cases can still break (quotes inside quotes)
-	local args="${@@Q}"
+	local args="${*@Q}"
 	script -q -c "screen $args" /dev/null
 }
 
@@ -849,7 +849,7 @@ function screen() {
 function mv() {
 	if [[ "$#" -eq 1 ]]; then
 		local new
-		read -ei "$1" new
+		read -rei "$1" new
 		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$new"
 	else
 		command mv "$@"
@@ -871,7 +871,7 @@ function editln() {
 		ln -vsfT -- "$2" "$1"
 	else
 		( cd "$(dirname "$1")"	# for tab completion
-		read -e -i "$old" new
+		read -rei "$old" new
 		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "$1"
 		)
 	fi
@@ -885,7 +885,7 @@ function editvar() {
 	fi
 
 	local newvar
-	read -e -i "${!1}" newvar
+	read -rei "${!1}" newvar
 
 	if export | grep -q "declare -x $1="; then
 		export $1="$newvar"	# can't just use 'declare' as it creates function-local vars (??)
@@ -897,7 +897,7 @@ function editvar() {
 # cd to dir by editing
 function cded() {
 	local newdir
-	read -e -i "$PWD" newdir
+	read -rei "$PWD" newdir
 	cd "$newdir"
 }
 
@@ -957,7 +957,7 @@ function curll() {
 
 # Grab site's cert info
 function cert() {
-	openssl s_client -connect "${1:?missing url}":443 -servername $1 </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
 }
 
 # Recursively show dirs as tree
@@ -1049,17 +1049,17 @@ function diff() {
 	command diff "$@" | "$dh" | sed -e "s/\$/${fg[x]}/" \
 		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
 		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
-	return ${PIPESTATUS[0]}
+	return "${PIPESTATUS[0]}"
 }
 
 # sort sensor chips
 function sensors() {
 	local prev_line=""; local sensor_names
-	while read line; do
+	while read -r line; do
     	[[ $prev_line == "" ]] && sensor_names+="$line"$'\n'
 	    prev_line="$line"
 	done <<< $(command sensors)
-	command sensors "$@" $(sort <<< $sensor_names)
+	command sensors "$@" $(sort <<< "$sensor_names")
 }
 
 # run iotop with task delay accounting
@@ -1124,12 +1124,12 @@ function makeprogress() {
 		return 1
 	fi
 
-	local CCOUNT=$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)
+	local CCOUNT="$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)"
 	if [[ $CCOUNT = 0 ]]; then
 		echo "Can't calculate progress, no C files found!"
 	else
-		local OCOUNT=$(find "${1:-.}" -name *.o | wc -l)
-		echo "$[ $OCOUNT * 100 / $CCOUNT ]% ($OCOUNT / $CCOUNT)"
+		local OCOUNT="$(find "${1:-.}" -name "*.o" | wc -l)"
+		echo "$(( $OCOUNT * 100 / $CCOUNT ))% ($OCOUNT / $CCOUNT)"
 	fi
 }
 
@@ -1159,7 +1159,7 @@ function swap() {
 		echo "Cannot open $1 or $2!"
 		return 1
 	fi
-	local temp="$(mktemp -p "$(dirname "$1")" -u --suffix=.$FUNCNAME)"
+	local temp="$(mktemp -p "$(dirname "$1")" -u --suffix=".$FUNCNAME")"
 	mv "$1" "$temp" && \
 	mv "$2" "$1" && \
 	mv "$temp" "$2"
@@ -1178,7 +1178,7 @@ function urlencode() {
 	local LANG=C	# also encode umlauts and such
 	local line i o out
 
-	while read line; do
+	while read -r line; do
 		out=""
 		for (( i=0; i<${#line}; i++ )); do
 			o="${line:$i:1}"
@@ -1191,7 +1191,7 @@ function urlencode() {
 function urldecode() {
 	local line out
 
-	while read line; do
+	while read -r line; do
 		out="${line//+/ }"
 		echo -e "${out//%/\\x}"
 	done
@@ -1243,7 +1243,7 @@ function speedtest.nc.down() {
 		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
 		return 1
 	fi
-	read -p "Run this on $1 now, then press enter to continue: nc -l -p 44444 </dev/zero"
+	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 </dev/zero"
 	nc "$1" 44444 | pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
 
 }
@@ -1252,7 +1252,7 @@ function speedtest.nc.up() {
 		echo "Measure upstream network throughput with netcat. Usage: $FUNCNAME <host>"
 		return 1
 	fi
-	read -p "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
+	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
 	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | nc "$1" 44444
 }
 complete_clone ping speedtest.nc.down speedtest.nc.up
@@ -1310,7 +1310,7 @@ function orphans() {
 	# FIXME: doesn't link symlinks
 	# FIXME: fails on spaces in filenames
 	# FIXME: reduce argument list to qfile
-	local allthethings=$(find "${1:-.}" -print0 | sort -z | tr '\0' ' ')
+	local allthethings="$(find "${1:-.}" -print0 | sort -z | tr '\0' ' ')"
 	qfile -o $allthethings
 }
 
@@ -1329,18 +1329,18 @@ function changelogs() {
 		local num=$1
 	else
 		#get number of merges from last emerge session
-		local num=$(grep "completed emerge" /var/log/emerge.log | tail -n1)
+		local num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
 		num=${num#*of }; num=${num%) *}
 	fi
 	[[ $num -gt 0 ]] || return 1
 	#determine the packages behind them
-	local recent=$(grep "completed emerge" /var/log/emerge.log | tail -n$num | awk '{print $8}')
+	local recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
 
 	local name; for name in $recent; do
 		name=${name%-[0-9]*}	# strip version
 		purename=${name#*/}	# strip category
 
-		local reply=""; read -p "Show $name? [y/n] " reply
+		local reply=""; read -rp "Show $name? [y/n] " reply
 		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
 
 		# repo git changelog
@@ -1369,7 +1369,7 @@ function mask() {
 
 # Manifest multiple files
 function manifest() {
-	for file in ${@:-*.ebuild};
+	for file in "${@:-*.ebuild}";
 		do ebuild "$file" manifest;
 	done
 }
@@ -1377,19 +1377,19 @@ function manifest() {
 # Ping the current gateway
 function pinggw() {
 	local default junk gw metric gateway oldmetric=999999
-	while read default junk gw junk junk junk junk junk junk junk metric; do
+	while read -r default junk gw junk junk junk junk junk junk junk metric; do
 		[[ $default == "default" ]] || continue
 		if [[ $metric -lt $oldmetric ]]; then
 			gateway="$gw"
 			oldmetric=$metric
 		fi
-	done <<<$(ip route)
+	done <<< "$(ip route)"
 	if [[ ! "$gateway" ]]; then
 		echo "No internet gateways found!"
 		return 1
 	fi
 	echo "Pinging $gateway..."
-	ping $gateway
+	ping "$gateway"
 }
 
 # Stream audio directly to a server
@@ -1399,12 +1399,12 @@ function streamaudio() {
 		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>"
 		return
 	fi
-	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C $1 'aplay -f cd -'
+	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
 }
 
 # Enhance optirun with overclocking (needs >=nvidia-settings-337.19)
 # perf: pgrep/service is super slow, let's check the pidfile instead
-if [[ -e /proc/$( {< /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
+if [[ -e /proc/$( { < /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
 	function optirun() {
 		##local GPUOffset=135	# -> 880MHz
 		##local MemOffset=420	# -> 2220MHz
@@ -1446,8 +1446,8 @@ function pingpwn() {
 		tc qdisc del dev eth0 root
 	else
 		tc qdisc add dev eth0 root handle 1: prio
-		tc qdisc add dev eth0 parent 1:3 handle 30: netem delay ${2}ms 10ms distribution normal
-		tc filter add dev eth0 protocol ip parent 1:0 prio 3 u32 match ip dst ${1}/32 flowid 1:3
+		tc qdisc add dev eth0 parent 1:3 handle 30: netem delay "${2}ms" 10ms distribution normal
+		tc filter add dev eth0 protocol ip parent 1:0 prio 3 u32 match ip dst "${1}/32" flowid 1:3
 		# global:
 		# tc qdisc add dev eth0 root netem delay 100ms
 		# tc qdisc replace dev eth0 root netem latency 100ms
@@ -1473,11 +1473,11 @@ function us_proxy() {
 	)
 
 	## https://www.us-proxy.org/ (hx=yes: use only claimed https-capable ones)
-	local ip port junk; while read ip port junk; do
-		list+=($ip:$port)
-	done <<< $(curl -sS --connect-timeout 4 -A "$agent" 'https://www.us-proxy.org/' \
+	local ip port junk; while read -r ip port junk; do
+		list+=("$ip:$port")
+	done <<< "$(curl -sS --connect-timeout 4 -A "$agent" 'https://www.us-proxy.org/' \
 		| sed -e 's:</thead><tbody><tr>:\n:' -e 's:</tr><tr>:\n:g' -e 's:</tr></tbody><tfoot>:\n:' \
-		| grep "<td class='hx'>\(yes\|no\)</td>" | sed -e 's:<td>: :g' -e 's:</td>: :g' )
+		| grep "<td class='hx'>\(yes\|no\)</td>" | sed -e 's:<td>: :g' -e 's:</td>: :g' )"
 
 	## Evaluate
 	local joblist goldlist p b
@@ -1495,7 +1495,7 @@ function us_proxy() {
 	done
 
 	if [[ "$goldlist" ]]; then
-		local proxy=${goldlist[ $(($RANDOM % ${#goldlist[@]})) ]}
+		local proxy=${goldlist[ $(( RANDOM % ${#goldlist[@]} )) ]}
 		echo "Found ${#goldlist[@]} usable proxies out of ${#list[@]}, using $proxy" >&2
 		echo "$proxy"
 		return 0
