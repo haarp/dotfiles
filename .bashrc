@@ -467,9 +467,9 @@ function complete_clone() {
 
 	command -v "$oldcmd" >/dev/null || return 1
 	__load_completion "$oldcmd" 2>/dev/null
-	local completion="$(complete -p "$oldcmd")"
+	local completion="$(complete -p "$oldcmd" 2>/dev/null)"
 
-	${completion%$oldcmd} "$@"
+	[[ "$completion" ]] && ${completion%$oldcmd} "$@"
 }
 
 # misc additions
