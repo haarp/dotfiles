@@ -27,9 +27,9 @@ fi
 
 # generate modeline (always with best "Reduced Blanking" available)
 case $rb in
-	2)	modeline=$(cvt12 $2 $3 $4 --rb-v2);;
-	1)	modeline=$(cvt --reduced $2 $3 $4 | sed -e "s/R/_$(LC_NUMERIC=C printf "%.2f\n" "$4")_rb1/");;	# fix stupid name
-	0)	modeline=$(cvt $2 $3 $4);;
+	2)	modeline=$(cvt12 "$2" "$3" "$4" --rb-v2);;
+	1)	modeline=$(cvt --reduced "$2" "$3" "$4" | sed -e "s/R/_$(LC_NUMERIC=C printf "%.2f\n" "$4")_rb1/");;	# fix stupid name
+	0)	modeline=$(cvt "$2" "$3" "$4");;
 esac
 
 modeline=$(echo "$modeline" | sed -e '1d' -e 's/Modeline //' -e 's/"//g')
