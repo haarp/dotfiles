@@ -37,6 +37,7 @@ export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}
 export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
 export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
 export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_DIR/vagrant}"
+export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
 for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
@@ -579,6 +580,7 @@ alias stripgeo='exiftool -geotag='
 alias umount.fuse='fusermount -u'
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
+alias w3m='w3m -o use_history=false -o confirm_qq=false -o color=true'
 alias weather='curl -s https://wttr.in/Augsburg | nowrap'
 alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites) FIXME: doesn't work for gui apps, of course
 # wine temp replacer can be found in .profile
