@@ -1,1 +1,1 @@
-/home/haarp/.bashrc
+../../.bashrc
