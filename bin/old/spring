@@ -1,3 +1,0 @@
-#!/bin/sh
-export SDL_MOUSE_RELATIVE=0
-/home/haarp/bin/X1 /usr/games/bin/spring "$@"

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-sync
-echo "u" > /proc/sysrq-trigger
-sleep 1
-sync
-sleep 1
-echo "o" > /proc/sysrq-trigger
