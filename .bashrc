@@ -7,7 +7,8 @@
 #set -x
 
 ## Test for non-interactive shell
-[[ $- == *i* ]] || return
+# NOPE! we allow non-interactive shells now
+#[[ $- == *i* ]] || return
 ## Don't bother inside mc
 [[ $MC_SID ]] && return
 
@@ -279,76 +280,6 @@ PROMPT_DIRTRIM=3
 ## Version compare (returns 0 if $1 ≥ $2 )
 function vercmp() {	<<< "$2"$'\n'"$1" sort --check=quiet --version-sort && return 0 || return 1; }
 
-
-## Readline binds
-# press ctrl+v or run `read`, then the key to see codes
-stty -ixon								# unbind Ctrl+[sq], don't make it freeze/thaw buffer
-bind "set bind-tty-special-chars off"	# unbind some other defaults (see `stty -a`)
-# page up/down: cycle through history for commands that start with currently entered text
-bind	' "\e[5~":		history-search-backward '
-bind	' "\e[6~":		history-search-forward '
-# ctrl + arrow up/down: cycle through history yanking the last argument of the entry
-bind	' "\e[1;5A":	yank-last-arg '
-bind	' "\e[1;5B":	"\e-1\e." '
-# ctrl + arrow left/right
-bind	' "\e[1;5D":	backward-word '
-bind	' "\e[1;5C":	forward-word '
-# ctrl + backspace
-bind	' "\b":			backward-kill-word '
-# ctrl + del
-bind	' "\e[3;5~":	kill-word '
-# ctrl + g: list elements of glob behind cursor
-bind	' "\C-g":		glob-list-expansions '
-# ctrl + u
-bind	' "\C-u":		undo '
-# alt + z: go back ("undo cd") (indirect to not print command)
-bind -x	' "\201":		"cd - >/dev/null" '
-bind	' "\ez":		"\201\C-m" '
-# alt + x: go up
-bind -x	' "\202":		"cd .." '
-bind	' "\ex":		"\202\C-m" '
-# shift + tab: complete current string against EVERYTHING from history
-bind	' "\e[Z":		dynamic-complete-history '
-# F-keys: various nifty things
-bind	' "\eOQ":		start-kbd-macro '		# F2
-bind	' "\eOR":		end-kbd-macro '			# F3
-bind	' "\eOS":		call-last-kbd-macro '	# F4
-bind -x	' "\e[15~":		" xdg-open . &>/dev/null" '	# F5, already in Alacritty config
-# alt + q followed by key ("quick snippets")
-bind	' "\eq\"":		"\"\"\C-b" '	# paired characters
-bind	" \"\eq'\":		\"''\C-b\" "
-bind	' "\eq[":		"[]\C-b" '
-bind	' "\eq{":		"{}\C-b" '
-bind	' "\eq(":		"()\C-b" '
-bind	' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor (uses `backward-word`, letters/digits only. `shell-backward-word is too janky)
-bind	' "\eqn":		">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '		# common phrases
-bind	' "\eqw":		"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b" '
-bind	' "\eqf":		"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '
-bind	' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
-
-## Readline options
-bind "set active-region-start-color ${f[u-]}${u[R]}"	# colors for bracketed paste
-bind "set active-region-end-color ${f[~u]}${u[x]}"
-bind "set bell-style none"
-bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
-bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
-											# FIXME: LS_COLORS is only read while initializing. would need a .inputrc >:(
-											# https://unix.stackexchange.com/a/741843/138699
-bind "set colored-completion-prefix on"		# color common elements in list on completing
-bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
-##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
-##bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion (but breaks all colors...)
-bind "set completion-query-items 1024"
-##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
-bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
-##bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
-bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
-bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
-bind "set revert-all-at-newline on"			# revert modified history lines on enter
-##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
-bind "set skip-completed-text on"			# less annoying completion in the middle of a word
-bind "set visible-stats on"					# show character denoting file type in completions
-
 ## Shell flags
 set +o histexpand		# get rid off the fucking annoying `!!` expansion
 ##set -o noclobber		# don't allow > to clobber files (use >| to force)
@@ -368,36 +299,109 @@ vercmp "${BASH_COMPLETION_VERSINFO[*]}" '2 8' && shopt -s nullglob
 ## Shell variables
 export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
 
-## Shell history options
-export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG
-export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
-export HISTCONTROL=ignoreboth	# ignore identical with previous or beginning with space
-export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
 
-# don't save history if HISTFILE is broken symlink (prevent its creation on unmounted ~/Private)
-[[ -L "$HISTFILE" && ! -w "$HISTFILE" ]] && unset HISTFILE
+## Readline binds
+# press ctrl+v or run `read`, then the key to see codes
+if [[ $- == *i* ]]; then
+	stty -ixon								# unbind Ctrl+[sq], don't make it freeze/thaw buffer
+	bind "set bind-tty-special-chars off"	# unbind some other defaults (see `stty -a`)
+	# page up/down: cycle through history for commands that start with currently entered text
+	bind	' "\e[5~":		history-search-backward '
+	bind	' "\e[6~":		history-search-forward '
+	# ctrl + arrow up/down: cycle through history yanking the last argument of the entry
+	bind	' "\e[1;5A":	yank-last-arg '
+	bind	' "\e[1;5B":	"\e-1\e." '
+	# ctrl + arrow left/right
+	bind	' "\e[1;5D":	backward-word '
+	bind	' "\e[1;5C":	forward-word '
+	# ctrl + backspace
+	bind	' "\b":			backward-kill-word '
+	# ctrl + del
+	bind	' "\e[3;5~":	kill-word '
+	# ctrl + g: list elements of glob behind cursor
+	bind	' "\C-g":		glob-list-expansions '
+	# ctrl + u
+	bind	' "\C-u":		undo '
+	# alt + z: go back ("undo cd") (indirect to not print command)
+	bind -x	' "\201":		"cd - >/dev/null" '
+	bind	' "\ez":		"\201\C-m" '
+	# alt + x: go up
+	bind -x	' "\202":		"cd .." '
+	bind	' "\ex":		"\202\C-m" '
+	# shift + tab: complete current string against EVERYTHING from history
+	bind	' "\e[Z":		dynamic-complete-history '
+	# F-keys: various nifty things
+	bind	' "\eOQ":		start-kbd-macro '		# F2
+	bind	' "\eOR":		end-kbd-macro '			# F3
+	bind	' "\eOS":		call-last-kbd-macro '	# F4
+	bind -x	' "\e[15~":		" xdg-open . &>/dev/null" '	# F5, already in Alacritty config
+	# alt + q followed by key ("quick snippets")
+	bind	' "\eq\"":		"\"\"\C-b" '	# paired characters
+	bind	" \"\eq'\":		\"''\C-b\" "
+	bind	' "\eq[":		"[]\C-b" '
+	bind	' "\eq{":		"{}\C-b" '
+	bind	' "\eq(":		"()\C-b" '
+	bind	' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor (uses `backward-word`, letters/digits only. `shell-backward-word is too janky)
+	bind	' "\eqn":		">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '		# common phrases
+	bind	' "\eqw":		"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b" '
+	bind	' "\eqf":		"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '
+	bind	' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
 
-# save everything (use export!! subshells, screen, etc. MUST inherit these settings!)
-if vercmp "$BASH_VERSION" "4.3"; then
-	export HISTSIZE=-1	# commands
-else
-	export HISTSIZE=999999	# old bash doesn't support -1
+	## Readline options
+	bind "set active-region-start-color ${f[u-]}${u[R]}"	# colors for bracketed paste
+	bind "set active-region-end-color ${f[~u]}${u[x]}"
+	bind "set bell-style none"
+	bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
+	bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
+												# FIXME: LS_COLORS is only read while initializing. would need a .inputrc >:(
+												# https://unix.stackexchange.com/a/741843/138699
+	bind "set colored-completion-prefix on"		# color common elements in list on completing
+	bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
+	##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
+	##bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion (but breaks all colors...)
+	bind "set completion-query-items 1024"
+	##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
+	bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
+	##bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
+	bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
+	bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
+	bind "set revert-all-at-newline on"			# revert modified history lines on enter
+	##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
+	bind "set skip-completed-text on"			# less annoying completion in the middle of a word
+	bind "set visible-stats on"					# show character denoting file type in completions
+
+	## Shell history options
+	export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG
+	export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
+	export HISTCONTROL=ignoreboth	# ignore identical with previous or beginning with space
+	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
+
+	# don't save history if HISTFILE is broken symlink (prevent its creation on unmounted ~/Private)
+	[[ -L "$HISTFILE" && ! -w "$HISTFILE" ]] && unset HISTFILE
+
+	# save everything (use export!! subshells, screen, etc. MUST inherit these settings!)
+	if vercmp "$BASH_VERSION" "4.3"; then
+		export HISTSIZE=-1	# commands
+	else
+		export HISTSIZE=999999	# old bash doesn't support -1
+	fi
+	export HISTFILESIZE=$HISTSIZE	# lines
+	declare -r HISTSIZE HISTFILESIZE
+
+	# share history across all open terminals
+	##PROMPT_COMMAND+=('history -a; history -n')
+
+	## HSTR stuff
+	# workaround https://github.com/dvorka/hstr/issues/531 (needs `dev.tty.legacy_tiocsti=1`)
+	function hstrnotiocsti() {
+		{ READLINE_LINE="$( { </dev/tty hstr ${READLINE_LINE}; } 2>&1 1>&3 3>&- )"; } 3>&1;
+		READLINE_POINT=${#READLINE_LINE}
+	}
+	bind -x '"\C-r": "hstrnotiocsti"'	# bind to ctrl-r and F12
+	bind -x '"\C-[[24~": "hstrnotiocsti"'
+	export HSTR_CONFIG='prompt-bottom,hicolor,hide-basic-help'
 fi
-export HISTFILESIZE=$HISTSIZE	# lines
-declare -r HISTSIZE HISTFILESIZE
 
-# share history across all open terminals
-##PROMPT_COMMAND+=('history -a; history -n')
-
-## HSTR stuff
-# workaround https://github.com/dvorka/hstr/issues/531 (needs `dev.tty.legacy_tiocsti=1`)
-function hstrnotiocsti() {
-	{ READLINE_LINE="$( { </dev/tty hstr ${READLINE_LINE}; } 2>&1 1>&3 3>&- )"; } 3>&1;
-	READLINE_POINT=${#READLINE_LINE}
-}
-bind -x '"\C-r": "hstrnotiocsti"'	# bind to ctrl-r and F12
-bind -x '"\C-[[24~": "hstrnotiocsti"'
-export HSTR_CONFIG='prompt-bottom,hicolor,hide-basic-help'
 
 ## Personal preferences
 tabs -4
@@ -477,6 +481,7 @@ complete_clone ssh salt-ssh
 
 
 ## Custom aliases
+shopt -s expand_aliases	# for non-interactive shells
 alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
 alias 7z7='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on'	# presets to create 7z/zip
 alias 7z7ns='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=off'	# no solid archive
