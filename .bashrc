@@ -449,7 +449,7 @@ export ZSTD_NBTHREADS="0"
 if command -v pygmentize >/dev/null; then
 	# Debian's lesspipe won't do syntax highlighting, Gentoo's is incomplete; monkey-wrench in pygmentize
 	# based on https://unix.stackexchange.com/q/191487/138699
-	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; if [[ "$lp" ]]; then echo "$lp"; else pygmentize -g -O style=emacs "$s"; fi'
+	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; if [[ "$lp" ]]; then echo "$lp"; else pygmentize -g -O style=emacs "$s" 2>/dev/null; fi'
 else
 	export LESSOPEN='|lesspipe %s'
 fi
