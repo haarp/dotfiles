@@ -242,9 +242,36 @@ do
 		GIT_PS1_SHOWDIRTYSTATE=1
 		GIT_PS1_SHOWSTASHSTATE=1
 		GIT_PS1_SHOWUNTRACKEDFILES=1
-		GIT_PS1_SHOWUPSTREAM="auto"
+		GIT_PS1_SHOWUPSTREAM="verbose"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
-		PROMPT_COMMAND+=('_git_prompt=$(__git_ps1 "%s")')
+		tosub() {
+			local tosub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
+			local result
+			for ((i=0; i<${#1}; i++)); do
+				char="${1:i:1}"
+				if [[ "$char" =~ [0-9] ]]; then
+					result+="${tosub[$char]}"
+				else
+					result+="$char"
+				fi
+			done
+			echo "$result"
+		}
+		PROMPT_COMMAND+=('
+			_git_prompt=$(__git_ps1 "%s")
+
+			_git_prompt=${_git_prompt/|u+/⇡}	# ahead and behind upstream
+			_git_prompt=${_git_prompt/-/⇣}	# or in Terminus: ↑↓
+			_git_prompt=${_git_prompt/|u=/}
+			_git_prompt=${_git_prompt/|u/}
+
+			_git_prompt=${_git_prompt/\*/±}	# unstaged changes
+			_git_prompt=${_git_prompt/+/‡}	# staged changes
+			_git_prompt=${_git_prompt/\%/…}	# untracked files
+			_git_prompt=${_git_prompt/\$/■}	# stashed changes
+
+			_git_prompt="$(tosub "$_git_prompt")"
+		')
 		break
 	fi
 done; unset _gp
