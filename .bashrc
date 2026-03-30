@@ -37,7 +37,7 @@ export PYTHON_HISTORY="${PYTHON_HISTORY:-$XDG_STATE_HOME/python_history}"
 export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}"
 export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
 export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
-export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_DIR/vagrant}"
+export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_HOME/vagrant}"
 export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
