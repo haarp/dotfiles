@@ -2,7 +2,7 @@
 <language id="nginx" _name="Nginx config" version="2.0" _section="Other">
   <metadata>
     <property name="mimetypes">text/x-nginx-conf-file;application/x-nginx-conf-file</property>
-    <property name="globs">*.conf</property>
+    <!--<property name="globs">*.conf</property>-->
     <property name="line-comment-start">#</property>
   </metadata>
 
