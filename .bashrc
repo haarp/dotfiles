@@ -21,6 +21,7 @@ for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-comp
 do
 	[[ -f "$_file" ]] && . "$_file"
 done
+unset _file
 
 ## XDG locations (partial duplicate from .profile, for use in master and slave shells)
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -41,12 +42,10 @@ export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
 export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_HOME/vagrant}"
 export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
 
-## Source files in custom locations
-for _file in ~/.rbenvrc
-do
-	[[ -f "$_file" ]] && . "$_file"
-done
-unset _file
+## Source rbenv after setting RBENV_ROOT
+if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
+	eval "$("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)"
+fi
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
 for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
