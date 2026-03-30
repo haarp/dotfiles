@@ -42,11 +42,6 @@ export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
 export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_HOME/vagrant}"
 export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
 
-## Source rbenv after setting RBENV_ROOT
-if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
-	eval "$("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)"
-fi
-
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
 for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
 do
@@ -59,6 +54,11 @@ done; unset _dir
 ## Set CDPATH (works like $PATH but for `cd`)
 ## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
 ####CDPATH=".:~:/"
+
+## Source rbenv after setting RBENV_ROOT
+if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
+	eval "$("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)"
+fi
 
 
 ## Colors! Formatting!
