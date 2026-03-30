@@ -15,11 +15,11 @@
 ## Source various files, if they exist, in given order
 for _file in /lib/systemd/user-environment-generators/30-systemd-environment-d-generator
 do
-	[[ -x "$_file" ]] && eval "$("$_file")"
+	[[ -x "$_file" ]] && source <("$_file")
 done
 for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion
 do
-	[[ -f "$_file" ]] && . "$_file"
+	[[ -f "$_file" ]] && source "$_file"
 done
 unset _file
 
@@ -57,7 +57,7 @@ done; unset _dir
 
 ## Source rbenv after setting RBENV_ROOT
 if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
-	eval "$("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)"
+	source <("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)
 fi
 
 
@@ -123,11 +123,11 @@ if [[ ! "$ENV_HOME" ]]; then
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
 	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
 		:
-	elif kill -0 "$(. "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID)" 2>/dev/null; then
-		. "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
+	elif kill -0 "$(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID)" 2>/dev/null; then
+		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
 	else
 		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"
-		. "$XDG_CACHE_HOME/ssh-agent-info"
+		source "$XDG_CACHE_HOME/ssh-agent-info"
 	fi
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
@@ -151,7 +151,7 @@ if [[ ! "$ENV_HOME" ]]; then
 else
 	## Slave Shells
 	# Source user bashrc too, if it isn't the same as us (loops!)
-	[[ -f ~/.bashrc ]] && { grep -q 'Aut inveniam viam aut faciam' ~/.bashrc || . ~/.bashrc; }
+	[[ -f ~/.bashrc ]] && { grep -q 'Aut inveniam viam aut faciam' ~/.bashrc || source ~/.bashrc; }
 
 	# Include ENV_HOME bins in PATH
 	for _dir in "$ENV_HOME/bin" "$ENV_HOME/.local/bin"
@@ -174,7 +174,7 @@ else
 	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
 	# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
 	( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-		echo -e "${bg[c]}$(. /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
+		echo -e "${bg[c]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
 		last=$(last -n 2 --fullnames --time-format iso "$USER")
 		read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 		echo "Last login: $start from $addr on $tty"
@@ -243,7 +243,7 @@ PS1+='\[$( [[ -w . ]] && echo -n "${bg[B]}" || echo -n "${bg[b]}" )\]\W'
 for _gp in	/usr/share/git/git-prompt.sh /usr/lib/git-core/git-sh-prompt
 do
 	if [[ -e "$_gp" ]]; then
-		. "$_gp"
+		source "$_gp"
 		GIT_PS1_SHOWCOLORHINTS=''	# uses 0-code to do resets :(
 		GIT_PS1_STATESEPARATOR=''
 		GIT_PS1_SHOWDIRTYSTATE=1
@@ -443,8 +443,8 @@ export EDITOR="mcedit -d"	# see aliases below
 export PAGER=less
 
 ## Colorful ls
-if [[ -r "$XDG_CONFIG_HOME/dir_colors" ]]; then	. <(dircolors -b "$XDG_CONFIG_HOME/dir_colors")
-else											. <(dircolors -b)
+if [[ -r "$XDG_CONFIG_HOME/dir_colors" ]]; then	source <(dircolors -b "$XDG_CONFIG_HOME/dir_colors")
+else											source <(dircolors -b)
 fi
 
 ## Colorful less and manpages (https://unix.stackexchange.com/a/108840)
@@ -696,7 +696,7 @@ function yubi() {
 	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
 
 	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
-		. "$SSH_AGENT_FILE" >/dev/null
+		source "$SSH_AGENT_FILE" >/dev/null
 		return
 
 	elif [[ $1 == "kill" ]]; then	# Restart scdaemon when it fucks up
@@ -729,7 +729,7 @@ function yubi() {
 		echo "Starting gpg-agent..."
 		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
 	}
-	. "$XDG_CACHE_HOME/gpg-agent-info" || return 1
+	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
 
 	gpg-connect-agent updatestartuptty /bye	# fix pinentry (see ~/.gnupg/gpg-agent.conf for details)
 }
@@ -1026,7 +1026,7 @@ function iotop {
 #make
 function make2() { (
 	shopt -s extglob
-	. /etc/portage/make.conf
+	source /etc/portage/make.conf
 	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
 ) }
 complete_clone make make2

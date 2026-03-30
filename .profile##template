@@ -7,7 +7,7 @@ export HISTFILESIZE=$HISTSIZE
 # Source user files if they exist
 for _file in ~/.bashrcNOPE ~/.rbenvrc
 do
-	[[ -f "$_file" ]] && . "$_file"
+	[[ -f "$_file" ]] && source "$_file"
 done; unset _file
 
 # Set XDG dirs if unset
