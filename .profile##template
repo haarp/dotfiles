@@ -130,7 +130,6 @@ export SSH_ASKPASS_REQUIRE="force"
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
-# FIXME: doesn't work! (at least in xed 3.4.3) -> re-login required?
 export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
 # workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
 export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
