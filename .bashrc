@@ -55,7 +55,7 @@ done; unset _dir
 ## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
 ####CDPATH=".:~:/"
 
-## Source rbenv after setting RBENV_ROOT
+## Source rbenv after setting RBENV_ROOT and PATH
 if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
 	source <("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)
 fi
