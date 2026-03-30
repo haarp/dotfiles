@@ -436,10 +436,8 @@ export EDITOR="mcedit -d"	# see aliases below
 export PAGER=less
 
 ## Colorful ls
-if command -v dircolors >/dev/null; then
-	if [[ -r ~/.dir_colors ]]; then	. <(dircolors -b ~/.dir_colors)
-	else							. <(dircolors -b)
-	fi
+if [[ -r "$XDG_CONFIG_HOME/dir_colors" ]]; then	. <(dircolors -b "$XDG_CONFIG_HOME/dir_colors")
+else											. <(dircolors -b)
 fi
 
 ## Colorful less and manpages (https://unix.stackexchange.com/a/108840)
