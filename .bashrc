@@ -17,10 +17,10 @@ for _file in /lib/systemd/user-environment-generators/30-systemd-environment-d-g
 do
 	[[ -x "$_file" ]] && eval "$("$_file")"
 done
-for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion ~/.rbenvrc
+for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion
 do
 	[[ -f "$_file" ]] && . "$_file"
-done; unset _file
+done
 
 ## XDG locations (partial duplicate from .profile, for use in master and slave shells)
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -40,6 +40,13 @@ export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
 export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
 export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_HOME/vagrant}"
 export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
+
+## Source files in custom locations
+for _file in ~/.rbenvrc
+do
+	[[ -f "$_file" ]] && . "$_file"
+done
+unset _file
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
 for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
