@@ -13,10 +13,6 @@
 [[ $MC_SID ]] && return
 
 ## Source various files, if they exist, in given order
-for _file in /lib/systemd/user-environment-generators/30-systemd-environment-d-generator
-do
-	[[ -x "$_file" ]] && source <("$_file")
-done
 for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion
 do
 	[[ -f "$_file" ]] && source "$_file"
