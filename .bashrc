@@ -440,7 +440,7 @@ export EDITOR="mcedit -d"	# see aliases below
 export PAGER=less
 
 ## Colorful ls
-if [[ -r "$XDG_CONFIG_HOME/dir_colors" ]]; then	source <(dircolors -b "$XDG_CONFIG_HOME/dir_colors")
+if [[ -r "$XDG_CONFIG_HOME/DIR_COLORS" ]]; then	source <(dircolors -b "$XDG_CONFIG_HOME/DIR_COLORS")
 else											source <(dircolors -b)
 fi
 
