@@ -222,12 +222,14 @@ PROMPT_COMMAND+=('_exit=$?')	# this needs to be the first cmd in PROMPT_COMMAND
 PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Y]}\]$_exit" )'
 # user/host depending on root or luser, darker color inside ssh ($EUID is bashism)
 if [[ $EUID == 0 ]]; then
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[r]}\]\h'
-	else							PS1+='\[${bg[R]}\]\h'
+	if [[ $SSH_CONNECTION ]]
+		then PS1+='\[${bg[r]}\]\h'
+		else PS1+='\[${bg[R]}\]\h'
 	fi
 else
-	if [[ $SSH_CONNECTION ]]; then	PS1+='\[${bg[G]}\]\u\[${bg[g]}\]@\h'
-	else							PS1+='\[${bg[G]}\]\u@\h'
+	if [[ $SSH_CONNECTION ]]
+		then PS1+='\[${bg[G]}\]\u\[${bg[g]}\]@\h'
+		else PS1+='\[${bg[G]}\]\u@\h'
 	fi
 fi
 # if screen sessions >0: session count
@@ -252,10 +254,9 @@ do
 			local char result tosub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
 			for ((i=0; i<${#1}; i++)); do
 				char="${1:i:1}"
-				if [[ "$char" =~ [0-9] ]]; then
-					result+="${tosub[$char]}"
-				else
-					result+="$char"
+				if [[ "$char" =~ [0-9] ]]
+					then result+="${tosub[$char]}"
+					else result+="$char"
 				fi
 			done
 			echo "$result"
@@ -410,10 +411,9 @@ if [[ $- == *i* ]]; then
 	[[ -L "$HISTFILE" && ! -w "$HISTFILE" ]] && unset HISTFILE
 
 	# save everything (use export!! subshells, screen, etc. MUST inherit these settings!)
-	if vercmp "$BASH_VERSION" "4.3"; then
-		export HISTSIZE=-1	# commands
-	else
-		export HISTSIZE=999999	# old bash doesn't support -1
+	if vercmp "$BASH_VERSION" "4.3"
+		then export HISTSIZE=-1	# commands
+		else export HISTSIZE=999999	# old bash doesn't support -1
 	fi
 	export HISTFILESIZE=$HISTSIZE	# lines
 	declare -r HISTSIZE HISTFILESIZE
@@ -440,8 +440,9 @@ export EDITOR="mcedit -d"	# see aliases below
 export PAGER=less
 
 ## Colorful ls
-if [[ -r "$XDG_CONFIG_HOME/DIR_COLORS" ]]; then	source <(dircolors -b "$XDG_CONFIG_HOME/DIR_COLORS")
-else											source <(dircolors -b)
+if [[ -r "$XDG_CONFIG_HOME/DIR_COLORS" ]]
+	then source <(dircolors -b "$XDG_CONFIG_HOME/DIR_COLORS")
+	else source <(dircolors -b)
 fi
 
 ## Colorful less and manpages (https://unix.stackexchange.com/a/108840)
@@ -455,10 +456,9 @@ export LESS_TERMCAP_us="${f[u]}${fg[m]}"			# begin underline
 export LESS_TERMCAP_ue="${f[~u]}${fg[x]}"			# end mode
 
 ## Colorful mc, prefer Debian's thin skins
-if [[ $EUID -eq 0 ]]; then
-	export MC_SKIN="modarin256root-defbg"
-else
-	export MC_SKIN="modarin256-defbg"
+if [[ $EUID -eq 0 ]]
+	then export MC_SKIN="modarin256root-defbg"
+	else export MC_SKIN="modarin256-defbg"
 fi
 [[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
 
@@ -551,18 +551,21 @@ if command -v schedtool >/dev/null && [[ $(</proc/version) =~ '-ck' ]]; then
 	# chrt also exists, is part of util-linux, but can't execute commands
 	# more info on classes/policies: https://lwn.net/Articles/805317/
 	# schedtool -I and -D need -ck kernels
-	if [[ $EUID -eq 0 ]]; then	alias hipri='schedtool -I -n-10 -e'
-	else						alias hipri='schedtool -I -n-5 -e'	# -5 only works on hellbringer, usually limited to 0
+	if [[ $EUID -eq 0 ]]
+		then alias hipri='schedtool -I -n-10 -e'
+		else alias hipri='schedtool -I -n-5 -e'	# -5 only works on hellbringer, usually limited to 0
 	fi
 	alias lopri='ionice -c3 schedtool -D -n15 -e'	# ionice supports -c3 but only as root
 elif command -v schedtool >/dev/null; then
-	if [[ $EUID -eq 0 ]]; then	alias hipri='nice -n-10'
-	else						alias hipri='nice -n-5'
+	if [[ $EUID -eq 0 ]]
+		then alias hipri='nice -n-10'
+		else alias hipri='nice -n-5'
 	fi
 	alias lopri='ionice -c3 schedtool -B -n15 -e'
 else
-	if [[ $EUID -eq 0 ]]; then	alias hipri='nice -n-10'
-	else						alias hipri='nice -n-5'
+	if [[ $EUID -eq 0 ]]
+		then alias hipri='nice -n-10'
+		else alias hipri='nice -n-5'
 	fi
 	alias lopri='ionice -c3 nice -n15'
 fi
@@ -901,8 +904,9 @@ function tree() {
 
 # mkdir and cd in one
 function mkcd() {
-	if [[ -d "${1:?missing arg}" ]]; then	echo "$1 already exists, entering." >&2
-	else									mkdir -p -- "$1"
+	if [[ -d "${1:?missing arg}" ]]
+		then echo "$1 already exists, entering." >&2
+		else mkdir -p -- "$1"
 	fi
 	cd -- "$1"
 }
