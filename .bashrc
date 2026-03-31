@@ -35,6 +35,7 @@ export LESSHISTFILE="${LESSHISTFILE:-/dev/null}" # want no search history (but i
 export MYSQL_HISTFILE="${MYSQL_HISTFILE:-$XDG_STATE_HOME/mysql_history}"
 export PSQL_HISTORY="${PSQL_HISTORY:-$XDG_STATE_HOME/psql_history}"
 export PYTHON_HISTORY="${PYTHON_HISTORY:-$XDG_STATE_HOME/python_history}"
+export RANDFILE="${RANDFILE:-$XDG_CACHE_HOME/rnd}"
 export RBENV_ROOT="${RBENV_ROOT:-$XDG_DATA_HOME/rbenv}"
 export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}"
 export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"

@@ -131,6 +131,7 @@ export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
 export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
+export RANDFILE="$XDG_CACHE_HOME/rnd"
 export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
 # workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
 export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
