@@ -247,8 +247,8 @@ do
 		GIT_PS1_SHOWCOLORHINTS=''	# uses 0-code to do resets :(
 		GIT_PS1_STATESEPARATOR=''
 		GIT_PS1_SHOWDIRTYSTATE=1
-		GIT_PS1_SHOWSTASHSTATE=1
 		GIT_PS1_SHOWUNTRACKEDFILES=1
+		GIT_PS1_SHOWSTASHSTATE=1
 		GIT_PS1_SHOWUPSTREAM="verbose"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
 		tosub() {
@@ -264,25 +264,25 @@ do
 			echo "$result"
 		}
 		PROMPT_COMMAND+=('
-			_git_prompt=$(__git_ps1 "%s")
+			# 0=branch 1=state
+			_git_prompt="$(__git_ps1 "%s")"
 
-			_git_prompt=${_git_prompt/|u+/⇡}	# ahead and behind upstream
-			_git_prompt=${_git_prompt/-/⇣}	# or in Terminus: ↑↓
-			_git_prompt=${_git_prompt/|u=/}
-			_git_prompt=${_git_prompt/|u/}
+			# ahead and behind upstream (Terminus has: ↑ ↓)
+			if [[ "$_git_prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)?$ ]]; then
+				_git_prompt=${_git_prompt%|u*}
+				_git_prompt+="${BASH_REMATCH[1]:+⇡}$(tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(tosub ${BASH_REMATCH[2]})"
+			fi
 
 			_git_prompt=${_git_prompt/\*/±}	# unstaged changes
 			_git_prompt=${_git_prompt/+/‡}	# staged changes
 			_git_prompt=${_git_prompt/\%/…}	# untracked files
 			_git_prompt=${_git_prompt/\$/■}	# stashed changes
-
-			_git_prompt="$(tosub "$_git_prompt")"
 		')
 		break
 	fi
 done; unset _gp
 # show git prompt and adapt final triangle color
-PS1+='$( [[ "$_git_prompt" ]] && echo "\[${bg[M]}\]$_git_prompt\[${bg[x]}${fg[M]}\]" || echo "\[${bg[x]}${fg[B]}\]" )'
+PS1+='$( [[ "${_git_prompt[@]}" ]] && printf "%s" "\[${bg[M]}\]${_git_prompt[@]}\[${bg[x]}${fg[M]}\]" || echo "\[${bg[x]}${fg[B]}\]" )'
 # right-pointing triangle, and reset formatting
 PS1+='\[${f[x]}\]'
 
