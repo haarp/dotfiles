@@ -174,7 +174,7 @@ else
 	# Show stuff on login (this might break pseudo-interactive shells like scp/rcp!)
 	# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
 	( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-		echo -e "${bg[c]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
+		echo -e "${bg[m]}$(source /etc/os-release && echo "$PRETTY_NAME") $(uname -rn)${bg[x]}"
 		last=$(last -n 2 --fullnames --time-format iso "$USER")
 		read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 		echo "Last login: $start from $addr on $tty"
