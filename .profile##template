@@ -130,6 +130,7 @@ export SSH_ASKPASS_REQUIRE="force"
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
+export _JAVA_OPTIONS="-Duser.home=\"$XDG_DATA_HOME\""	# creates .java there, good enough
 export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
 export RANDFILE="$XDG_CACHE_HOME/rnd"
 export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
@@ -161,7 +162,7 @@ export NO_AT_BRIDGE=1
 export QT_QPA_PLATFORMTHEME="gtk3"
 # Make Java's GTK+ style work. Maybe.
 # NOPE, enables some awkward DPI scaling
-export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
+export _JAVA_OPTIONS="$_JAVA_OPTIONS -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
 
 # Make QT apps not scale horribly (https://wiki.archlinux.org/title/HiDPI#Qt_5)
 # also consider `QT_FONT_DPI=96` to override font DPI scaling
