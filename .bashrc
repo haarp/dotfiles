@@ -285,7 +285,9 @@ do
 	fi
 done; unset _gp
 # show git prompt and adapt final triangle color
-PS1+='$( [[ "${_git_prompt[@]}" ]] && printf "%s" "\[${bg[M]}\]${_git_prompt[@]}\[${bg[x]}${fg[M]}\]" || echo "\[${bg[x]}${fg[B]}\]" )'
+PS1+='$( [[ "${_git_prompt[@]}" ]] &&
+	printf "%s" "\[${bg[M]}\]${_git_prompt[@]}\[${bg[x]}${fg[M]}\]" ||
+	echo "\[${bg[x]}${fg[B]}\]" )'
 # right-pointing triangle, and reset formatting
 PS1+='\[${f[x]}\]'
 
