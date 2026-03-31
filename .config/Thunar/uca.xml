@@ -87,7 +87,7 @@
 	<video-files/>
 </action>
 <action>
-	<icon>edit-cut</icon>
+	<icon>edit-delete</icon>
 	<name>Shred</name>
 	<submenu></submenu>
 	<unique-id>1524821199300299-6</unique-id>
@@ -208,7 +208,7 @@
 	<text-files/>
 </action>
 <action>
-	<icon>application-x-partial-download</icon>
+	<icon>folder-download</icon>
 	<name>Download clipboard URL here</name>
 	<submenu></submenu>
 	<unique-id>1472803200891713-1</unique-id>
@@ -219,7 +219,7 @@
 	<directories/>
 </action>
 <action>
-	<icon>mintupload</icon>
+	<icon>go-up</icon>
 	<name>Upload to Imgur</name>
 	<submenu></submenu>
 	<unique-id>1482516723824333-5</unique-id>
