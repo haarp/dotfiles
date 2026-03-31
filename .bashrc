@@ -13,7 +13,8 @@
 [[ $MC_SID ]] && return
 
 ## Source various files, if they exist, in given order
-for _file in /etc/profile /etc/bash/bashrc /etc/bash.bashrc /usr/share/bash-completion/bash_completion /etc/bash_completion
+for _file in	/etc/profile /etc/bash/bashrc /etc/bash.bashrc \
+				/usr/share/bash-completion/bash_completion /etc/bash_completion
 do
 	[[ -f "$_file" ]] && source "$_file"
 done
@@ -130,7 +131,9 @@ if [[ ! "$ENV_HOME" ]]; then
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
 	( for pid in $(pgrep -u "$USER" -x gvfsd); do
-		gdb -batch -ex "attach $pid" -ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" -ex "detach" &>/dev/null
+		gdb -batch	-ex "attach $pid" \
+					-ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" \
+					-ex "detach" &>/dev/null
 	done & disown )
 
 	## Do some things on a Linux console
@@ -194,7 +197,7 @@ for _fallback in "en_US.UTF-8" "C.UTF-8" "C"; do
 	[[ "$_locales" =~ "$_fallback" ]] && break
 done
 [[ "$LANG" && ! "$_locales" =~ "$LANG" ]] && export LANG="$_fallback"
-for _cat in LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MONETARY LC_MESSAGES \
+for _cat in	LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MONETARY LC_MESSAGES \
 			LC_MEASUREMENT LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME
 do
 	[[ "${!_cat}" && ! "$_locales" =~ "${!_cat}" ]] && unset "$_cat"
@@ -233,7 +236,9 @@ else
 	fi
 fi
 # if screen sessions >0: session count
-PS1+='$( shopt -s nullglob; sess=("${TMPDIR:-/tmp}/screen/S-$USER"/* "/run/screen/S-$USER"/*); [[ $sess ]] && echo -n "\[${bg[W]}\]${#sess[@]}" )'
+PS1+='$( shopt -s nullglob;
+	sess=("${TMPDIR:-/tmp}/screen/S-$USER"/* "/run/screen/S-$USER"/*);
+	[[ $sess ]] && echo -n "\[${bg[W]}\]${#sess[@]}" )'
 # if jobs >0: job count
 PS1+='$( [[ \j -gt 0 ]] && echo -n "\[${bg[C]}\]\j" )'
 # pwd; darker color if not writable
@@ -1166,14 +1171,16 @@ function speedtest.ssh.down() {
 		echo "Measure downstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
 		return 1
 	fi
-	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat /dev/zero' | pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
+	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat /dev/zero' | \
+		pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
 }
 function speedtest.ssh.up() {
 	if [[ $# -lt 1 ]]; then
 		echo "Measure upstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
 		return 1
 	fi
-	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
+	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | \
+		ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
 }
 complete_clone ssh speedtest.ssh.down speedtest.ssh.up
 function speedtest.nc.down() {
@@ -1210,7 +1217,8 @@ function remotescreen() {
 		echo "Shows someone's remote X screen locally. Usage: $FUNCNAME <sshhost>"
 		return 1
 	fi
-	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'DISPLAY=:0 xwd -root | convert -resize 50% - -define png:compression-level=9 png:-' | display -
+	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" \
+		'DISPLAY=:0 xwd -root | convert -resize 50% - -define png:compression-level=9 png:-' | display -
 }
 complete_clone ssh remotescreen
 
