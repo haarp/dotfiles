@@ -510,10 +510,12 @@ function complete_clone() {
 	shift
 
 	command -v "$oldcmd" >/dev/null || return 1
+
 	__load_completion "$oldcmd" 2>/dev/null
 	local completion="$(complete -p "$oldcmd" 2>/dev/null)"
+	[[ "$completion" ]] || return 2
 
-	[[ "$completion" ]] && ${completion%$oldcmd} "$@"
+	${completion%$oldcmd} "$@"
 }
 
 # misc additions
