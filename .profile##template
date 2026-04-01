@@ -4,12 +4,6 @@
 export HISTSIZE=-1
 export HISTFILESIZE=$HISTSIZE
 
-# Source user files if they exist
-for _file in ~/.bashrcNOPE ~/.rbenvrc
-do
-	[[ -f "$_file" ]] && source "$_file"
-done; unset _file
-
 # Set XDG dirs if unset
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
