@@ -4,12 +4,19 @@
 
 # Refer to pinentry's Assuan protocol
 
-TOOL='pinentry-qt5'	# QT5 version allows doing shit in the background like copying a password
+# QT5 version allows doing shit in the background like copying a password
+TOOLS=(pinentry-qt5 pinentry-gnome3 pinentry-x11 pinentry)
 
-which "$TOOL" >/dev/null || {
-	echo "Tool $TOOL not found!" >&2
+for t in "${TOOLS[@]}"; do
+	if command -v "$t" >/dev/null; then
+		tool="$t"
+		break
+	fi
+done
+if [[ ! "$tool" ]]; then
+	"No suitable pinentry found!"
 	exit 3
-}
+fi
 
 # avoid leading whitespace
 # avoid percent sign (convert to %25)
@@ -26,7 +33,7 @@ else
 	commands+=$'\n'"GETPIN"
 fi
 
-reply=$(pinentry-qt5 <<< "$commands" 2>/dev/null)
+reply=$("$tool" <<< "$commands" 2>/dev/null)
 
 # Debug
 ##echo "Commands:" >&2
