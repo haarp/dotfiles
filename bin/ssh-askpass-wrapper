@@ -24,7 +24,7 @@ desc="${*//%/%25}"
 # avoid newlines (used as separator, convert to %0A)
 desc="${desc//$'\n'/%0A}"
 
-commands="SETTITLE ssh-askpass"$'\n'"SETDESC $desc"$'\n'"SETPROMPT"
+commands="SETTITLE ssh-askpass"$'\n'"SETDESC $desc"$'\n'"SETPROMPT ssh-askpass"
 if [[ "$1" == Add* || "$1" == Allow* ]]; then
 	type="confirm"
 	commands+=$'\n'"CONFIRM"
