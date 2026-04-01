@@ -126,7 +126,7 @@ xinput map-to-output "ELAN Touchscreen" eDP-1
 ###fi
 
 # Use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
-export SSH_ASKPASS="$HOME/bin/ssh-askpass-wrapper"
+export SSH_ASKPASS="ssh-askpass-wrapper"
 export SSH_ASKPASS_REQUIRE="force"
 
 # Disable GTK+-3 CSD with gtk3-nocsd
