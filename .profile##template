@@ -1,10 +1,24 @@
 #!/bin/bash
 
-# Set XDG dirs if unset
+# XDG locations
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# those relevant to GUI apps
+# also see https://github.com/b3nj5m1n/xdg-ninja
+export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
+export GNUPGHOME="$XDG_DATA_HOME/gnupg"
+export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
+export _JAVA_OPTIONS="-Duser.home=\"$XDG_DATA_HOME\""	# creates .java there, good enough
+export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
+export RANDFILE="$XDG_CACHE_HOME/rnd"	# openssl
+export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
+# workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
+export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
+/usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps:\
+/usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/pixmaps/xorg-x11:/usr/share/icons:/usr/share/pixmaps"
 
 # Set PATH to include user dirs (bashrc also does it)
 for _dir in ~/bin ~/.local/bin
@@ -114,21 +128,6 @@ xinput map-to-output "ELAN Touchscreen" eDP-1
 # Use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
 export SSH_ASKPASS="$HOME/bin/ssh-askpass-wrapper"
 export SSH_ASKPASS_REQUIRE="force"
-
-# Move some stuff to their proper XDG places (those relevant to GUI apps)
-# also see https://github.com/b3nj5m1n/xdg-ninja
-export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
-export GNUPGHOME="$XDG_DATA_HOME/gnupg"
-export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
-export _JAVA_OPTIONS="-Duser.home=\"$XDG_DATA_HOME\""	# creates .java there, good enough
-export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
-export RANDFILE="$XDG_CACHE_HOME/rnd"
-export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
-# workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
-export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
-/usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps:\
-/usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/pixmaps/xorg-x11:/usr/share/icons:/usr/share/pixmaps"
-
 
 # Disable GTK+-3 CSD with gtk3-nocsd
 # EDIT: not needed anymore, recent Xfce allows disabling CSD
