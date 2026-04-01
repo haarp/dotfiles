@@ -386,8 +386,10 @@ if [[ $- == *i* ]]; then
 	bind	' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
 
 	## Readline options
-	bind "set active-region-start-color ${f[u-]}${u[R]}"	# colors for bracketed paste
-	bind "set active-region-end-color ${f[~u]}${u[x]}"
+	if vercmp "$BASH_VERSION" "5.2"
+		bind "set active-region-start-color ${f[u-]}${u[R]}"	# colors for bracketed paste
+		bind "set active-region-end-color ${f[~u]}${u[x]}"
+	fi
 	bind "set bell-style none"
 	bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
 	bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
