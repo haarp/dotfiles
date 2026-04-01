@@ -65,9 +65,9 @@ do
 		GPUCache
 	do
 		if [[ ! -L "$app/$temp" && -d "$app/$temp" ]]; then
-			mkdir -p -m 700 "$XDG_CACHE_HOME/$(basename "$app")/$temp/"
+			mkdir -p -m 700 "$XDG_CACHE_HOME/${app##*/}/$temp/"
 			rm -rf "$app/$temp/"
-			ln -s "$XDG_CACHE_HOME/$(basename "$app")/$temp/" "$app/$temp"
+			ln -s "$XDG_CACHE_HOME/${app##*/}/$temp/" "$app/$temp"
 		fi
 	done
 done )

@@ -413,7 +413,7 @@ if [[ $- == *i* ]]; then
 
 	## Shell history options
 	export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG (and secure against truncation)
-	[[ -f "$HISTFILE" ]] || mkdir -p "$(dir "$HISTFILE")"
+	[[ -f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
 	export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
 	export HISTCONTROL=ignoreboth	# ignore identical with previous or beginning with space
 	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
