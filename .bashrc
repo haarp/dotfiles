@@ -386,7 +386,7 @@ if [[ $- == *i* ]]; then
 	bind	' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
 
 	## Readline options
-	if vercmp "$BASH_VERSION" "5.2"
+	if vercmp "$BASH_VERSION" "5.2"; then
 		bind "set active-region-start-color ${f[u-]}${u[R]}"	# colors for bracketed paste
 		bind "set active-region-end-color ${f[~u]}${u[x]}"
 	fi
