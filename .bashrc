@@ -869,6 +869,7 @@ function wtf() {
 		if command -v rpm >/dev/null; then rpm -qf "$path"; fi
 	fi
 }
+complete -c wtf
 
 # Highlight phrase(s) with (multiple) colors!
 # FIXME: still buffering a lot before showing
