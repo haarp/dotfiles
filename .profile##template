@@ -16,9 +16,9 @@ export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
 export RANDFILE="$XDG_CACHE_HOME/rnd"	# openssl
 export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
 # workaround https://gitlab.xfce.org/xfce/xfce4-settings/-/issues/490
-export XCURSOR_PATH="~/.local/share/cursors:~/.cursors:~/.local/share/icons:~/.icons:\
-/usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps:\
-/usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/pixmaps/xorg-x11:/usr/share/icons:/usr/share/pixmaps"
+export XCURSOR_PATH="$XDG_DATA_HOME/cursors:~/.cursors:$XDG_DATA_HOME/icons:~/.icons:\
+/usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps/xorg-x11:/usr/local/share/pixmaps:\
+/usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/icons:/usr/share/pixmaps/xorg-x11:/usr/share/pixmaps"
 
 # Set PATH to include user dirs (bashrc also does it)
 for _dir in ~/bin ~/.local/bin
