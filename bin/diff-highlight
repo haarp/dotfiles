@@ -1,0 +1,19 @@
+#!/bin/bash
+
+dh="cat"	# if below fails
+
+if [[ -e "/usr/bin/diff-highlight" ]]; then	# Gentoo
+	dh="/usr/bin/diff-highlight"
+elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then	# Debian 9
+	dh="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
+elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; then	# Debian 10+
+	if ( cp -rT "/usr/share/doc/git/contrib/diff-highlight" "${TMPDIR:-/tmp}/diff-highlight-$$" &&
+		cd "${TMPDIR:-/tmp}/diff-highlight-$$" &&
+		make >/dev/null )
+	then
+		trap 'rm -rf "${TMPDIR:-/tmp}/diff-highlight-$$"' EXIT
+		dh="${TMPDIR:-/tmp}/diff-highlight-$$/diff-highlight"
+	fi
+fi
+
+"$dh" "$@"

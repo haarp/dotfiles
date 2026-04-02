@@ -982,23 +982,7 @@ function diff() {
 
 	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
 
-	local dh="cat"	# if below fails
-
-	if [[ -e "/usr/bin/diff-highlight" ]]; then	# Gentoo
-		dh="/usr/bin/diff-highlight"
-	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then		# Debian 9
-		dh="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
-	elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; then	# Debian 10+
-		if ( cp -rT "/usr/share/doc/git/contrib/diff-highlight" "${TMPDIR:-/tmp}/diff-highlight-$$" &&
-			cd "${TMPDIR:-/tmp}/diff-highlight-$$" &&
-			make >/dev/null )
-		then
-			trap 'trap - RETURN; rm -rf "${TMPDIR:-/tmp}/diff-highlight-$$"' RETURN
-			dh="${TMPDIR:-/tmp}/diff-highlight-$$/diff-highlight"
-		fi
-	fi
-
-	command diff "$@" | "$dh" | sed -e "s/\$/${fg[x]}/" \
+	command diff "$@" | diff-highlight | sed -e "s/\$/${fg[x]}/" \
 		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
 		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
 	return "${PIPESTATUS[0]}"
