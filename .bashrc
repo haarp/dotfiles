@@ -1212,7 +1212,11 @@ function remotescreen() {
 		return 1
 	fi
 	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" \
-		'DISPLAY=:0 xwd -root | convert -resize 50% - -define png:compression-level=9 png:-' | display -
+		'DISPLAY="$(echo /tmp/.X11-unix/X*)" &&
+		export DISPLAY=":${DISPLAY#/tmp/.X11-unix/X}" &&
+		xwd -root | \
+		convert -resize 50% xwd:- -define png:compression-level=9 png:-' | \
+		display -
 }
 complete_clone ssh remotescreen
 
