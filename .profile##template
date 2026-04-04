@@ -151,22 +151,23 @@ done )
 {% if yadm.class == "home" %}
 if [[ $DISPLAY ]]; then
 	## Video setup
-	# Monitor overclocking
 	# FIXME: runs too late for xfce4-display-settings to pick up on login?
-##	xrandr | awk '/connected/{print $1}' | while read display; do
-##		xrandr --output $display --set TearFree on
-##	done
+	# Tearfree
+###	xrandr | awk '/connected/{print $1}' | while read display; do
+###		xrandr --output $display --set TearFree on
+###	done
+	# Monitor overclocking
 	# amdgpu
-##	custom_mode eDP 2560 1600 67.5
-##	custom_mode DisplayPort-1 3840 1600 82
+###	custom_mode eDP 2560 1600 67.5 >/dev/null
+###	custom_mode DisplayPort-1 3840 1600 82 >/dev/null
 	# modesetting
-##	custom_mode eDP-1 2560 1600 67.5
-##	custom_mode DP-2 3840 1600 82
+###	custom_mode eDP-1 2560 1600 67.5 >/dev/null
+###	custom_mode DP-2 3840 1600 82 >/dev/null
 	# new thinkpad
-	custom_mode eDP-1 1920 1080 82.5
-	custom_mode eDP-1 1920 1080 75
-	custom_mode DP-1 3840 1600 82
-	custom_mode DP-1 3840 1600 75
+	custom_mode eDP-1 1920 1080 82.5 >/dev/null
+	custom_mode eDP-1 1920 1080 75 >/dev/null
+	custom_mode DP-1 3840 1600 82 >/dev/null
+	custom_mode DP-1 3840 1600 75 >/dev/null
 
 	# Nvidia video setup
 	# Underclock to save power when Nvidia goes to higher P-states (which is all the fucking time)
