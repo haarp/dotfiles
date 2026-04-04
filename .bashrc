@@ -98,7 +98,7 @@ declare -A bg=( # background colors
 	[KK]=$'\e[48;5;232m'
 	[x]=$'\e[49m'
 )
-declare -A u=(	# underline colors for use w/ f[u]
+declare -A u=(	# underline colors for use w/ f[u*]
 	[k]=$'\e[58;5;0m' [r]=$'\e[58;5;1m' [g]=$'\e[58;5;2m' [y]=$'\e[58;5;3m'
 	[b]=$'\e[58;5;4m' [m]=$'\e[58;5;5m' [c]=$'\e[58;5;6m' [w]=$'\e[58;5;7m'
 	[K]=$'\e[58;5;8m' [R]=$'\e[58;5;9m' [G]=$'\e[58;5;10m' [Y]=$'\e[58;5;11m'
