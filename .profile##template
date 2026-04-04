@@ -20,6 +20,58 @@ export XCURSOR_PATH="$XDG_DATA_HOME/cursors:~/.cursors:$XDG_DATA_HOME/icons:~/.i
 /usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps/xorg-x11:/usr/local/share/pixmaps:\
 /usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/icons:/usr/share/pixmaps/xorg-x11:/usr/share/pixmaps"
 
+
+## Environment variables
+
+# gtk3-nocsd setting (needs LD_PRELOAD), AND
+# gtk3-classic settings (https://github.com/lah7/gtk3-classic/blob/master/README.Variables.md)
+export GTK_CSD=0
+###export GTK_BACKDROP=1
+export GTK_USE_IEC_UNITS=1
+export GTKM_INSERT_EMOJI=1
+# Disable accessibility and GTK trying to contact non-existent accessibility bus and complaining about it (https://wiki.archlinux.org/title/Accessibility#Disable_accessibility)
+export GTK_A11Y=none
+export NO_AT_BRIDGE=1
+
+# Make QT apps not scale horribly (https://wiki.archlinux.org/title/HiDPI#Qt_5)
+# also consider `QT_FONT_DPI=96` to override font DPI scaling
+# KeePassXC: looks about right on 1.25; https://github.com/keepassxreboot/keepassxc/issues/2815
+# OpenSCAD looks too big w/ 1.25, breaks w/ <1.0
+# VirtualBox looks too big w/ 1.25, breaks w/ <1.0
+export QT_ENABLE_HIGHDPI_SCALING=0
+export QT_SCREEN_SCALE_FACTORS=1.0
+# Make QT copy GTK's style (needs dev-qt/qtstyleplugins?) (https://wiki.archlinux.org/title/Uniform_look_for_Qt_and_GTK_applications#QGtk3Style)
+export QT_QPA_PLATFORMTHEME=gtk3
+# Make QT not scan Wifi all the fucking time (https://www.lesswrong.com/posts/8hxvfZiqH24oqyr6y/wireless-is-a-trap https://apple.stackexchange.com/a/312388)
+export QT_BEARER_POLL_TIMEOUT=-1
+# Make Nextcloud client STOP FUCKING LOGGING EVERY MOVED BIT (https://github.com/nextcloud/desktop/issues/5302#issuecomment-2139805467)
+# it even motherfucking moves log archives from the log/ dir to the CONFIG DIR (on restart?) WHAT THE FUCK
+# also chattr +i the fucking Nextcloud_sync.log, QT_LOGGING_RULES doesn't affect it
+export QT_LOGGING_RULES='*=false'
+
+# Java: Try to make GTK+ style work. Maybe.
+export _JAVA_OPTIONS+=" -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
+
+# SSH: use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
+export SSH_ASKPASS=ssh-askpass-wrapper
+export SSH_ASKPASS_REQUIRE=force
+
+# Firefox: Smooth scrolling
+export MOZ_USE_XINPUT2=1
+# Firefox: Fix stuck tooltips (https://bugzilla.mozilla.org/show_bug.cgi?id=1569439#c25)
+export MOZ_GTK_TITLEBAR_DECORATION=system
+
+# Chromium: don't scale horribly; source system-wide settings too
+if [[ -d "/etc/chromium" ]]; then
+	for f in /etc/chromium/*; do [[ -f "$f" ]] && source "$f"; done
+	export CHROMIUM_USER_FLAGS="$CHROMIUM_FLAGS"
+	CHROMIUM_USER_FLAGS+=" --force-device-scale-factor=1.33333"
+fi
+
+# Wine: disable winemenubuilder
+export WINEDLLOVERRIDES=winemenubuilder.exe=d
+
+
 ## Set PATH to include user dirs (bashrc also does it)
 for _dir in ~/bin ~/.local/bin
 do
@@ -27,6 +79,21 @@ do
 	[[ "$PATH" =~ ":$_dir" ]] && continue
 	PATH="$_dir:$PATH"
 done; unset _dir
+
+
+## LD_PRELOAD
+_preload=(
+	# Disable Cripple-AMD CPU dispatcher in Intel Math Kernel Library (https://danieldk.eu/Intel-MKL-on-AMD-Zen)
+	# FIXME: breaks Steam game launch, unless given launch opts: `LD_PRELOAD="libpthread.so.0 libGL.so.1" %command%`
+###	"$HOME/bogusintel.so"
+	# gtk3-nocsd (also GTK_CSD env var)
+###	"/usr/lib64/libgtk3-nocsd.so.0"
+)
+for _p in "${_preload[@]}"; do
+	[[ -x "$_p" ]] || continue
+	export LD_PRELOAD="$_p $LD_PRELOAD"
+done; unset _preload _p
+
 
 ## Create cache/temp dirs
 # NOTE: some early starters (gnome-keyring) need ~/.cache earlier → handled by /etc/local.d
@@ -76,6 +143,7 @@ do
 	done
 done )
 
+
 {% if yadm.class == "home" %}
 if [[ $DISPLAY ]]; then
 	## Video setup
@@ -116,72 +184,5 @@ fi
 xinput map-to-output "ELAN Touchscreen" eDP-1
 {% endif %}
 
-## LD_PRELOAD
-# Disable Cripple-AMD CPU dispatcher in Intel Math Kernel Library (https://danieldk.eu/Intel-MKL-on-AMD-Zen)
-# FIXME: these break Steam games launching, unless they're given launch options `LD_PRELOAD="libpthread.so.0 libGL.so.1" %command%`
-# outdated, doesn't work any longer
-###export MKL_DEBUG_CPU_TYPE=5
-# try this
-###if [[ -e "$HOME/bogusintel.so" ]]; then
-###	export LD_PRELOAD=""$HOME/bogusintel.so" $LD_PRELOAD"
-###fi
-
-## Environment variables
-# Use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
-export SSH_ASKPASS="ssh-askpass-wrapper"
-export SSH_ASKPASS_REQUIRE="force"
-
-# Disable GTK+-3 CSD with gtk3-nocsd
-# EDIT: not needed anymore, recent Xfce allows disabling CSD
-###if [[ -e /usr/lib64/libgtk3-nocsd.so.0 ]]; then
-###	export GTK_CSD=0
-###	export LD_PRELOAD="/usr/lib64/libgtk3-nocsd.so.0 $LD_PRELOAD"
-###fi
-
-# gtk3-classic settings (https://github.com/lah7/gtk3-classic/blob/master/README.Variables.md)
-export GTK_USE_IEC_UNITS=1
-###export GTK_BACKDROP=1
-export GTKM_INSERT_EMOJI=1
-
-# Make QT not scan Wifi all the fucking time (https://www.lesswrong.com/posts/8hxvfZiqH24oqyr6y/wireless-is-a-trap https://apple.stackexchange.com/a/312388)
-export QT_BEARER_POLL_TIMEOUT=-1
-# Make GTK+ apps stop trying to contact non-existent accessibility bus and complaining about it
-export NO_AT_BRIDGE=1
-
-# Make QT copy GTK's style (needs dev-qt/qtstyleplugins?)
-# https://wiki.archlinux.org/title/Uniform_look_for_Qt_and_GTK_applications#QGtk3Style
-export QT_QPA_PLATFORMTHEME="gtk3"
-# Make Java's GTK+ style work. Maybe.
-# NOPE, enables some awkward DPI scaling
-export _JAVA_OPTIONS="$_JAVA_OPTIONS -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
-
-# Make QT apps not scale horribly (https://wiki.archlinux.org/title/HiDPI#Qt_5)
-# also consider `QT_FONT_DPI=96` to override font DPI scaling
-# KeePassXC: https://github.com/keepassxreboot/keepassxc/issues/2815
-# KeePassXC: looks about right on 1.25
-# OpenSCAD looks too big w/ 1.25, breaks w/ <1.0
-# VirtualBox looks too big w/ 1.25, breaks w/ <1.0
-export QT_AUTO_SCREEN_SCALE_FACTOR=0	# replaced by QT_ENABLE_HIGHDPI_SCALING in Qt-5.14
-export QT_SCREEN_SCALE_FACTORS=1.0
-
-# Make Chromium not scale horribly
-# source system-wide settings too
-for f in /etc/chromium/*; do [[ -f "$f" ]] && source "$f"; done
-export CHROMIUM_USER_FLAGS="$CHROMIUM_FLAGS"
-CHROMIUM_USER_FLAGS+=" --force-device-scale-factor=1.33333"
-
-# Firefox: Smooth scrolling
-export MOZ_USE_XINPUT2=1
-# Firefox: Fix stuck tooltips (https://bugzilla.mozilla.org/show_bug.cgi?id=1569439#c25)
-export MOZ_GTK_TITLEBAR_DECORATION=system
-
-# Disable winemenubuilder
-export WINEDLLOVERRIDES=winemenubuilder.exe=d
-
-# Make Nextcloud client STOP FUCKING LOGGING EVERY MOVED BIT
-# https://github.com/nextcloud/desktop/issues/5302#issuecomment-2139805467
-# it even motherfucking moves log archives from the log/ dir to the CONFIG DIR (on restart?) WHAT THE FUCK
-# also chattr +i the fucking Nextcloud_sync.log, QT_LOGGING_RULES doesn't affect it
-export QT_LOGGING_RULES='*=false'
 
 # vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4
