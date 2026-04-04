@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# XDG locations
+## XDG locations
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
-# those relevant to GUI apps
+## Make GUI applications use XDG paths
 # also see https://github.com/b3nj5m1n/xdg-ninja
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
@@ -20,7 +20,7 @@ export XCURSOR_PATH="$XDG_DATA_HOME/cursors:~/.cursors:$XDG_DATA_HOME/icons:~/.i
 /usr/local/share/cursors/xorg-x11:/usr/local/share/cursors:/usr/local/share/icons:/usr/local/share/pixmaps/xorg-x11:/usr/local/share/pixmaps:\
 /usr/share/cursors/xorg-x11:/usr/share/cursors:/usr/share/icons:/usr/share/pixmaps/xorg-x11:/usr/share/pixmaps"
 
-# Set PATH to include user dirs (bashrc also does it)
+## Set PATH to include user dirs (bashrc also does it)
 for _dir in ~/bin ~/.local/bin
 do
 	[[ -d "$_dir" ]] || continue
@@ -28,7 +28,7 @@ do
 	PATH="$_dir:$PATH"
 done; unset _dir
 
-# Create cache/temp dirs
+## Create cache/temp dirs
 # NOTE: some early starters (gnome-keyring) need ~/.cache earlier → handled by /etc/local.d
 ( if [[ -L "$XDG_CACHE_HOME" ]]; then
 	target="$(readlink "$XDG_CACHE_HOME")"
@@ -78,7 +78,8 @@ done )
 
 {% if yadm.class == "home" %}
 if [[ $DISPLAY ]]; then
-	# Video setup
+	## Video setup
+	# Monitor overclocking
 	# FIXME: runs too late for xfce4-display-settings to pick up on login?
 ##	xrandr | awk '/connected/{print $1}' | while read display; do
 ##		xrandr --output $display --set TearFree on
@@ -111,11 +112,11 @@ fi
 {% endif %}
 
 {% if yadm.class == "home" %}
-# Input setup
+## Input setup
 xinput map-to-output "ELAN Touchscreen" eDP-1
 {% endif %}
 
-# LD_PRELOAD
+## LD_PRELOAD
 # Disable Cripple-AMD CPU dispatcher in Intel Math Kernel Library (https://danieldk.eu/Intel-MKL-on-AMD-Zen)
 # FIXME: these break Steam games launching, unless they're given launch options `LD_PRELOAD="libpthread.so.0 libGL.so.1" %command%`
 # outdated, doesn't work any longer
@@ -125,6 +126,7 @@ xinput map-to-output "ELAN Touchscreen" eDP-1
 ###	export LD_PRELOAD=""$HOME/bogusintel.so" $LD_PRELOAD"
 ###fi
 
+## Environment variables
 # Use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
 export SSH_ASKPASS="ssh-askpass-wrapper"
 export SSH_ASKPASS_REQUIRE="force"

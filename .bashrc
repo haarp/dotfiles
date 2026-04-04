@@ -20,12 +20,13 @@ do
 done
 unset _file
 
-## XDG locations (partial duplicate from .profile, for use in master and slave shells)
+## XDG locations
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
+## Make CLI appplications use XDG paths (partial duplicate from .profile, for use in master and slave shells)
 export ANDROID_USER_HOME="${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}"
 export GNUPGHOME="${GNUPGHOME:-$XDG_DATA_HOME/gnupg}"
 export LESSHISTFILE="${LESSHISTFILE:-/dev/null}" # want no search history (but if I did: $XDG_STATE_HOME/lesshst)
