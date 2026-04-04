@@ -531,7 +531,7 @@ alias 7z7ns='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=off'	# no solid archi
 alias 7zz='7za a -mm=Deflate -mx=9'				# needs p7zip-full (otherwise only 7zr is installed)
 alias adb='HOME="$XDG_DATA_HOME/android" adb'	# XDG dir
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'	# from Debian bashrc, alert to be used with long-running commands
-function apt-belongs() { dpkg -S "$(realpath "$(which "$1")")"; }	# too retarded to resolve actual path itself
+alias apt-belongs='dpkg -S'
 alias apt-depends='apt-cache rdepends --installed'
 alias apt-depgraph='apt-cache depends'
 alias apt-files='dpkg -L'
