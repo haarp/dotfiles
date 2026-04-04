@@ -32,6 +32,10 @@ export GTKM_INSERT_EMOJI=1
 # Disable accessibility and GTK trying to contact non-existent accessibility bus and complaining about it (https://wiki.archlinux.org/title/Accessibility#Disable_accessibility)
 export GTK_A11Y=none
 export NO_AT_BRIDGE=1
+# Switch GTK settings backend to text file instead of a fucking windoze registry
+# can also use `memory` for volatile backend
+# migration: `dconf dump / > ~/.config/glib-2.0/settings/keyfile`
+###export GSETTINGS_BACKEND=keyfile
 
 # Make QT apps not scale horribly (https://wiki.archlinux.org/title/HiDPI#Qt_5)
 # also consider `QT_FONT_DPI=96` to override font DPI scaling
