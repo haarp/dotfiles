@@ -478,6 +478,7 @@ fi
 ## Some aliasless defaults
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'	# warnings and errors
 export LESS="-RiKMQ --follow-name --tabs=4"	# allow escapes, dynamic case on search, allow signal kills, better prompt, no bell (can block on older less!), follow filename not inode, proper default tab width
+vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 632" && LESS+=" --use-color --wordwrap"	# distinct meta colors (v581), wrap at word boundaries (v632)
 export SUDO_PROMPT='[sudo] %p  '	# target username and lock char
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"
