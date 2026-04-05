@@ -100,6 +100,8 @@ bindings = [
 	{ key = "Return", mods = "Control|Shift", action = "SpawnNewInstance" },
 	# Open file browser
 	{ key = "F5", mods = "Alt", command = { program = "xdg-open", args = ["."] } },
+	# Fullscreen
+	{ key = "F11", action = "ToggleFullscreen" },
 	# Focus prompt (https://github.com/alacritty/alacritty/issues/5850#issuecomment-2342001833)
 	{ key = "Escape", action = "ToggleViMode", mode="Vi" },
 	{ key = "PageUp", mods = "Control", action = "ToggleViMode", mode = "~Search|~Vi" },
