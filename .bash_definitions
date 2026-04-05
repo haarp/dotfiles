@@ -500,21 +500,40 @@ function makeprogress() {
 	fi
 }
 
-# chmod recursively for dirs and files
-# source: http://www.commandlinefu.com/commands/view/1981/recursively-change-permissions-on-files-leave-directories-alone.
-function chmoddir() {
-	if [[ ! $# -ge 2 ]]; then
-		echo "Recursively chmod only dirs. Usage: $FUNCNAME <mode> <dir> [dir]..."
+# Sensible recursive chmod
+function chmodr() {
+	if [[ $# -lt 2 ]]; then
+		echo "chmod files recursively, setting matching dir permissions. Usage: $FUNCNAME <mode> <dir> [dir]..." >&2
 		return 1
 	fi
-	find "$2" -type d -print0 | xargs -r0 chmod "$1"
-}
-function chmodfile() {
-	if [[ ! $# -ge 2 ]]; then
-		echo "Recursively chmod only files. Usage: $FUNCNAME <mode> <file> [file]..."
-		return 1
-	fi
-	find "$2" -type f -print0 | xargs -r0 chmod "$1"
+
+	local mode="$1"; shift
+
+	for d in "$@"; do
+		if [[ ! -d "$d" ]]; then
+			echo "Target '$d' not a dir!" >&2
+			return 2
+		fi
+	done
+
+	local special=''
+	case "$mode" in
+		[0-9][0-9][0-9])		;;
+		[0-9][0-9][0-9][0-9])	special="${mode:0:1}"; mode="${mode:1:3}";;
+		*)						echo "wtf is the mode '$mode'?" >&2; return 3;;
+	esac
+
+	local newmode="$special" newdirmode='' perm
+	for (( i=0; i<${#mode}; i++ )); do
+		perm="${mode:i:1}"
+		newmode+="$perm"
+		newdirmode+="$(( perm | (perm != 0) ))"
+	done
+
+	echo "mode: $newmode, dirmode: $newdirmode" >&2
+
+	chmod "$newdirmode" "$@"; find "$@" -type d -print0 | xargs -r0 chmod "$newdirmode"
+	find "$@" '!' -type d '!' -type l  -print0 | xargs -r0 chmod "$newmode"
 }
 
 # Swap names of two files
