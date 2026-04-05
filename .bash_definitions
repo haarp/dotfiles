@@ -434,11 +434,6 @@ function sensors() {
 
 # run iotop with task delay accounting
 function iotop {
-	if ! command -v iotop >/dev/null; then
-		echo "iotop not found!"
-		return 1
-	fi
-
 	if [[ $(sysctl -n kernel.task_delayacct) == 0 ]]; then
 		sysctl -q kernel.task_delayacct=1
 		command iotop "$@"
