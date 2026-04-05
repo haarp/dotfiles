@@ -1,3 +1,5 @@
+# man lesskey
+
 # F2: toggle line wrapping
 \eOQ toggle-option S
 # F3: quit like mcview
@@ -6,3 +8,6 @@
 \e[18~ forw-search
 # F10: quit
 \e[21~ quit
+# , .
+, prev-file
+. next-file
