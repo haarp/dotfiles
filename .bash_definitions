@@ -717,40 +717,38 @@ function genlop() {
 # Automagically show changelogs of last emerge session
 function changelogs() {
 	if [[ $# -ge 1 ]]; then
-		#read number of merges from command line
+		# number of merges from command line
 		local num=$1
 	else
-		#get number of merges from last emerge session
+		# number of merges from last emerge session
 		local num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
 		num=${num#*of }; num=${num%) *}
 	fi
 	[[ $num -gt 0 ]] || return 1
-	#determine the packages behind them
+	# determine the packages behind them
 	local recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
 
 	local name; for name in $recent; do
 		name=${name%-[0-9]*}	# strip version
-		purename=${name#*/}	# strip category
+		purename=${name#*/}		# strip category
 
-		local reply=""; read -rp "Show $name? [y/n] " reply
+		local reply; read -rp "Show $name? [y/n] " reply
 		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
 
 		# repo git changelog
-		local dir; for dir in /var/db/repos/*/; do
-			(cd "$dir" && git log "$name" 2>/dev/null)
-		done
+		local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
+			(cd "$dir" && git log --color -- "$name" 2>/dev/null)
+		done | ${PAGER:-less}
 
 		# changelog files
-		local exists=""
+		local exists
 		local file; for file in /var/db/repos/*/$name/ChangeLog \
 		                        /usr/share/doc/$purename-[0-9]*/[nN][eE][wW][sS]* \
 		                        /usr/share/doc/$purename-[0-9]*/[cC][hH][aA][nN][gG][eE]*
 		do
-			[[ -f $file ]] && exists="$exists $file"
+			[[ -f $file ]] && exists+=" $file"
 		done
-		for file in $exists; do
-			${PAGER:-less} "$file"
-		done
+		${PAGER:-less} $exists
 	done
 }
 
