@@ -735,11 +735,6 @@ function changelogs() {
 		local reply; read -rp "Show $name? [y/n] " reply
 		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
 
-		# repo git changelog
-		local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
-			(cd "$dir" && git log --color -- "$name" 2>/dev/null)
-		done | ${PAGER:-less}
-
 		# changelog files
 		local exists
 		local file; for file in /var/db/repos/*/$name/ChangeLog \
@@ -748,7 +743,18 @@ function changelogs() {
 		do
 			[[ -f $file ]] && exists+=" $file"
 		done
-		${PAGER:-less} $exists
+		# use simpler LESSOPEN to make it open compressed files but not do syntax-hilite
+		# sabotage `stat` to force lesspipe to open pipes
+		(
+			stat() { return 1; }; export -f stat
+			LESSOPEN='|lesspipe %s' ${PAGER:-less} -f <(
+				# repo git changelog
+				local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
+					cd "$dir" && git log --color -- "$name" 2>/dev/null
+				done
+			) \
+			$exists
+		)
 	done
 }
 
