@@ -489,8 +489,9 @@ export ZSTD_NBTHREADS="0"
 # FIXME: pygmentize w/ `-g` takes 0.25s to finish
 if command -v pygmentize >/dev/null; then
 	# Debian's lesspipe won't do syntax highlighting, Gentoo's is incomplete; monkey-wrench in pygmentize
+	# also large files are slow to highlight, bail out early
 	# based on https://unix.stackexchange.com/q/191487/138699
-	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; if [[ "$lp" ]]; then echo "$lp"; else timeout 5 pygmentize -g -O style=emacs "$s" 2>/dev/null; fi'
+	export LESSOPEN='|s=%s; [[ "$(stat -c %%s "$s")" -gt 1000000 ]] && exit 2; lp="$(lesspipe "$s")"; if [[ "$lp" ]]; then echo "$lp"; else timeout 5 pygmentize -g -O style=emacs "$s" 2>/dev/null; fi'
 else
 	export LESSOPEN='|lesspipe %s'
 fi
