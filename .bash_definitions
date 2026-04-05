@@ -1,0 +1,970 @@
+#!/bin/bash
+
+## Aliases
+
+alias ..='cd ../'; alias ...='cd ../../'; alias ....='cd ../../../'
+alias 7z7='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on'	# presets to create 7z/zip
+alias 7z7ns='7zr a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=off'	# no solid archive
+alias 7zz='7za a -mm=Deflate -mx=9'				# needs p7zip-full (otherwise only 7zr is installed)
+alias adb='HOME="$XDG_DATA_HOME/android" adb'	# XDG dir
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'	# from Debian bashrc, alert to be used with long-running commands
+alias apt-belongs='dpkg -S'
+alias apt-depends='apt-cache rdepends --installed'
+alias apt-depgraph='apt-cache depends'
+alias apt-files='dpkg -L'
+alias apt-info='COLUMNS=240 dpkg -l'
+alias apt-purgeremoved="dpkg -l | awk '/^rc/{print \$2}' | xargs dpkg --dry-run --purge"
+alias apt-purgeremoved!="dpkg -l | awk '/^rc/{print \$2}' | xargs dpkg --purge"
+alias apt-removeobsolete!='aptitude remove "~o"'
+alias apt-removeobsolete='aptitude search "~o"'
+alias apt-removeorphans='deborphan --guess-all | xargs dpkg --dry-run -r'
+alias apt-removeorphans!='deborphan --guess-all | xargs dpkg -r'
+alias apt-upgrade='apt install --only-upgrade'
+command -v beep >/dev/null || alias beep='echo -ne "\a"'
+alias cp='cp --reflink=auto'	# CoW (old advcpmv disables reflink, so screw em)
+alias dd='dd status=progress'	# interactively show progress
+alias df2='findmnt -D'
+alias df3='findmnt -D -t nosquashfs,notmpfs,nodevtmpfs'
+##alias df='df -h'
+alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
+alias dl='wget -t0 --waitretry=5 -c -T5'
+alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
+alias ffmpeg='ffmpeg -hide_banner'; alias ffprobe='ffprobe -hide_banner'; alias gdb='gdb -q'
+alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
+alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m\n\e[5m5:blink\e[0m \e[7m7:reverse-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n22: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
+alias glxgears='vblank_mode=0 glxgears'	# no vsync
+alias grep="grep --color=auto"; alias egrep="grep -E"; alias fgrep="grep -F"
+alias zgrep='zgrep --color=auto';  alias zegrep="zgrep -E"; alias zfgrep="zgrep -F"
+alias hgrep='history | grep'	# history grep
+alias hexdump='hexdump -C'	# better display
+alias hexencode='od -A none -t x1'
+alias hexencode2='od -A none -t x2'
+if command -v schedtool >/dev/null && [[ $(</proc/version) =~ '-ck' ]]; then
+	# chrt also exists, is part of util-linux, but can't execute commands
+	# more info on classes/policies: https://lwn.net/Articles/805317/
+	# schedtool -I and -D need -ck kernels
+	if [[ $EUID -eq 0 ]]
+		then alias hipri='schedtool -I -n-10 -e'
+		else alias hipri='schedtool -I -n-5 -e'	# -5 only works on hellbringer, usually limited to 0
+	fi
+	alias lopri='ionice -c3 schedtool -D -n15 -e'	# ionice supports -c3 but only as root
+elif command -v schedtool >/dev/null; then
+	if [[ $EUID -eq 0 ]]
+		then alias hipri='nice -n-10'
+		else alias hipri='nice -n-5'
+	fi
+	alias lopri='ionice -c3 schedtool -B -n15 -e'
+else
+	if [[ $EUID -eq 0 ]]
+		then alias hipri='nice -n-10'
+		else alias hipri='nice -n-5'
+	fi
+	alias lopri='ionice -c3 nice -n15'
+fi
+alias hs='echo "Saving history now!"; history -a'
+alias shist='history -a /dev/stdout | less'	# show session history only
+alias nh='echo "History saving disabled!"; unset HISTFILE'
+alias whoops='history -d -1; history -d -1'	# purge last command from history (and whoops itself)
+alias suicide='nh; exit'	# exit without saving history
+if vercmp "$(python3 --version 2>/dev/null)" "Python 3.8"; then
+	# https://stackoverflow.com/a/55501674/5424487
+	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000 --bind ::'
+else
+	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000'	## [--bind 127.0.0.1]
+fi
+alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
+alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
+alias intercept='strace -ff -e trace=write -e write=1,2 -p'	# show some process' stdout/stderr
+command -v external-ip >/dev/null && alias ipa='external-ip' || alias ipa='ipi' # also check out https://www.reddit.com/r/bash/comments/19839z9/curl_geofindme/
+alias iperppc='curl -s https://erppc.net/ip.php'
+alias ipg='dig @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg4='dig -4 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg6='dig -6 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'
+alias ipi='curl -s https://icanhazip.com'; alias ipi4='curl -s https://ipv4.icanhazip.com'; alias ipi6='curl -s https://ipv6.icanhazip.com'
+alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex mode
+alias l="ls -la"; alias lt="ls --sort=time"
+alias ls='ls --human --color=auto --classify --group-directories-first'
+alias lspci2='lspci -nnk'
+alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# mc: disable annoying mouse
+alias mount2='findmnt --invert --pseudo'
+##alias nmap='nmap -PE'			# use ICMP ping for host discovery
+alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
+##alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
+alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (misleadingly slow) reverse DNS lookups on each reply
+alias prettyjson='python -m json.tool'	# alternative to `jq`
+alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
+alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
+alias resolve='getent hosts'; alias resolve4='getent ahostsv4'; alias resolve6='getent ahostsv6'	# resolve name like libc
+complete_clone ping resolve resolve4 resolve6
+alias rng='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" | head -c80; echo'		# alphanumeric w/o [lI1O0] ([:alnum:] otherwise)
+alias rng2='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 ~!@#$%^&*()_+-=\[\]{}|;\:,./<>?" | head -c80; echo'	# more chars
+alias scp-resume='rsync --partial --progress --rsh=ssh'
+alias ssh-add='</dev/null ssh-add'	# "disable" terminal to force ssh-add to use ssh-askpass (https://unix.stackexchange.com/a/352492/138699)
+alias sshnokey='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
+alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
+complete_clone ssh sshnokey; complete_clone scp scpnokey
+alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
+complete_clone killall stopall contall
+alias stripexif='exiftool -all='
+alias stripgeo='exiftool -geotag='
+alias umount.fuse='fusermount -u'
+alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
+alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
+alias w3m='w3m -o use_history=false -o confirm_qq=false -o color=true'
+alias weather='curl -s https://wttr.in/Augsburg | nowrap'
+alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites) FIXME: doesn't work for gui apps, of course
+# wine temp replacer can be found in .profile
+alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
+	"$XDG_DATA_HOME"/applications/wine* \
+	"$XDG_DATA_HOME"/desktop-directories/wine* \
+	"$XDG_DATA_HOME"/icons/????_*.xpm \
+	"$XDG_DATA_HOME"/mime/{application,packages}/x-wine-extension-*'
+alias winedesktop='wine explorer /desktop=Wine,1024x768'
+alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
+complete_clone emerge xemerge demerge
+alias xorgmerge='emerge -av1 --jobs=4 @x11-module-rebuild'
+alias xev2='xev -event keyboard -event button | egrep --line-buffered -o "^ButtonPress|^ButtonRelease|^KeyPress|^KeyRelease|\(keysym.*\)|button [0-9]+" | sed -e "/Press/{N;s/\n/ /;}" -e "/Release/{N;s/\n/ /;}"'	# far less spammy
+alias yt-dlp='yt-dlp -o "%(title)s.%(ext)s" --embed-metadata'	# cleaner filename, chapter info and stuff
+alias yt-dlp-audio='yt-dlp -xf "(bestaudio/best)[ext=m4a][abr>240]/(bestaudio/best)[ext=mp4][abr>240]/
+	mp3-320/(bestaudio/best)[ext=mp3][abr=320]/
+	aac-hi/22/(bestaudio/best)[ext=m4a]/(bestaudio/best)[ext=mp4]/
+	(bestaudio/best)[ext=mp3]/
+	(bestaudio/best)[ext!=aiff][ext!=wav][ext!=flac][format_id!=alac]"'
+alias yt-dlp-audio-index='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s"'	# index albums/playlists
+alias yt-dlp-audio-thumb='yt-dlp-audio --embed-thumbnail'	# only use when thumb not already included! (needs atomicparsley for mp4)
+alias yt-dlp-audio-index-thumb='yt-dlp-audio -o "%(playlist_index)02d - %(title)s.%(ext)s" --embed-thumbnail'
+alias yt-dlp-subs='yt-dlp --all-subs'
+
+
+## Functions
+
+# Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
+# Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
+# also: https://developers.yubico.com/PGP/Importing_keys.html
+function yubi() {
+	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
+
+	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
+		source "$SSH_AGENT_FILE" >/dev/null
+		return
+
+	elif [[ $1 == "kill" ]]; then	# Restart scdaemon when it fucks up
+				# https://bugs.launchpad.net/serverguide/+bug/1569019/comments/6
+				# https://dev.gnupg.org/T1081
+		if pgrep -u "$USER" scdaemon >/dev/null; then
+			echo "Killing scdaemon..."
+			##gpg-connect-agent "SCD KILLSCD" "SCD BYE" /bye
+			gpg-connect-agent "SCD RESET" "SCD BYE" /bye
+			for i in {3..1}; do echo -n "${i}.."; sleep 1; done; echo ""	# takes a while until it works again
+		fi
+		return
+	fi
+
+	# Remember ssh-agent values in case we want to switch back later
+	if [[ ! -e "$SSH_AGENT_FILE" ]]; then
+		echo SSH_AGENT_PID=$SSH_AGENT_PID > "$SSH_AGENT_FILE"
+		echo SSH_AUTH_SOCK=$SSH_AUTH_SOCK >> "$SSH_AGENT_FILE"
+	fi
+
+	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
+		echo "Killing ssh-less gpg-agent..."
+		pkill -u "$USER" gpg-agent
+		while pgrep -u "$USER" gpg-agent >/dev/null; do	# wait until really gone
+			sleep 0.1
+		done
+	}
+
+	pgrep -u "$USER" gpg-agent >/dev/null || {
+		echo "Starting gpg-agent..."
+		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
+	}
+	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
+
+	gpg-connect-agent updatestartuptty /bye	# fix pinentry (see ~/.gnupg/gpg-agent.conf for details)
+}
+
+# Schedule one-off tasks that delete themselves from crontab after execution
+function schedule() {
+	if [[ $# -lt 2 ]]; then
+		echo "Schedule one-off task using cron with flexible datestring"
+		echo "Usage: $FUNCNAME '<datestring>' <command> [parm]..."
+		return 1
+	fi
+
+	local schedule
+	schedule=$(date "+%s" -d "$1") || return 2
+	if [[ $(( schedule - EPOCHSECONDS )) -lt 60 ]]; then
+		echo "Scheduled date lies less than a minute ahead, aborting!"
+		return 3
+	fi
+
+	local minute hour day month command random crontab
+
+	minute=$(date "+%M" -d "$1")
+	hour=$(date "+%H" -d "$1")
+	day=$(date "+%d" -d "$1")
+	month=$(date "+%m" -d "$1")
+	shift
+
+	command="PATH='$PATH' DISPLAY='$DISPLAY' XAUTHORITY='$XAUTHORITY' DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS' "
+	for p in "$@"; do
+		command+="'$p' "
+	done
+	command+="&>/dev/null"
+
+	random=$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM
+	crontab=$(crontab -l 2>/dev/null)
+	crontab+=$'\n'"$minute $hour $day $month * "
+	crontab+="crontab -l 2>/dev/null | grep -v sched-$random | crontab - 2>/dev/null; "
+	crontab+="$command"
+
+	echo "$crontab" | crontab -
+
+	echo "*** command scheduled for $(date "+%b %d %H:%M" -d "@$schedule") ***"
+}
+
+# Wrapper around screen to make it work with dropped privileges (https://serverfault.com/a/620149/315665)
+function screen() {
+	# fix screwy quoting with parameter transformation (bash-4.4+)
+	# edge cases can still break (quotes inside quotes)
+	local args="${*@Q}"
+	script -q -c "screen $args" /dev/null
+}
+
+# Edit filenames quickly and interactively by calling mv with only one arg
+function mv() {
+	if [[ "$#" -eq 1 ]]; then
+		local new
+		read -rei "$1" new
+		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$new"
+	else
+		command mv "$@"
+		return
+	fi
+}
+
+# Edit symlinks quickly (and optionally interactively)
+function editln() {
+	if [[ $# -eq 0 || $# -gt 2 ]]; then
+		echo "Usage: $FUNCNAME <symlink> [target]"
+		return 1
+	fi
+
+	local old new
+	old=$(readlink -v "$1") || return $?
+
+	if [[ -n "$2" ]]; then
+		ln -vsfT -- "$2" "$1"
+	else
+		( cd "$(dirname "$1")"	# for tab completion
+		read -rei "$old" new
+		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "$1"
+		)
+	fi
+}
+
+# Edit variables quickly and interactively
+function editvar() {
+	if [[ ! $# -eq 1 ]]; then
+		echo "Usage: $FUNCNAME <variablename>"
+		return 1
+	fi
+
+	local newvar
+	read -rei "${!1}" newvar
+
+	if export | grep -q "declare -x $1="; then
+		export $1="$newvar"	# can't just use 'declare' as it creates function-local vars (??)
+	else
+		export -n $1="$newvar"	# set and unexport (wasn't exported to begin with)
+	fi
+}
+
+# cd to dir by editing
+function cded() {
+	local newdir
+	read -rei "$PWD" newdir
+	cd "$newdir"
+}
+
+# Give information about arg command
+# TODO: tab completion
+function wtf() {
+	whatis "$1" | tr -s ' '
+	local path="$(which "$1" 2>/dev/null)"
+	type -a "$1"
+	if [[ $path ]]; then
+		local realpath=$(realpath "$path")
+		if [[ "$path" != "$realpath" ]]; then
+			echo "$path is symlinked to $realpath"
+		fi
+		echo -n "package: "
+		if command -v equery >/dev/null; then equery belongs "$path"; fi
+		if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
+		if command -v rpm >/dev/null; then rpm -qf "$path"; fi
+	fi
+}
+complete -c wtf
+
+# Highlight phrase(s) with (multiple) colors!
+# FIXME: still buffering a lot before showing
+function hilite() {
+	local palette=(r g y b m c R G Y B M C)
+	local phrase cmd
+	local sep=$'\037'	# separator for sed
+	local i=0
+	for phrase in "${@:?missing arg}"; do
+		cmd+="s${sep}\($phrase\)${sep}${bg[${palette[$i]}]}&${bg[x]}${sep}g;"
+		((i++))
+	done
+	sed -u "$cmd"
+	## old version:
+	##grep --color=always -E "$1|$"
+}
+
+# Curl host override
+function curll() {
+	if [[ $# -lt 2 || "$1" == -* || "$1" =~ "/" || "$2" == -* ]]; then
+		echo "Usage: $FUNCNAME <newhost> <URL> [curl args]" >&2
+		return 1
+	fi
+
+	local url="$2"
+	local oldhost="${url/http?(s):\/\//}"; oldhost="${oldhost%%/*}"
+	local newhost="$1"
+	shift 2
+
+	local args=""; local port
+	for port in 80 443 25 465; do
+		args+="--connect-to $oldhost:$port:$newhost:$port "
+	done
+
+	curl $args "$url" "$@"
+}
+
+# Grab site's cert info
+function cert() {
+	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+}
+
+# Recursively show dirs as tree
+function tree() {
+	ls -R "${1:-.}" | grep ":$" | sed -e "s/:$//" -e "s/[^-][^\/]*\//  /g"
+}
+
+# mkdir and cd in one
+function mkcd() {
+	if [[ -d "${1:?missing arg}" ]]
+		then echo "$1 already exists, entering." >&2
+		else mkdir -p -- "$1"
+	fi
+	cd -- "$1"
+}
+
+# btrfs attribute set
+function btrfs.set.zstd() {
+	if [[ $# != 1 ]]; then
+		echo "Recursively set dirs to be compressed with zstd on btrfs" >&2
+		echo 'Also run `btrfs fi defrag -r -czstd $dir` to actually do the compressing' >&2
+		echo '`compsize` is also an useful tool' >&2
+		echo "Usage: $FUNCNAME <dir>" >&2
+		return 1
+	fi
+	find "$1" -exec btrfs property set {} compression zstd \;
+}
+
+# Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
+# early mc don't use existing files!
+function mc() {
+	local pwd_file="${MC_TMPDIR:-${TMPDIR:-/tmp}}/mc.pwd.XXXXXX"
+
+	command mc -P "$pwd_file" "$@"
+	local exit=$?
+
+	if [[ -r "$pwd_file" ]]; then
+		local pwd="$(<"$pwd_file")"
+		rm "$pwd_file"
+		[[ -d "$pwd" && "$pwd" != "$PWD" ]] && cd "$pwd"
+	fi
+
+	return $exit
+}
+
+# Process name for lsof
+function lsofp() {
+	local pids
+	pids=$(pgrep -d, "${1:?missing arg}") || return 1
+	shift
+
+	[[ "$pids" ]] || {
+		echo "No process found!" >&2
+		return 1
+	}
+
+	lsof -p "$pids" "$@"
+}
+
+# Try to reduce ss' whitespace spam (https://bugzilla.kernel.org/show_bug.cgi?id=119311)
+function ss() {
+	##command ss "$@" | sed -e 's/\(.....\) /\1;/' -e 's/  \+/;/g' | column -t -s ';'
+	command ss "$@" | cat
+}
+
+# Add colors to diff
+function diff() {
+	# diff-highlight is part of git and generates intra-line highlights
+	# we also additionally colorize the entire line
+	# also see git config
+
+	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
+
+	command diff "$@" | diff-highlight | sed -e "s/\$/${fg[x]}/" \
+		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
+		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
+	return "${PIPESTATUS[0]}"
+}
+
+# sort sensor chips
+function sensors() {
+	local prev_line=""; local sensor_names
+	while read -r line; do
+    	[[ $prev_line == "" ]] && sensor_names+="$line"$'\n'
+	    prev_line="$line"
+	done <<< $(command sensors)
+	command sensors "$@" $(sort <<< "$sensor_names")
+}
+
+# run iotop with task delay accounting
+function iotop {
+	if ! command -v iotop >/dev/null; then
+		echo "iotop not found!"
+		return 1
+	fi
+
+	if [[ $(sysctl -n kernel.task_delayacct) == 0 ]]; then
+		sysctl -q kernel.task_delayacct=1
+		command iotop "$@"
+		sysctl -q kernel.task_delayacct=0
+	else
+		command iotop "$@"
+	fi
+}
+
+# make make make.conf-aware ;)
+# to make autotools shit:
+#libtoolize
+#autoreconf
+#aclocal
+#autoconf
+#automake --add-missing --copy
+#./configure
+#make
+function make2() { (
+	shopt -s extglob
+	source /etc/portage/make.conf
+	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
+) }
+complete_clone make make2
+
+# Configure kernel with menuconfig
+function confkernel() { (
+	cd /usr/src/linux
+	make menuconfig
+) }
+
+# Make and install kernel
+function makekernel() { (
+	##cd /usr/src/linux && make2 && make modules_install && make install && emerge -av1 --jobs=4 @module-rebuild
+	cd /usr/src/linux && make2 && make2 modules_install && {
+		mv /efi/EFI/Gentoo/linux.old2.efi /efi/EFI/Gentoo/linux.old3.efi 2>/dev/null
+		mv /efi/EFI/Gentoo/linux.old1.efi /efi/EFI/Gentoo/linux.old2.efi 2>/dev/null
+		mv /efi/EFI/Gentoo/linux.old.efi /efi/EFI/Gentoo/linux.old1.efi 2>/dev/null
+		mv /efi/EFI/Gentoo/linux.efi /efi/EFI/Gentoo/linux.old.efi 2>/dev/null
+		cp -v arch/x86_64/boot/bzImage /efi/EFI/Gentoo/linux.efi;
+	} && \
+	emerge -av1 --jobs=4 @module-rebuild
+) }
+function makekernel2() {
+	cp -v -n $(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' | sort -r | head -n1 | cut -d' ' -f2-) /usr/src/linux/
+	makekernel
+}
+
+# Crappy make progress meter
+function makeprogress() {
+	if [[ ! $# -eq 1 ]]; then
+		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]"
+		return 1
+	fi
+
+	local CCOUNT="$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)"
+	if [[ $CCOUNT = 0 ]]; then
+		echo "Can't calculate progress, no C files found!"
+	else
+		local OCOUNT="$(find "${1:-.}" -name "*.o" | wc -l)"
+		echo "$(( $OCOUNT * 100 / $CCOUNT ))% ($OCOUNT / $CCOUNT)"
+	fi
+}
+
+# chmod recursively for dirs and files
+# source: http://www.commandlinefu.com/commands/view/1981/recursively-change-permissions-on-files-leave-directories-alone.
+function chmoddir() {
+	if [[ ! $# -ge 2 ]]; then
+		echo "Recursively chmod only dirs. Usage: $FUNCNAME <mode> <dir> [dir]..."
+		return 1
+	fi
+	find "$2" -type d -print0 | xargs -r0 chmod "$1"
+}
+function chmodfile() {
+	if [[ ! $# -ge 2 ]]; then
+		echo "Recursively chmod only files. Usage: $FUNCNAME <mode> <file> [file]..."
+		return 1
+	fi
+	find "$2" -type f -print0 | xargs -r0 chmod "$1"
+}
+
+# Swap names of two files
+function swap() {
+	if [[ ! $# -eq 2 ]]; then
+		echo "Swap names of two files. Usage: $FUNCNAME <file> <file>"
+		return 1
+	elif [[ ! -e "$1" || ! -e "$2" ]]; then
+		echo "Cannot open $1 or $2!"
+		return 1
+	fi
+	local temp="$(mktemp -p "$(dirname "$1")" -u --suffix=".$FUNCNAME")"
+	mv "$1" "$temp" && \
+	mv "$2" "$1" && \
+	mv "$temp" "$2"
+}
+
+# Convert between unix and dos line endings (stdin)
+function d2u() {
+	sed 's:\r::'
+}
+function u2d() {
+	sed 's:$:\r:'
+}
+
+# En-/Decode URL-encoded strings (stdin)
+function urlencode() {
+	local LANG=C	# also encode umlauts and such
+	local line i o out
+
+	while read -r line; do
+		out=""
+		for (( i=0; i<${#line}; i++ )); do
+			o="${line:$i:1}"
+			[[ "$o" =~ ^[a-zA-Z0-9\.\~\_\-]$ ]] || o="$(printf '%%%02x' "'$o")"
+			out+="${o}"
+		done
+		echo "${out}"
+	done
+}
+function urldecode() {
+	local line out
+
+	while read -r line; do
+		out="${line//+/ }"
+		echo -e "${out//%/\\x}"
+	done
+}
+
+## Simple benchmark, calculating pi to 4096 digits (or input)
+## source: https://tuxshell.blogspot.com/2009/08/bc-as-cpu-benchmark.html
+function pibench() {
+	time bc -l <<< "scale=${1:-4096}; a(1)*4" >/dev/null
+}
+
+# Network throughput testing
+# http://speedtest-ams2.digitalocean.com/
+# http://cachefly.cachefly.net/100mb.test
+alias speedtest='curl --parallel http://speedtest-fra1.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams2.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams3.digitalocean.com/5gb.test -o /dev/null'
+alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
+alias speedtest.erppc.down.slow='curl https://erppc.net/infinite.php?slow=1 -o /dev/null'
+alias speedtest.erppc.up='dd if=/dev/zero bs=1M status=none | curl -T - https://erppc.net/infinite.php -o /dev/null'
+
+function speedtest.httpserver() {
+	ip -o addr show scope global primary | awk "{print \$2,\$4}"
+	echo "Port 8000"
+	while true; do
+		{ echo -e 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\nContent-Disposition: attachment; filename="foo.bar"\n\n'; yes; } |
+		pv -i 1 -W -F "Speed: %r | Total: %b" |
+		nc -l -p 8000
+
+		sleep 0.1
+	done
+}
+# source: http://www.commandlinefu.com/commands/view/4434/live-ssh-network-throughput-test
+function speedtest.ssh.down() {
+	if [[ $# -lt 1 ]]; then
+		echo "Measure downstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
+		return 1
+	fi
+	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat /dev/zero' | \
+		pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
+}
+function speedtest.ssh.up() {
+	if [[ $# -lt 1 ]]; then
+		echo "Measure upstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
+		return 1
+	fi
+	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | \
+		ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
+}
+complete_clone ssh speedtest.ssh.down speedtest.ssh.up
+function speedtest.nc.down() {
+	if [[ $# -ne 1 ]]; then
+		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
+		return 1
+	fi
+	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 </dev/zero"
+	nc "$1" 44444 | pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
+
+}
+function speedtest.nc.up() {
+	if [[ $# -ne 1 ]]; then
+		echo "Measure upstream network throughput with netcat. Usage: $FUNCNAME <host>"
+		return 1
+	fi
+	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
+	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | nc "$1" 44444
+}
+complete_clone ping speedtest.nc.down speedtest.nc.up
+
+# https://unix.stackexchange.com/a/254976/138699
+function wasteram() {
+	if [[ $# -ne 1 ]]; then
+		echo "Waste RAM. May be be Ctrl+Ced once effect achieved. Usage: $FUNCNAME <megs>"
+		return 1
+	fi
+
+	head -c "${1}m" /dev/zero | tail
+}
+
+function remotescreen() {
+	if [[ $# -ne 1 ]]; then
+		echo "Shows someone's remote X screen locally. Usage: $FUNCNAME <sshhost>"
+		return 1
+	fi
+	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" \
+		'DISPLAY="$(echo /tmp/.X11-unix/X*)" &&
+		export DISPLAY=":${DISPLAY#/tmp/.X11-unix/X}" &&
+		xwd -root | \
+		convert -resize 50% xwd:- -define png:compression-level=9 png:-' | \
+		display -
+}
+complete_clone ssh remotescreen
+
+# Sync portage tree and rebuild, etc.
+function sync-portage() {
+	lopri emerge --sync || return
+	etc-update
+	echo "emerge -avDuU -j4 world"
+	emerge -avDuU -j4 world #--changed-deps
+	etc-update
+	emerge -av1 -j4 @preserved-rebuild
+	lopri emerge -a --depclean
+	echo "eclean-dist -d -f -t3m"
+	lopri eclean-dist -d -f -t3m
+	echo "portpeek -a -r -z"
+	lopri portpeek -a -r -z
+}
+
+# Print orphaned files
+# FIXME: finds non-orphaned files with merged-usr
+# TODO: If lib/ fails, check /lib64 and vice-versa
+function orphans() {
+	if [[ $# -gt 1 ]]; then
+		echo "Print orphaned (not tracked by portage) files in a dir. Usage: $FUNCNAME [dir]"
+		return
+	fi
+
+##	analyze() {
+##		local packages=$(equery -q belongs -ne "$1" | wc -l)
+##		[[ $packages -eq 0 ]] && echo "$1"
+##	}
+##	export -f analyze
+##	find "${1:-.}" -print0 | sort -z | xargs -r -0 -n1 -P$(nproc) bash -c 'analyze "$@"' _
+
+	# FIXME: doesn't link symlinks
+	# FIXME: fails on spaces in filenames
+	# FIXME: reduce argument list to qfile
+	local allthethings="$(find "${1:-.}" -print0 | sort -z | tr '\0' ' ')"
+	qfile -o $allthethings
+}
+
+# Make genlop use rotated logfiles automatically
+function genlop() {
+	local log; for log in /var/log/emerge.log*; do
+		local logfiles="${logfiles} -f $log"
+	done
+	command genlop $logfiles "$@"
+}
+
+# Automagically show changelogs of last emerge session
+function changelogs() {
+	if [[ $# -ge 1 ]]; then
+		#read number of merges from command line
+		local num=$1
+	else
+		#get number of merges from last emerge session
+		local num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
+		num=${num#*of }; num=${num%) *}
+	fi
+	[[ $num -gt 0 ]] || return 1
+	#determine the packages behind them
+	local recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
+
+	local name; for name in $recent; do
+		name=${name%-[0-9]*}	# strip version
+		purename=${name#*/}	# strip category
+
+		local reply=""; read -rp "Show $name? [y/n] " reply
+		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
+
+		# repo git changelog
+		local dir; for dir in /var/db/repos/*/; do
+			(cd "$dir" && git log "$name" 2>/dev/null)
+		done
+
+		# changelog files
+		local exists=""
+		local file; for file in /var/db/repos/*/$name/ChangeLog \
+		                        /usr/share/doc/$purename-[0-9]*/[nN][eE][wW][sS]* \
+		                        /usr/share/doc/$purename-[0-9]*/[cC][hH][aA][nN][gG][eE]*
+		do
+			[[ -f $file ]] && exists="$exists $file"
+		done
+		for file in $exists; do
+			${PAGER:-less} "$file"
+		done
+	done
+}
+
+# Display reason for masked packages
+function mask() {
+	awk -v "s=$1" '/^#/ && blockend { x = "" } 1 { blockend = 0 } /^#/ { x = x $0 "\n" } !/^#/ && $0 ~ s { print x "\n" $0 "\n" "\n" } /^$/ { blockend++ }' /usr/portage/profiles/package.mask | head -n-2
+}
+
+# Manifest multiple files
+function manifest() {
+	for file in "${@:-*.ebuild}";
+		do ebuild "$file" manifest;
+	done
+}
+
+# Ping the current gateway
+function pinggw() {
+	local default junk gw metric gateway oldmetric=999999
+	while read -r default junk gw junk junk junk junk junk junk junk metric; do
+		[[ $default == "default" ]] || continue
+		if [[ $metric -lt $oldmetric ]]; then
+			gateway="$gw"
+			oldmetric=$metric
+		fi
+	done <<< "$(ip route)"
+	if [[ ! "$gateway" ]]; then
+		echo "No internet gateways found!"
+		return 1
+	fi
+	echo "Pinging $gateway..."
+	ping "$gateway"
+}
+
+# Stream audio directly to a server
+# or use pa: pacmd load-module module-tunnel-sink server=$1
+function streamaudio() {
+	if [[ $# -ne 2 ]]; then
+		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>"
+		return
+	fi
+	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
+}
+
+# Enhance optirun with overclocking (needs >=nvidia-settings-337.19)
+# perf: pgrep/service is super slow, let's check the pidfile instead
+if [[ -e /proc/$( { < /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
+	function optirun() {
+		##local GPUOffset=135	# -> 880MHz
+		##local MemOffset=420	# -> 2220MHz
+
+		##( 	command optirun nvidia-settings -c :8 \
+		##	-a [gpu:0]/GPUGraphicsClockOffset[1]=$GPUOffset \
+		##	-a [gpu:0]/GPUMemoryTransferRateOffset[1]=$MemOffset \
+		##	2>/dev/null &
+		##)
+		command optirun "$@"
+	}
+	alias nvidia-settings='optirun nvidia-settings -c :8'
+fi
+# Fix primusrun (https://forums.gentoo.org/viewtopic-p-8380752.html#8380752)
+# (might also need __GLVND_DISALLOW_PATCHING=1 in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
+alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
+# Modern prime-run for native Nvidia setups (https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html)
+prime-run() {
+	__NV_PRIME_RENDER_OFFLOAD=1 \
+	__GLX_VENDOR_LIBRARY_NAME=nvidia \
+	__VK_LAYER_NV_optimus=NVIDIA_only \
+	"$@"
+}
+
+# Increase ping for a certain IP
+function pingpwn() {
+	if [[ $# -ne 2 ]]; then
+		if [[ ! $1 == "off" ]]; then
+			echo "Increase ping for a certain IP (not hostname). Usage: $FUNCNAME <ip> <latency> OR pingpwn off"
+			return 1
+		fi
+	fi
+	if [[ $EUID -ne 0 ]]; then
+		echo "Needs root rights!"
+		return 1
+	fi
+
+	if [[ $1 == "off" ]]; then
+		tc qdisc del dev eth0 root
+	else
+		tc qdisc add dev eth0 root handle 1: prio
+		tc qdisc add dev eth0 parent 1:3 handle 30: netem delay "${2}ms" 10ms distribution normal
+		tc filter add dev eth0 protocol ip parent 1:0 prio 3 u32 match ip dst "${1}/32" flowid 1:3
+		# global:
+		# tc qdisc add dev eth0 root netem delay 100ms
+		# tc qdisc replace dev eth0 root netem latency 100ms
+		# also packet loss:
+		# tc qdisc replace dev eth0 root netem loss 1.5% latency 100ms
+	fi
+}
+
+# Grab random HTTPS-capable US proxy, for various use cases
+function us_proxy() {
+	local agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:77.0) Gecko/20100101 Firefox/77.0"
+	local blacklist=(38.77.36.35:8080)
+
+	echo "Finding US proxy..." >&2
+	local list=()
+
+	## Proxtube (proxies unresponsive as of 2020-06-14)
+	## https://proxtube.com/ext/stable/config.php?version=2.2.2&browser=firefox&locale=en&monetization=nope
+	list+=(64.251.25.57:3131 64.251.10.192:3131)
+
+	## http://free-proxy.cz/en/proxylist/country/US/http/uptime/all (site needs JS >:( )
+	list+=(
+	)
+
+	## https://www.us-proxy.org/ (hx=yes: use only claimed https-capable ones)
+	local ip port junk; while read -r ip port junk; do
+		list+=("$ip:$port")
+	done <<< "$(curl -sS --connect-timeout 4 -A "$agent" 'https://www.us-proxy.org/' \
+		| sed -e 's:</thead><tbody><tr>:\n:' -e 's:</tr><tr>:\n:g' -e 's:</tr></tbody><tfoot>:\n:' \
+		| grep "<td class='hx'>\(yes\|no\)</td>" | sed -e 's:<td>: :g' -e 's:</td>: :g' )"
+
+	## Evaluate
+	local joblist goldlist p b
+	local p b; for p in "${list[@]}"; do
+		for b in ${blacklist[@]}; do
+			[[ "$p" == "$b" ]] && continue 2
+		done
+  		{ https_proxy="http://$p/" curl -f -s --max-time 13 -A "$agent" -i \
+			'https://www.gstatic.com/generate_204' & } &>/dev/null
+		joblist[$!]=$p
+	done
+	## Collect
+	for p in ${!joblist[@]}; do
+		wait $p 2>/dev/null && goldlist+=(${joblist[$p]})
+	done
+
+	if [[ "$goldlist" ]]; then
+		local proxy=${goldlist[ $(( RANDOM % ${#goldlist[@]} )) ]}
+		echo "Found ${#goldlist[@]} usable proxies out of ${#list[@]}, using $proxy" >&2
+		echo "$proxy"
+		return 0
+	else
+		echo "Couldn't find working proxy out of ${#list[@]}!" >&2
+		return 1
+	fi
+}
+function mpvus() {
+	# mpv doesn't support SOCKS proxies yet (https://github.com/mpv-player/mpv/issues/3373)
+	# but ytdl integration does
+##	local us_proxy
+##	us_proxy=$(us_proxy) || return 1
+##
+##	http_proxy="http://$us_proxy/" mpv "$@"
+	mpv --ytdl-raw-options-append=proxy=socks5://10.64.0.1:1080/ "$@"
+}
+function youtube-dl-us() {
+##	local us_proxy
+##	us_proxy=$(us_proxy) || return 1
+##
+##	http_proxy="http://$us_proxy/" youtube-dl "$@"
+	youtube-dl --proxy socks5://10.64.0.1:1080/ "$@"
+}
+##function pianobar() {
+##	local us_proxy
+##	us_proxy=$(us_proxy) || return 1
+##
+##	sed -i -e "s|control_proxy = http://.*/|control_proxy = http://$us_proxy/|" "$XDG_CONFIG_HOME/pianobar/config"
+##	command pianobar "$@"
+##}
+
+# Digital Rain =D
+# https://bruxy.regnet.cz/web/linux/EN/matrix-sh/
+function matrix() {
+	trap 'trap - SIGINT; echo -e "\e[?1049l"; echo -e "\e[?25h"; return' SIGINT
+
+	echo -e "\e[?25l"	# invisible cursor
+	echo -e "\e[?1049h"	# switch to alternate screen
+
+	local j d i
+
+	while true; do
+		(
+		j=$(( RANDOM % COLUMNS ))
+		d=$(( RANDOM % LINES ))
+
+		for i in $( seq 1 $((LINES-1)) ); do
+			char=$(printf '\\\\0%o' $(( (RANDOM % 57) + 33 )) )
+			echo -e "\e[$[i-1];${j}H${fg[green]}$char\033[$i;${j}H${fg[white]}$char"
+			sleep 0.1
+			[[ $i -ge $d ]] && echo -e "\e[$((i-d));${j}H "
+		done
+
+		for i in $( seq $((i-d)) $((LINES-1)) ); do
+			echo -e "\e[$i;${j}f "
+			sleep 0.1
+		done ) &
+		sleep 0.05
+	done
+}
+# Terminal noise =D
+function noise() {
+	local P=(' ' '░' '▒' '▓' '█')
+
+	trap 'trap - SIGINT; echo -ne "\e[?1049l"; echo -ne "\e[?25h"; return' SIGINT
+
+	echo -ne "\e[?25l"		# invisible cursor
+	echo -ne "\e[?1049h"	# switch to alternate screen
+	while true; do
+		echo -ne "\e[$(( RANDOM % (LINES+1) ));$(( RANDOM % (COLUMNS+1) ))f${P[ $RANDOM%5 ]}"
+	done
+}
+# Pretend you're busy =D
+alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'
+
+# Reverse a patch file (http://stackoverflow.com/a/3902431/5424487)
+function reversepatch() {
+	if [[ $# -ne 2 ]]; then
+		echo "Reverse a patch, saving it into the same file. Usage: $FUNCNAME <patch> <newpatch>"
+		echo "FIXME: Assumes only one file to be patched."
+		return
+	fi
+	if [[ ! -e "$1" ]]; then
+		echo "'$1' not found/readable!"
+		return 1
+	fi
+
+	sed -e "s/^+++/PPP${FUNCNAME}PPP/" -e "s/^---/MMM${FUNCNAME}MMM/" \
+		-e "s/@@ -\([0-9]\+,[0-9]\+\) +\([0-9]\+,[0-9]\+\) @@/@@ -\2 +\1 @@/" \
+		-e "s/^+/P${FUNCNAME}P/" -e "s/^-/+/" -e "s/^P${FUNCNAME}P/-/" \
+		-e "s/^PPP${FUNCNAME}PPP/---/" -e "s/^MMM${FUNCNAME}MMM/+++/" "$1" > "$2"
+}
+
+# vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4
