@@ -528,7 +528,7 @@ complete_clone ssh salt-ssh
 
 ## Custom aliases and functions
 shopt -s expand_aliases	# for non-interactive shells
-if [[ -e ~/.bash_definitions ]]; then source ~/.bash_definitions; fi
+if [[ -e "${ENV_HOME:-$HOME}/.bash_definitions" ]]; then source "${ENV_HOME:-$HOME}/.bash_definitions"; fi
 
 
 ## Timers and terminal title
