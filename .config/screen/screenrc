@@ -10,6 +10,6 @@ defscrollback 100000
 # keep finished screens alive
 zombie kr
 
-# status line (fuck knows who made it, wasnt me)
+# status line
 hardstatus alwayslastline
-hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{=kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{W}%Y-%m-%d %c%{g}]'
+hardstatus string '%{= kg}[%{G}%H%? %1`%?%{g}][%= %{= kw}%-w%{+b yk} %n*%t%?(%u)%? %{-}%+w %=%{g}][%{B}%S%{g}]'
