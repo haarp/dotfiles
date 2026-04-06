@@ -553,12 +553,11 @@ function settermtitle() {
 	if [[ "$2" ]]; then
 		# clean up the command string
 		# strip env variable assignments and args (FIXME: cmd names with spaces get split)
-		for cmd in $2; do
-			[[ "$cmd" =~ '=' ]] || {
-				# strip path
-				cmd="${cmd##*/}"
-				break
-			}
+		local IFS=$' \t\n()'; for cmd in $2; do
+			[[ "$cmd" =~ '=' ]] && continue
+			# strip path if present
+			cmd="${cmd##*/}"
+			break
 		done
 
 		text="${text/\\c/$cmd}"
