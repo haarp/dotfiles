@@ -262,10 +262,10 @@ do
 			local char result tosub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
 			for ((i=0; i<${#1}; i++)); do
 				char="${1:i:1}"
-				if [[ "$char" =~ [0-9] ]]
-					then result+="${tosub[$char]}"
-					else result+="$char"
-				fi
+				case "$char" in
+					[0-9]) result+="${tosub[$char]}";;
+					*) result+="$char";;
+				esac
 			done
 			echo "$result"
 		}
