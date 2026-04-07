@@ -5,7 +5,7 @@ dh="cat"	# if below fails
 if [[ -e "/usr/bin/diff-highlight" ]]; then	# Gentoo
 	dh="/usr/bin/diff-highlight"
 elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight" ]]; then	# Debian 9
-	dh="/usr/share/doc/git/contrib/diff-highlight/diff-highlight"
+	dh="perl /usr/share/doc/git/contrib/diff-highlight/diff-highlight"
 elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; then	# Debian 10+
 	if ( cp -rT "/usr/share/doc/git/contrib/diff-highlight" "${TMPDIR:-/tmp}/diff-highlight-$$" &&
 		cd "${TMPDIR:-/tmp}/diff-highlight-$$" &&
@@ -16,4 +16,4 @@ elif [[ -e "/usr/share/doc/git/contrib/diff-highlight/diff-highlight.perl" ]] ; 
 	fi
 fi
 
-"$dh" "$@"
+$dh "$@"
