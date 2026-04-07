@@ -112,8 +112,8 @@ alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
 alias w3m='w3m -o use_history=false -o confirm_qq=false -o color=true'
 alias weather='curl -s https://wttr.in/Augsburg | nowrap'
-alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# put hsts in proper place, never bother with robots (which causes problems when getting prerequisites) FIXME: doesn't work for gui apps, of course
-# wine temp replacer can be found in .profile
+alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# proper hsts place, ignore robots (problematic when getting prerequisites)
+# wine temp replacer can be found
 alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
 	"$XDG_DATA_HOME"/applications/wine* \
 	"$XDG_DATA_HOME"/desktop-directories/wine* \
@@ -288,7 +288,6 @@ function cded() {
 }
 
 # Give information about arg command
-# TODO: tab completion
 function wtf() {
 	whatis "$1" | tr -s ' '
 	local path="$(which "$1" 2>/dev/null)"
