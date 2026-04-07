@@ -417,7 +417,8 @@ function diff() {
 
 	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
 
-	command diff "$@" | diff-highlight | sed -e "s/\$/${fg[x]}/" \
+	command diff "$@" | { command -v diff-highlight >/dev/null && diff-highlight || cat; } | \
+	sed -e "s/\$/${fg[x]}/" \
 		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
 		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
 	return "${PIPESTATUS[0]}"
