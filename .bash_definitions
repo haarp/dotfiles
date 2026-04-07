@@ -454,21 +454,21 @@ function iotop {
 #automake --add-missing --copy
 #./configure
 #make
-function make2() { (
+function make2() (
 	shopt -s extglob
 	source /etc/portage/make.conf
 	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
-) }
+)
 complete_clone make make2
 
 # Configure kernel with menuconfig
-function confkernel() { (
+function confkernel() (
 	cd /usr/src/linux
 	make menuconfig
-) }
+)
 
 # Make and install kernel
-function makekernel() { (
+function makekernel() (
 	##cd /usr/src/linux && make2 && make modules_install && make install && emerge -av1 --jobs=4 @module-rebuild
 	cd /usr/src/linux && make2 && make2 modules_install && {
 		mv /efi/EFI/Gentoo/linux.old2.efi /efi/EFI/Gentoo/linux.old3.efi 2>/dev/null
@@ -478,7 +478,7 @@ function makekernel() { (
 		cp -v arch/x86_64/boot/bzImage /efi/EFI/Gentoo/linux.efi;
 	} && \
 	emerge -av1 --jobs=4 @module-rebuild
-) }
+)
 function makekernel2() {
 	cp -v -n $(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' | sort -r | head -n1 | cut -d' ' -f2-) /usr/src/linux/
 	makekernel
