@@ -108,6 +108,8 @@ alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
 complete_clone killall stopall contall
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
+alias sc='systemctl'; alias jc='journalctl'
+complete_clone systemctl sc; complete_clone journalctl jc
 alias umount.fuse='fusermount -u'
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
