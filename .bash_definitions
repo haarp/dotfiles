@@ -113,7 +113,7 @@ alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://git
 alias w3m='w3m -o use_history=false -o confirm_qq=false -o color=true'
 alias weather='curl -s https://wttr.in/Augsburg | nowrap'
 alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# proper hsts place, ignore robots (problematic when getting prerequisites)
-# wine temp replacer can be found
+# wine temp replacer can be found in .profile
 alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
 	"$XDG_DATA_HOME"/applications/wine* \
 	"$XDG_DATA_HOME"/desktop-directories/wine* \
@@ -411,8 +411,8 @@ function ss() {
 
 # Add colors to diff
 function diff() {
-	# diff-highlight is part of git and generates intra-line highlights
-	# we also additionally colorize the entire line
+	# we colorize entire lines
+	# diff-highlight is part of git and additionally does intra-line highlights
 	# also see git config
 
 	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
