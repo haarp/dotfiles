@@ -27,7 +27,6 @@ alias df2='findmnt -D'
 alias df3='findmnt -D -t nosquashfs,notmpfs,nodevtmpfs'
 ##alias df='df -h'
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
-alias dl='wget -t0 --waitretry=5 -c -T5'
 alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
 alias essh='envy ssh'; alias esudo='envy sudo'; alias esu='envy su'
 complete_clone ssh essh; complete_clone sudo esudo; complete_clone esu su
@@ -116,6 +115,7 @@ alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://git
 alias w3m='w3m -o use_history=false -o confirm_qq=false -o color=true'
 alias weather='curl -s https://wttr.in/Augsburg | nowrap'
 alias wget='wget --hsts-file="$XDG_STATE_HOME/wget-hsts" -e robots=off'	# proper hsts place, ignore robots (problematic when getting prerequisites)
+alias dl='wget --tries=0 --waitretry=5 --timeout=5 -c'
 # wine temp replacer can be found in .profile
 alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* \
 	"$XDG_DATA_HOME"/applications/wine* \
