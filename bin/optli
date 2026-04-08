@@ -43,7 +43,7 @@ work() {
 	local temp=$(mktemp -u "/tmp/${0##*/}_${1##*/}_XXXXXX") || fail "$1" "tempfile"
 
 	[[ -w "$1" ]] || fail "$1" "no-write-permission"
-	[[ "$(dirname "$1")/" =~ "fail/" ]] && fail "$1" "possible-test-image"
+	[[ "$(dirname "$1")/" == *"fail/"* ]] && fail "$1" "possible-test-image"
 
 	case $(file -b --mime-type "$1") in # detect mime type to catch mislabeled file extensions
 		image/jpeg)

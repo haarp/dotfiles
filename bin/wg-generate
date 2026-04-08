@@ -14,7 +14,7 @@ config="[Interface]
 PrivateKey = $privkey
 "
 for ip in ${3//,/ }; do
-	if [[ $ip =~ .*:.* ]]; then
+	if [[ $ip == *':'* ]]; then
 		config+="Address = $ip/128"$'\n'
 	else
 		config+="Address = $ip/32"$'\n'
@@ -32,7 +32,7 @@ echo "$config"
 echo -e "\e[44mServer config (pubkey and allowed IPs):\e[49m" >&2
 echo "$pubkey" >&2
 for ip in ${3//,/ }; do
-	if [[ $ip =~ .*:.* ]]; then
+	if [[ $ip == *':'* ]]; then
 		echo -n "$ip/128," >&2
 	else
 		echo -n "$ip/32," >&2

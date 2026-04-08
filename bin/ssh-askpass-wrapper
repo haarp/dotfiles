@@ -41,13 +41,13 @@ reply=$("$tool" <<< "$commands" 2>/dev/null)
 ##echo "Reply:" >&2
 ##echo "$reply" >&2
 
-if [[ "$reply" =~ "Operation cancelled <Pinentry>" ]]; then
+if [[ "$reply" == *"Operation cancelled <Pinentry>"* ]]; then
 	exit 1
-elif [[ "$reply" =~ $'\n'"ERR " ]]; then
+elif [[ "$reply" == *$'\n'"ERR "* ]]; then
 	exit 2
 else
 	if [[ "$type" == "passphrase" ]]; then
-		if [[ "$reply" =~ $'\n'"D " ]]; then	# valid passphrase returned
+		if [[ "$reply" == *$'\n'"D "* ]]; then	# valid passphrase returned
 			pass=${reply#*D }
 			pass=${pass%$'\n'OK}
 			unset PATH	# enforce bash builtin echo

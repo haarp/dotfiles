@@ -58,7 +58,7 @@ case $TYPE in
 			# or try first file inside
 			GLOBSORT='+name'	# bash-5.3+
 			files=("$INPUT"/*)
-			[[ -s "${files[0]}" && $(xdg-mime query filetype "${files[0]}") =~ "audio/" ]] && media_thumb "${files[0]}" "$OUTPUT" "$SIZE"
+			[[ -s "${files[0]}" && "$(xdg-mime query filetype "${files[0]}")" == "audio/"* ]] && media_thumb "${files[0]}" "$OUTPUT" "$SIZE"
 		fi
 		;;
 	# any text (https://docs.xfce.org/xfce/tumbler/available_plugins#customized_thumbnailer_for_text-based_documents)
