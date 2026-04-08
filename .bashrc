@@ -577,13 +577,19 @@ function _format_seconds() {
 	else				echo "(${s}s) "
 	fi
 }
+# Trap to be executed as a command starts
+function _debug_trap() {
+	_timer=${_timer:-$SECONDS}
+	settermtitle "$PST2" "$BASH_COMMAND"
+}
+
 # Terminal title on prompt
 PROMPT_COMMAND+=('settermtitle "$PST1"')
 # should be last PROMPT_COMMAND
 PROMPT_COMMAND+=('unset _timer')
 # Terminal title on command
 # moved to bottom because other directives put a lot of garbage through the DEBUG trap on startup
-[[ $- == *i* ]] && trap ' _timer=${_timer:-$SECONDS}; settermtitle "$PST2" "$BASH_COMMAND" ' DEBUG
+[[ $- == *i* ]] && trap '_debug_trap' DEBUG
 
 
 
