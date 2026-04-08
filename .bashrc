@@ -298,7 +298,7 @@ PS1+='\[${f[x]}\]'
 PS2='\[${fg[Y]}\]\[${fg[x]}\]'
 
 # Terminal title used while idle (prompt-like)
-PST1='[\u@\h]: \w $( _show_time $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
+PST1='[\u@\h]: \w $( _format_seconds $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
 # Terminal title used while running command (prompt-like)
 PST2='\c [@\h] (\t) {$BASHPID}'
 
@@ -567,7 +567,7 @@ function settermtitle() {
 	echo -ne "\e]0;$text\a"
 }
 # Turn seconds into Hh Mm Ss
-function _show_time() {
+function _format_seconds() {
 	(($1<5)) && return 1	# don't bother below 5s
 
 	local h m s
