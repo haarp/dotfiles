@@ -431,8 +431,8 @@ function diff() {
 function sensors() {
 	local prev_line=""; local sensor_names
 	while read -r line; do
-    	[[ $prev_line == "" ]] && sensor_names+="$line"$'\n'
-	    prev_line="$line"
+		[[ $prev_line == "" ]] && sensor_names+="$line"$'\n'
+		prev_line="$line"
 	done <<< $(command sensors)
 	command sensors "$@" $(sort <<< "$sensor_names")
 }
@@ -535,7 +535,7 @@ function chmodr() {
 	echo "mode: $newmode, dirmode: $newdirmode" >&2
 
 	chmod "$newdirmode" "$@"; find "$@" -type d -print0 | xargs -r0 chmod "$newdirmode"
-	find "$@" '!' -type d '!' -type l  -print0 | xargs -r0 chmod "$newmode"
+	find "$@" '!' -type d '!' -type l -print0 | xargs -r0 chmod "$newmode"
 }
 
 # Swap names of two files
@@ -884,7 +884,7 @@ function us_proxy() {
 		for b in ${blacklist[@]}; do
 			[[ "$p" == "$b" ]] && continue 2
 		done
-  		{ https_proxy="http://$p/" curl -f -s --max-time 13 -A "$agent" -i \
+		{ https_proxy="http://$p/" curl -f -s --max-time 13 -A "$agent" -i \
 			'https://www.gstatic.com/generate_204' & } &>/dev/null
 		joblist[$!]=$p
 	done
