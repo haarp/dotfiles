@@ -555,7 +555,7 @@ function settermtitle() {
 		# clean up the command string
 		# strip env variable assignments and args (FIXME: cmd names with spaces get split)
 		local IFS=$' \t\n()'; for cmd in $2; do
-			[[ "$cmd" =~ '=' ]] && continue
+			[[ "$cmd" == *'='* ]] && continue	# using `[[ =~ ]]` messes with $BASH_REMATCH
 			# strip path if present
 			cmd="${cmd##*/}"
 			break
