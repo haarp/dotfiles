@@ -8,6 +8,11 @@
 \e[18~ forw-search
 # F10: quit
 \e[21~ quit
+
+# search w/ wraparound (https://unix.stackexchange.com/a/621514)
+/ forw-search ^W
+? back-search ^W
+
 # , .
 , prev-file
 . next-file
