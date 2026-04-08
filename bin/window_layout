@@ -77,5 +77,3 @@ elif [[ "$1" && "$2" == 'restore' ]]; then
 else
 	echo "Usage: $(basename "$0") <profile> <save|restore>"
 fi
-
-# vim: set noexpandtab tabstop=4 shiftwidth=4:

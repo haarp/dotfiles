@@ -36,5 +36,3 @@ if success:
 else:
 	print( "couldn't get color!", file=sys.stderr )
 	sys.exit(1)
-
-# vim: set noexpandtab tabstop=4 shiftwidth=4:
