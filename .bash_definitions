@@ -40,7 +40,7 @@ alias hgrep='history | grep'	# history grep
 alias hexdump='hexdump -C'	# better display
 alias hexencode='od -A none -t x1'
 alias hexencode2='od -A none -t x2'
-if command -v schedtool >/dev/null && [[ $(</proc/version) =~ '-ck' ]]; then
+if command -v schedtool >/dev/null && [[ "$(</proc/version)" == *'-ck'* ]]; then
 	# chrt also exists, is part of util-linux, but can't execute commands
 	# more info on classes/policies: https://lwn.net/Articles/805317/
 	# schedtool -I and -D need -ck kernels
@@ -326,7 +326,7 @@ function hilite() {
 
 # Curl host override
 function curll() {
-	if [[ $# -lt 2 || "$1" == -* || "$1" =~ "/" || "$2" == -* ]]; then
+	if [[ $# -lt 2 || "$1" == '-'* || "$1" == *'/'* || "$2" == '-'* ]]; then
 		echo "Usage: $FUNCNAME <newhost> <URL> [curl args]" >&2
 		return 1
 	fi
@@ -570,7 +570,7 @@ function urlencode() {
 		out=""
 		for (( i=0; i<${#line}; i++ )); do
 			o="${line:$i:1}"
-			[[ "$o" =~ ^[a-zA-Z0-9\.\~\_\-]$ ]] || o="$(printf '%%%02x' "'$o")"
+			[[ "$o" == [a-zA-Z0-9\.\~\_\-] ]] || o="$(printf '%%%02x' "'$o")"
 			out+="${o}"
 		done
 		echo "${out}"

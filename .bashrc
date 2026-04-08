@@ -46,7 +46,7 @@ for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.loc
 do
 	[[ -d "$_dir" ]] || continue
 	[[ -L "$_dir" ]] && continue	# for merged-usr setups
-	[[ "$PATH" =~ ":$_dir" ]] && continue
+	[[ "$PATH" == *":$_dir"* ]] && continue
 	PATH="$_dir:$PATH"
 done; unset _dir
 
@@ -183,7 +183,7 @@ else
 			echo "Last login: $start from $addr on $tty"
 			uptime
 			ip -o addr show scope global primary | while read -r num iface type ip junk; do
-				[[ "$iface" =~ ":" ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
+				[[ "$iface" == *":"* ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
 				echo "$iface $ip"
 			done;
 		fi )
@@ -197,13 +197,13 @@ fi
 ## Reset locales that don't exist on a machine (make perl shut the fuck up, fix mc charset(LANG+LC_NUMERIC))
 _locales=$(locale -a 2>/dev/null) && _locales="${_locales//utf8/UTF-8}"
 for _fallback in "en_US.UTF-8" "C.UTF-8" "C"; do
-	[[ "$_locales" =~ "$_fallback" ]] && break
+	[[ "$_locales" == *"$_fallback"* ]] && break
 done
-[[ "$LANG" && ! "$_locales" =~ "$LANG" ]] && export LANG="$_fallback"
+[[ "$LANG" && ! "$_locales" == *"$LANG"* ]] && export LANG="$_fallback"
 for _cat in	LC_ADDRESS LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MONETARY LC_MESSAGES \
 			LC_MEASUREMENT LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME
 do
-	[[ "${!_cat}" && ! "$_locales" =~ "${!_cat}" ]] && unset "$_cat"
+	[[ "${!_cat}" && ! "$_locales" == *"${!_cat}"* ]] && unset "$_cat"
 done
 unset _locales _fallback _cat
 
