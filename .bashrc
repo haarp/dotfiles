@@ -214,13 +214,6 @@ unset _locales _fallback _cat
 # Get started
 PROMPT_COMMAND=()
 PS1=""
-# bottom line status bar (https://mdk.fr/blog/how-apt-does-its-fancy-progress-bar.html, https://tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html)
-###PS1+='\033[s'			# save cursor position
-###PS1+="\033[$LINES;0f"		# go to bottom line
-###PS1+='\033[0K'			# clear line
-###PS1+='\D{%x %X}'			# print stuff
-###PS1+="\033[0;$((LINES-1))r"	# reserve bottom line
-###PS1+='\033[u'			# restore cursor position
 # reset to all bold black text
 PS1+='\[${f[x]}${f[b]}${fg[KK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
