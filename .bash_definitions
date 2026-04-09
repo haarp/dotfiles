@@ -930,10 +930,10 @@ function youtube-dl-us() {
 # Digital Rain =D
 # https://bruxy.regnet.cz/web/linux/EN/matrix-sh/
 function matrix() {
-	trap 'trap - SIGINT; echo -e "\e[?1049l"; echo -e "\e[?25h"; return' SIGINT
+	trap 'trap - SIGINT; tput rmcup; echo -e "\e[?25h"; return' SIGINT
 
 	echo -e "\e[?25l"	# invisible cursor
-	echo -e "\e[?1049h"	# switch to alternate screen
+	tput smcup			# switch to alternate screen
 
 	local j d i
 
@@ -960,10 +960,10 @@ function matrix() {
 function noise() {
 	local P=(' ' '░' '▒' '▓' '█')
 
-	trap 'trap - SIGINT; echo -ne "\e[?1049l"; echo -ne "\e[?25h"; return' SIGINT
+	trap 'trap - SIGINT; tput rmcup; echo -ne "\e[?25h"; return' SIGINT
 
-	echo -ne "\e[?25l"		# invisible cursor
-	echo -ne "\e[?1049h"	# switch to alternate screen
+	echo -ne "\e[?25l"	# invisible cursor
+	tput smcup			# switch to alternate screen
 	while true; do
 		echo -ne "\e[$(( RANDOM % (LINES+1) ));$(( RANDOM % (COLUMNS+1) ))f${P[ $RANDOM%5 ]}"
 	done
