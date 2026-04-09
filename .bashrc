@@ -569,7 +569,7 @@ function _format_seconds() {
 }
 # Trap to be executed as a command starts
 function _debug_trap() {
-	_timer=${_timer:-$SECONDS}
+	: ${_timer:=$SECONDS}
 	settermtitle "$PST2" "$BASH_COMMAND"
 }
 
