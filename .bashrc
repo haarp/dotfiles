@@ -173,8 +173,9 @@ else
 	fi
 
 	if [[ $- == *i* ]]; then
-		# Show stuff on login (which isn't shown because we aren't considered a login shell anymore)
+		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
 		# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
+		# TODO: maybe iterate over `/etc/update-motd.d/`?
 		( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 			echo "${bg[m]}$(hostname -f)${bg[x]}"
 			echo "$(source /etc/os-release && echo "$PRETTY_NAME") - $(uname -sr)"
