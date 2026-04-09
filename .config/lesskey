@@ -16,3 +16,6 @@
 # , .
 , prev-file
 . next-file
+
+# chop lines
+c toggle-option S
