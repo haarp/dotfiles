@@ -483,7 +483,7 @@ if command -v pygmentize >/dev/null; then
 	# Debian's lesspipe won't do syntax highlighting, Gentoo's is incomplete; monkey-wrench in pygmentize
 	# also large files are slow to highlight, bail out early
 	# based on https://unix.stackexchange.com/q/191487/138699
-	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; [[ "$lp" ]] && { echo "$lp"; exit 0; }; [[ "$(stat -c %%s "$s")" -gt 1000000 ]] && exit 2; pygmentize -O style=emacs "$s" 2>/dev/null || exit 1'
+	export LESSOPEN='|s=%s; lp="$(lesspipe "$s")"; [[ "$lp" ]] && { echo "$lp"; exit 0; }; [[ "$(stat -c %%s "$s" 2>/dev/null)" -gt 1000000 ]] && exit 2; pygmentize -O style=emacs "$s" 2>/dev/null || exit 1'
 else
 	export LESSOPEN='|lesspipe %s'
 fi
