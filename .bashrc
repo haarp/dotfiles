@@ -251,32 +251,29 @@ do
 		GIT_PS1_SHOWSTASHSTATE=1
 		GIT_PS1_SHOWUPSTREAM="verbose"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
-		tosub() {
-			local char result tosub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
-			for ((i=0; i<${#1}; i++)); do
-				char="${1:i:1}"
-				case "$char" in
-					[0-9]) result+="${tosub[$char]}";;
-					*) result+="$char";;
-				esac
-			done
-			echo "$result"
-		}
-		PROMPT_COMMAND+=('
-			# 0=branch 1=state
-			_git_prompt="$(__git_ps1 "%s")"
+		_gen_git_prompt() {
+			local prompt="$(__git_ps1 "%s")"
+			local BASH_REMATCH
 
 			# ahead and behind upstream (Terminus has: ↑ ↓)
-			if [[ "$_git_prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)?$ ]]; then
-				_git_prompt=${_git_prompt%|u*}
-				_git_prompt+="${BASH_REMATCH[1]:+⇡}$(tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(tosub ${BASH_REMATCH[2]})"
+			if [[ "$prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)?$ ]]; then
+				prompt=${prompt%|u*}
+				prompt+="${BASH_REMATCH[1]:+⇡}$(_tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(_tosub ${BASH_REMATCH[2]})"
 			fi
 
-			_git_prompt=${_git_prompt/\*/±}	# unstaged changes
-			_git_prompt=${_git_prompt/+/‡}	# staged changes
-			_git_prompt=${_git_prompt/\%/…}	# untracked files
-			_git_prompt=${_git_prompt/\$/■}	# stashed changes
-		')
+			prompt=${prompt/\*/±}	# unstaged changes
+			prompt=${prompt/+/‡}	# staged changes
+			prompt=${prompt/\%/…}	# untracked files
+			prompt=${prompt/\$/■}	# stashed changes
+
+			echo "$prompt"
+		}
+		_tosub() {
+			local s="$1" sub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
+			for c in "${!sub[@]}"; do s=${s//$c/${sub[c]}}; done
+			echo "$s"
+		}
+		PROMPT_COMMAND+=('_git_prompt=$(_gen_git_prompt)')
 		break
 	fi
 done; unset _gp
