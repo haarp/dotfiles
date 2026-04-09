@@ -313,8 +313,7 @@ complete -c wtf
 # FIXME: still buffering a lot before showing
 # NOTE: don't bother w/ pure bash: no regex (only wildcards), chunking: incomplete highlights, not chunking: huge variables/bad performance
 function hilite() {
-	local palette=(r g y b m c R G Y B M C)
-	local phrase cmd
+	local phrase cmd palette=(r g y b m c R G Y B M C)
 	local sep=$'\037'	# separator for sed
 	local i=0
 	for phrase in "${@:?missing arg}"; do
