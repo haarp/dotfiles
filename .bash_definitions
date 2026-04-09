@@ -326,8 +326,6 @@ function hilite() {
 		i=$(( (i+1) % ${#palette[@]} ))
 	done
 	sed -u "$cmd"
-	## old version:
-	##grep --color=always -E "$1|$"
 }
 
 # Curl host override
