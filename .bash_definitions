@@ -311,6 +311,7 @@ complete -c wtf
 
 # Highlight phrase(s) with (multiple) colors!
 # FIXME: still buffering a lot before showing
+# NOTE: don't bother w/ pure bash: no regex (only wildcards), chunking: incomplete highlights, not chunking: huge variables/bad performance
 function hilite() {
 	local palette=(r g y b m c R G Y B M C)
 	local phrase cmd
