@@ -317,6 +317,11 @@ function hilite() {
 	local sep=$'\037'	# separator for sed
 	local i=0
 	for phrase in "${@:?missing arg}"; do
+		# prevent phrases resembling parts of escape codes from breaking previous substitutions
+		# FIXME: doesn't cover regexes
+		for p in "${palette[@]}"; do
+			[[ "${bg[$p]}" == *"$phrase"* ]] && continue 2
+		done
 		cmd+="s${sep}\($phrase\)${sep}${bg[${palette[$i]}]}&${bg[x]}${sep}g;"
 		i=$(( (i+1) % ${#palette[@]} ))
 	done
