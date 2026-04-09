@@ -419,7 +419,7 @@ if [[ $- == *i* ]]; then
 		else export HISTSIZE=999999	# old bash doesn't support -1
 	fi
 	export HISTFILESIZE=$HISTSIZE	# lines
-	declare -r HISTSIZE HISTFILESIZE
+	readonly HISTSIZE HISTFILESIZE
 
 	# share history across all open terminals
 	##PROMPT_COMMAND+=('history -a; history -n')
