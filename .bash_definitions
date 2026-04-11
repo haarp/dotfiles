@@ -69,9 +69,9 @@ alias whoops='echo "Purging from memory history: $(fc -l -n -1)"; history -d -1;
 alias suicide='nh; exit'	# exit without saving history
 if vercmp "$(python3 --version 2>/dev/null)" "Python 3.8"; then
 	# https://stackoverflow.com/a/55501674/5424487
-	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000 --bind ::'
+	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server --bind ::'
 else
-	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server 8000'	## [--bind 127.0.0.1]
+	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server'	## [--bind 127.0.0.1]
 fi
 alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
 alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
