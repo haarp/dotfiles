@@ -1,21 +1,18 @@
 # man lesskey
 
-# F2: toggle line wrapping
-\eOQ toggle-option S
+# F2,c : toggle line wrapping
+\eOQ	toggle-option S
+c		toggle-option S
+
 # F3: quit like mcview
-\eOR quit
-# F7: search
-\e[18~ forw-search
+\eOR	quit
+
+# F7: search w/ wraparound (https://unix.stackexchange.com/a/621514)
+\e[18~	forw-search ^W
+
 # F10: quit
 \e[21~ quit
 
-# search w/ wraparound (https://unix.stackexchange.com/a/621514)
-/ forw-search ^W
-? back-search ^W
-
-# , .
+# , .: switcj files
 , prev-file
 . next-file
-
-# chop lines
-c toggle-option S
