@@ -40,9 +40,9 @@ save() {
 		case $class in
 			# Slack for some reason needs no x compensation (?!)
 			Slack)
-				:;;
+				: ;;
 			*)
-				x=$((x-bl));;
+				x=$((x-bl)) ;;
 		esac
 		y=$((y-t))
 		# we don't need no correction for width/height?!?
