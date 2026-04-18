@@ -257,9 +257,8 @@ do
 ##			vercmp "$BASH_VERSION" "5.1" && local BASH_REMATCH
 
 			# ahead and behind upstream (Terminus has: ↑ ↓)
-			if [[ "$prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)?$ ]]; then
-				prompt=${prompt%|u*}
-				prompt+="${BASH_REMATCH[1]:+⇡}$(_tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(_tosub ${BASH_REMATCH[2]})"
+			if [[ "$prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)? ]]; then
+				prompt="${prompt/${BASH_REMATCH[0]}/${BASH_REMATCH[1]:+⇡}$(_tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(_tosub ${BASH_REMATCH[2]})}"
 			fi
 
 			prompt=${prompt/\*/±}	# unstaged changes
