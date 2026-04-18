@@ -66,13 +66,13 @@ restore() {
 	done
 }
 
-file="${XDG_STATE_HOME-$HOME/.local/state}/window_layouts/$1"
+file="${XDG_STATE_HOME-$HOME/.local/state}/window_layouts/$2"
 
-if [[ "$1" && "$2" == 'save' ]]; then
+if [[ "$1" == "save" && "$2" ]]; then
 	mkdir -p "$(dirname "$file")"
 	save > "$file"
-elif [[ "$1" && "$2" == 'restore' ]]; then
+elif [[ "$1" == "restore" && "$2" ]]; then
 	restore < "$file"
 else
-	echo "Usage: $(basename "$0") <profile> <save|restore>"
+	echo "Usage: $(basename "$0") <save|restore> <profilename>"
 fi
