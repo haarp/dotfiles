@@ -254,8 +254,6 @@ do
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
 		_gen_git_prompt() {
 			local prompt="$(__git_ps1 "%s")"
-			# "Bash sets BASH_REMATCH in the global scope; declaring it as a local variable will lead to unexpected results." :(
-			##vercmp "$BASH_VERSION" "5.1" && local BASH_REMATCH
 
 			# ahead and behind upstream (Terminus has: ↑ ↓)
 			if [[ "$prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)? ]]; then
