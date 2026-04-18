@@ -412,8 +412,7 @@ function lsofp() {
 
 # Try to reduce ss' whitespace spam (https://bugzilla.kernel.org/show_bug.cgi?id=119311)
 function ss() {
-	##command ss "$@" | sed -e 's/\(.....\) /\1;/' -e 's/  \+/;/g' | column -t -s ';'
-	command ss "$@" | cat
+	command ss "$@" | sed 's/[[:space:]]*$//'
 }
 
 # Add colors to diff
