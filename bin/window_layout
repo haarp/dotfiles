@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Save and Restore X11 window layout :D
+# TODO: use generic windows, not IDs
 
 EXCLUDED_CLASSES=(
 	Xfce4-panel
