@@ -1,30 +1,34 @@
 # https://iamkate.com/data/12-bit-rainbow/
 
 [colors.primary]
-foreground = '#cdcdcd'
-background = '#040404'
+foreground        = '#cdcdcd'
+background        = '#040404'
 bright_foreground = "#efefef"
-[colors.normal]
-black = '#2d2d2d'
-red = '#a83354'
-green = '#43d985'
-yellow = '#e99643'
-blue = '#3264b7'
-magenta = '#643296'
-cyan = '#00b7c8'
-white = '#bcbcbc'
-[colors.bright]
-black = '#4f4f4f'
-red = '#c86464'
-green = '#96d953'
-yellow = '#e9d900'
-blue = '#0096c8'
-magenta = '#851175'
-cyan = '#21c8b7'
-white = '#dedede'
+
 [colors.cursor]
 cursor = '#eedd00'
-text = '#000000'
+text   = '#000000'
+
 [colors.selection]
 background = '#606060'
-text = '#ffffff'
+text       = '#ffffff'
+
+[colors.normal]
+black   = '#2d2d2d'
+red     = '#a83354'
+green   = '#43d985'
+yellow  = '#e99643'
+blue    = '#3264b7'
+magenta = '#643296'
+cyan    = '#00b7c8'
+white   = '#bcbcbc'
+
+[colors.bright]
+black   = '#4f4f4f'
+red     = '#c86464'
+green   = '#96d953'
+yellow  = '#e9d900'
+blue    = '#0096c8'
+magenta = '#851175'
+cyan    = '#21c8b7'
+white   = '#dedede'
