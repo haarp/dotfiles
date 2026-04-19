@@ -832,6 +832,7 @@ function wtf() {
 	realpath=$(realpath "$path")
 	if [[ "$path" != "$realpath" ]]; then
 		echo "$path is symlinked to $realpath"
+		path="$realpath"
 	fi
 	echo -n "package: "
 	if command -v equery >/dev/null; then equery belongs "$path"; fi
