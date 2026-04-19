@@ -461,8 +461,8 @@ function makekernel() (
 		mv /efi/EFI/Gentoo/linux.old.efi /efi/EFI/Gentoo/linux.old1.efi 2>/dev/null
 		mv /efi/EFI/Gentoo/linux.efi /efi/EFI/Gentoo/linux.old.efi 2>/dev/null
 		cp -v arch/x86_64/boot/bzImage /efi/EFI/Gentoo/linux.efi;
-	} && \
-	emerge -av1 --jobs=4 @module-rebuild
+	} \
+	&& emerge -av1 --jobs=4 @module-rebuild
 )
 function makekernel2() {
 	cp -v -n "$(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' \
@@ -604,8 +604,8 @@ function remotescreen() {
 		'DISPLAY="$(echo /tmp/.X11-unix/X*)" &&
 		export DISPLAY=":${DISPLAY#/tmp/.X11-unix/X}" &&
 		xwd -root | \
-		convert -resize 50% xwd:- -define png:compression-level=9 png:-' | \
-		display -
+		convert -resize 50% xwd:- -define png:compression-level=9 png:-' \
+			| display -
 }
 complete_clone ssh remotescreen
 
