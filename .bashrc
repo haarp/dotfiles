@@ -122,7 +122,7 @@ if [[ ! "$ENV_HOME" ]]; then
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
 	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
 		:
-	elif kill -0 "$(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo $SSH_AGENT_PID)" 2>/dev/null; then
+	elif kill -0 "$(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo "$SSH_AGENT_PID")" 2>/dev/null; then
 		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
 	else
 		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"
@@ -257,11 +257,12 @@ do
 		GIT_PS1_SHOWUPSTREAM="verbose"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
 		function _gen_git_prompt() {
-			local prompt="$(__git_ps1 "%s")"
+			local prompt
+			prompt="$(__git_ps1 "%s")"
 
 			# ahead and behind upstream (Terminus has: ↑ ↓)
 			if [[ "$prompt" =~ \|u=?\+?([0-9]+)?-?([0-9]+)? ]]; then
-				prompt="${prompt/${BASH_REMATCH[0]}/${BASH_REMATCH[1]:+⇡}$(_tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(_tosub ${BASH_REMATCH[2]})}"
+				prompt="${prompt/${BASH_REMATCH[0]}/${BASH_REMATCH[1]:+⇡}$(_tosub "${BASH_REMATCH[1]}")${BASH_REMATCH[2]:+⇣}$(_tosub "${BASH_REMATCH[2]}")}"
 			fi
 
 			prompt="${prompt/\*/±}"	# unstaged changes
@@ -428,7 +429,7 @@ if [[ $- == *i* ]]; then
 	## HSTR stuff
 	# workaround https://github.com/dvorka/hstr/issues/531 (needs `dev.tty.legacy_tiocsti=1`)
 	function hstrnotiocsti() {
-		{ READLINE_LINE="$( { </dev/tty hstr ${READLINE_LINE}; } 2>&1 1>&3 3>&- )"; } 3>&1;
+		{ READLINE_LINE="$( { </dev/tty hstr "$READLINE_LINE"; } 2>&1 1>&3 3>&- )"; } 3>&1;
 		READLINE_POINT="${#READLINE_LINE}"
 	}
 	bind -x '"\C-r": "hstrnotiocsti"'	# bind to ctrl-r and F12
@@ -496,7 +497,7 @@ function command_not_found_handle() {
 ## custom completions
 # clone completions from command $1 to $2 [$3, $4, ...]
 function complete_clone() {
-	local oldcmd="$1"
+	local completion oldcmd="$1"
 	shift
 
 	command -v "$oldcmd" >/dev/null || return 1
@@ -504,10 +505,10 @@ function complete_clone() {
 	# this is much faster than __load_completion
 	[[ -f "/usr/share/bash-completion/completions/$oldcmd" ]] && source "/usr/share/bash-completion/completions/$oldcmd"
 	[[ -f "$XDG_DATA_HOME/bash-completion/completions/$oldcmd" ]] && source "$XDG_DATA_HOME/bash-completion/completions/$oldcmd"
-	local completion="$(complete -p "$oldcmd" 2>/dev/null)"
+	completion="$(complete -p "$oldcmd" 2>/dev/null)"
 	[[ "$completion" ]] || return 2
 
-	${completion%$oldcmd} "$@"
+	${completion%"$oldcmd"} "$@"
 }
 
 # misc additions
@@ -565,7 +566,7 @@ function _format_seconds() {
 }
 # Trap to be executed as a command starts
 function _debug_trap() {
-	: ${_timer:=$SECONDS}
+	: "${_timer:=$SECONDS}"
 	settermtitle "$PST2" "$BASH_COMMAND"
 }
 
