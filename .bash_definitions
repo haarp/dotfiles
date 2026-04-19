@@ -650,7 +650,7 @@ function schedule() {
 	month="$(date "+%m" -d "$1")"
 	shift
 
-	command="PATH='$PATH' DISPLAY='$DISPLAY' XAUTHORITY='$XAUTHORITY' DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS' "
+	for v in PATH DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS; do command+="$v='${!v}' "; done
 	command+="${@@Q} &>/dev/null"
 
 	random="$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM"
