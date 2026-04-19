@@ -12,4 +12,4 @@ zombie qr
 
 # status line
 hardstatus alwayslastline
-hardstatus string '%{= kg}[%{G}%H%? %1`%?%{g}][%= %{= kw}%-w%{+b yk} %n*%t%?(%u)%? %{-}%+w %=%{g}][%{B}%S%{g}]'
+hardstatus string '%{= kg}[%{G}%H%? %1`%?%{g}][%= %{= kw}%-w%{+b yk} %n:%t%?(%u)%? %{-}%+w %=%{g}][%{B}%S%{g}]'
