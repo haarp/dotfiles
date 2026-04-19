@@ -167,8 +167,8 @@ function yubi() {
 
 	# Remember ssh-agent values in case we want to switch back later
 	if [[ ! -e "$SSH_AGENT_FILE" ]]; then
-		echo SSH_AGENT_PID=$SSH_AGENT_PID > "$SSH_AGENT_FILE"
-		echo SSH_AUTH_SOCK=$SSH_AUTH_SOCK >> "$SSH_AGENT_FILE"
+		echo "SSH_AGENT_PID=$SSH_AGENT_PID" > "$SSH_AGENT_FILE"
+		echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$SSH_AGENT_FILE"
 	fi
 
 	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
@@ -289,24 +289,25 @@ function editvar() {
 function cded() {
 	local newdir
 	read -rei "$PWD" newdir
-	cd "$newdir"
+	cd -- "$newdir"
 }
 
 # Give information about arg command
 function wtf() {
+	local path realpath
+
 	whatis "$1" | tr -s ' '
-	local path="$(which "$1" 2>/dev/null)"
 	type -a "$1"
-	if [[ $path ]]; then
-		local realpath=$(realpath "$path")
-		if [[ "$path" != "$realpath" ]]; then
-			echo "$path is symlinked to $realpath"
-		fi
-		echo -n "package: "
-		if command -v equery >/dev/null; then equery belongs "$path"; fi
-		if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
-		if command -v rpm >/dev/null; then rpm -qf "$path"; fi
+
+	path="$(which "$1" 2>/dev/null)" || return
+	realpath=$(realpath "$path")
+	if [[ "$path" != "$realpath" ]]; then
+		echo "$path is symlinked to $realpath"
 	fi
+	echo -n "package: "
+	if command -v equery >/dev/null; then equery belongs "$path"; fi
+	if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
+	if command -v rpm >/dev/null; then rpm -qf "$path"; fi
 }
 complete -c wtf
 
@@ -341,12 +342,12 @@ function curll() {
 	local newhost="$1"
 	shift 2
 
-	local args=""; local port
+	local args=() port
 	for port in 80 443 25 465; do
-		args+="--connect-to $oldhost:$port:$newhost:$port "
+		args+=("--connect-to $oldhost:$port:$newhost:$port")
 	done
 
-	curl $args "$url" "$@"
+	curl ${args[@]} "$url" "$@"
 }
 
 # Grab site's cert info
@@ -383,15 +384,15 @@ function btrfs.set.zstd() {
 # Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
 # early mc don't use existing files!
 function mc() {
-	local pwd_file="${MC_TMPDIR:-${TMPDIR:-/tmp}}/mc.pwd.XXXXXX"
+	local pwd pwd_file="${MC_TMPDIR:-${TMPDIR:-/tmp}}/mc.pwd.XXXXXX"
 
 	command mc -P "$pwd_file" "$@"
 	local exit=$?
 
 	if [[ -r "$pwd_file" ]]; then
-		local pwd="$(<"$pwd_file")"
+		pwd="$(<"$pwd_file")"
 		rm "$pwd_file"
-		[[ -d "$pwd" && "$pwd" != "$PWD" ]] && cd "$pwd"
+		[[ -d "$pwd" && "$pwd" != "$PWD" ]] && cd -- "$pwd"
 	fi
 
 	return $exit
@@ -437,7 +438,7 @@ function sensors() {
 	while read -r line; do
 		[[ $prev_line == "" ]] && sensor_names+="$line"$'\n'
 		prev_line="$line"
-	done <<< $(command sensors)
+	done <<< "$(command sensors)"
 	command sensors "$@" $(sort <<< "$sensor_names")
 }
 
@@ -470,8 +471,8 @@ complete_clone make make2
 
 # Configure kernel with menuconfig
 function confkernel() (
-	cd /usr/src/linux
-	make menuconfig
+	cd /usr/src/linux \
+		&& make menuconfig
 )
 
 # Make and install kernel
@@ -487,27 +488,29 @@ function makekernel() (
 	emerge -av1 --jobs=4 @module-rebuild
 )
 function makekernel2() {
-	cp -v -n $(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' \
+	cp -v -n "$(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' \
 		| sort -r \
 		| head -n1 \
 		| cut -d' ' -f2-
-	) /usr/src/linux/
+	)" /usr/src/linux/
 	makekernel
 }
 
 # Crappy make progress meter
 function makeprogress() {
+	local ccount ocount
+
 	if [[ ! $# -eq 1 ]]; then
 		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]"
 		return 1
 	fi
 
-	local CCOUNT="$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)"
-	if [[ $CCOUNT = 0 ]]; then
+	ccount="$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)"
+	if [[ $ccount = 0 ]]; then
 		echo "Can't calculate progress, no C files found!"
 	else
-		local OCOUNT="$(find "${1:-.}" -name "*.o" | wc -l)"
-		echo "$(( $OCOUNT * 100 / $CCOUNT ))% ($OCOUNT / $CCOUNT)"
+		ocount="$(find "${1:-.}" -name "*.o" | wc -l)"
+		echo "$(( ocount * 100 / ccount ))% ($ocount / $ccount)"
 	fi
 }
 
@@ -555,7 +558,8 @@ function swap() {
 		echo "Cannot open $1 or $2!"
 		return 1
 	fi
-	local temp="$(mktemp -p "$(dirname "$1")" -u --suffix=".$FUNCNAME")"
+	local temp
+	temp="$(mktemp -p "$(dirname "$1")" -u --suffix=".$FUNCNAME")"
 	mv "$1" "$temp" && \
 	mv "$2" "$1" && \
 	mv "$temp" "$2"
@@ -578,7 +582,7 @@ function urlencode() {
 		out=""
 		for (( i=0; i<${#line}; i++ )); do
 			o="${line:$i:1}"
-			[[ "$o" == [a-zA-Z0-9\.\~\_\-] ]] || o="$(printf '%%%02x' "'$o")"
+			[[ "$o" == [a-zA-Z0-9\.\~_-] ]] || o="$(printf '%%%02x' "'$o")"
 			out+="${o}"
 		done
 		echo "${out}"
@@ -727,17 +731,18 @@ function genlop() {
 
 # Automagically show changelogs of last emerge session
 function changelogs() {
+	local num recent
 	if [[ $# -ge 1 ]]; then
 		# number of merges from command line
-		local num=$1
+		num="$1"
 	else
 		# number of merges from last emerge session
-		local num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
+		num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
 		num=${num#*of }; num=${num%) *}
 	fi
 	[[ $num -gt 0 ]] || return 1
 	# determine the packages behind them
-	local recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
+	recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
 
 	local name; for name in $recent; do
 		name=${name%-[0-9]*}	# strip version
@@ -747,12 +752,12 @@ function changelogs() {
 		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
 
 		# changelog files
-		local exists
-		local file; for file in /var/db/repos/*/$name/ChangeLog \
-		                        /usr/share/doc/$purename-[0-9]*/[nN][eE][wW][sS]* \
-		                        /usr/share/doc/$purename-[0-9]*/[cC][hH][aA][nN][gG][eE]*
+		local exists=()
+		local file; for file in "/var/db/repos/*/$name/ChangeLog" \
+		                        "/usr/share/doc/$purename"-[0-9]*/[nN][eE][wW][sS]* \
+		                        "/usr/share/doc/$purename"-[0-9]*/[cC][hH][aA][nN][gG][eE]*
 		do
-			[[ -f $file ]] && exists+=" $file"
+			[[ -f $file ]] && exists+=("$file")
 		done
 		# use simpler LESSOPEN to make it open compressed files but not do syntax-hilite
 		# sabotage `stat` to force lesspipe to open pipes
@@ -764,7 +769,7 @@ function changelogs() {
 					cd "$dir" && git log --color -- "$name" 2>/dev/null
 				done
 			) \
-			$exists
+			"${exists[@]}"
 		)
 	done
 }
@@ -880,7 +885,7 @@ function matrix() {
 
 		for i in $( seq 1 $((LINES-1)) ); do
 			char=$(printf '\\\\0%o' $(( (RANDOM % 57) + 33 )) )
-			echo -e "\e[$[i-1];${j}H${fg[green]}$char\033[$i;${j}H${fg[white]}$char"
+			echo -e "\e[$((i-1));${j}H${fg[green]}$char\033[$i;${j}H${fg[white]}$char"
 			sleep 0.1
 			[[ $i -ge $d ]] && echo -e "\e[$((i-d));${j}H "
 		done
