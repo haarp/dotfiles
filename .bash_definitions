@@ -932,7 +932,7 @@ function reversepatch() {
 
 # Fix shellcheck's braindead use of tabs (https://github.com/koalaman/shellcheck/issues/3454)
 function shellcheck() {
-	command shellcheck "$@" | less -F --tabs=8
+	command shellcheck "$@" --color=always | less -F --tabs=8
 }
 
 # vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4
