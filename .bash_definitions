@@ -163,7 +163,7 @@ function cert() {
 # Sensible recursive chmod
 function chmodr() {
 	local mode="$1"; shift
-	local perm local newmode newdirmode
+	local perm newmode newdirmode
 
 	if [[ $# -lt 1 ]]; then
 		echo "chmod files recursively, setting matching dir permissions. Usage: $FUNCNAME <mode> <dir> [dir]..." >&2
