@@ -162,13 +162,13 @@ set -f				# disable shell globbing due to unquoted $pattern
 shopt -s lastpipe	# run last pipe element in current shell
 
 # make SURE to only run on type f
-find "$@" \( $pattern \) -type f -print0 | xargs -r -0 -n1 -P$(getconf _NPROCESSORS_ONLN) bash -c 'work "$@"' _ | while read oldsize newsize status filename; do
-###find "$@" \( $pattern \) -type f | sort | xargs -r -n1 -P1 bash -c 'work "$@"' _ | while read oldsize newsize status filename; do
-	echo "$filename: $oldsize → $newsize, $status"
-
-	total=$(( total + oldsize ))
-	[[ $newsize -lt $oldsize ]] && saved=$(( saved + (oldsize-newsize) ))
-done
+find "$@" \( $pattern \) -type f -print0 \
+	| xargs -r -0 -n1 -P$(getconf _NPROCESSORS_ONLN) bash -c 'work "$@"' _ \
+	| while read oldsize newsize status filename; do
+		echo "$filename: $oldsize → $newsize, $status"
+		total=$(( total + oldsize ))
+		[[ $newsize -lt $oldsize ]] && saved=$(( saved + (oldsize-newsize) ))
+	done
 
 if [[ $total == 0 ]]; then percent=0
 else percent=$(( 100*$saved/$total ))
