@@ -240,9 +240,9 @@ function diff() {
 
 # Edit to cd
 function editcd() {
-	local newdir
-	read -rei "$PWD" newdir
-	cd -- "$newdir"
+	local new
+	read -rei "$PWD" new
+	cd -- "$new"
 }
 # Edit symlinks quickly (and optionally interactively)
 function editln() {
@@ -270,13 +270,13 @@ function editvar() {
 		return 1
 	fi
 
-	local newvar
-	read -rei "${!1}" newvar
+	local new
+	read -rei "${!1}" new
 
 	if export | grep -q "declare -x $1="; then
-		export $1="$newvar"	# can't just use 'declare' as it creates function-local vars (??)
+		export $1="$new"	# can't just use 'declare' as it creates function-local vars (??)
 	else
-		export -n $1="$newvar"	# set and unexport (wasn't exported to begin with)
+		export -n $1="$new"	# set and unexport (wasn't exported to begin with)
 	fi
 }
 # Edit filenames quickly and interactively by calling mv with only one arg
