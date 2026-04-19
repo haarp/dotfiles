@@ -365,7 +365,7 @@ function manifest() {
 }
 # Display reason for masked packages
 function mask() {
-	awk -v "s=$1" '/^#/ && blockend { x = "" } 1 { blockend = 0 } /^#/ { x = x $0 "\n" } !/^#/ && $0 ~ s { print x "\n" $0 "\n" "\n" } /^$/ { blockend++ }' /usr/portage/profiles/package.mask | head -n-2
+	awk -v "s=$1" '/^#/ && blockend { x = "" } 1 { blockend = 0 } /^#/ { x = x $0 "\n" } !/^#/ && $0 ~ s { print x "\n" $0 "\n" "\n" } /^$/ { blockend++ }' /var/db/repos/gentoo/profiles/package.mask | head -n-2
 }
 # Print orphaned files
 # FIXME: finds non-orphaned files with merged-usr
