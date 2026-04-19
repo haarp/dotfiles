@@ -651,10 +651,7 @@ function schedule() {
 	shift
 
 	command="PATH='$PATH' DISPLAY='$DISPLAY' XAUTHORITY='$XAUTHORITY' DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS' "
-	for p in "$@"; do
-		command+="'$p' "
-	done
-	command+="&>/dev/null"
+	command+="${@@Q} &>/dev/null"
 
 	random=$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM
 	crontab=$(crontab -l 2>/dev/null)
