@@ -190,8 +190,8 @@ function chmodr() {
 
 	echo "mode: $newmode, dirmode: $newdirmode" >&2
 
-	chmod "$newdirmode" "$@"; find "$@" -type d -print0 | xargs -r0 chmod "$newdirmode"
-	find "$@" '!' -type d '!' -type l -print0 | xargs -r0 chmod "$newmode"
+	chmod "$newdirmode" "$@"; find "$@" -type d -print0 | xargs -r0 chmod -- "$newdirmode"
+	find "$@" '!' -type d '!' -type l -print0 | xargs -r0 chmod -- "$newmode"
 }
 
 # Curl host override
