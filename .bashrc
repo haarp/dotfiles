@@ -152,7 +152,7 @@ if [[ ! "$ENV_HOME" ]]; then
 else
 	## Slave Shells
 	# Source user bashrc too, if it isn't the same as us (loops!)
-	[[ -f ~/.bashrc ]] && { grep -q 'Aut inveniam viam aut faciam' ~/.bashrc || source ~/.bashrc; }
+	[[ -f ~/.bashrc ]] && { grep -q "Aut inveniam viam aut faciam" ~/.bashrc || source ~/.bashrc; }
 
 	# Include ENV_HOME bins in PATH
 	for _dir in "$ENV_HOME/bin" "$ENV_HOME/.local/bin"
@@ -214,7 +214,7 @@ unset _locales _fallback _cat
 ## NOTE: some weird unicode chars only work correctly with terminus-font or nerd-fonts
 # Get started
 PROMPT_COMMAND=()
-PS1=""
+PS1=''
 # reset to all bold black text
 PS1+='\[${f[x]}${f[b]}${fg[KK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
@@ -328,7 +328,7 @@ shopt -s no_empty_cmd_completion	# TAB with empty prompt does nothing
 vercmp "${BASH_COMPLETION_VERSINFO[*]}" '2 8' && shopt -s nullglob
 
 ## Shell variables
-export GLOBIGNORE='-*'	# don't glob potentially dangerous files starting with dashes
+export GLOBIGNORE="-*"	# don't glob potentially dangerous files starting with dashes
 
 
 ## Readline binds
@@ -440,7 +440,7 @@ fi
 [[ $- == *i* ]] && tabs -4
 export EDITOR="mcedit -d"	# see aliases below
 # FIXME: viewer in mc shows previous dir's terminal title
-export PAGER=less
+export PAGER="less"
 
 ## Colorful ls
 if [[ -r "$XDG_CONFIG_HOME/DIR_COLORS" ]]
@@ -466,12 +466,12 @@ fi
 [[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
 
 ## Some aliasless defaults
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'	# warnings and errors
-export GREP_COLORS='ms=01;31:mc=01;31:sl=:cx=:fn=36:ln=32:bn=32:se=35'	# more visible filename
+export GCC_COLORS="error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01"	# warnings and errors
+export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=36:ln=32:bn=32:se=35"	# more visible filename
 export LESS="-RiMQ --follow-name --tabs=4"	# allow escapes, dynamic case on search, better prompt, no bell (can block on older less!), follow filename not inode, proper default tab width
 vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 581" && LESS+=" --use-color"	# distinct meta colors
 vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 632" && LESS+=" --wordwrap"	# wrap at word boundaries
-export SUDO_PROMPT='[sudo] %p  '	# target username and lock char
+export SUDO_PROMPT="[sudo] %p  "	# target username and lock char
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"
 export XZ_DEFAULTS="--threads=0"
