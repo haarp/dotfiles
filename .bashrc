@@ -324,7 +324,7 @@ shopt -s extglob		# allow some globs like !(foo)
 shopt -s globstar		# make ** work recursively
 shopt -s histappend		# don't overwrite history
 shopt -s no_empty_cmd_completion	# TAB with empty prompt does nothing
-# don't assume literal * if there's nothing to expand (but breaks bash-completion on old versions)
+# don't assume literal * if there's nothing to expand (but breaks bash-completion on old bash-completion)
 vercmp "${BASH_COMPLETION_VERSINFO[*]}" '2 8' && shopt -s nullglob
 
 ## Shell variables
@@ -365,7 +365,7 @@ if [[ $- == *i* ]]; then
 	bind	' "\eOQ":		start-kbd-macro '		# F2
 	bind	' "\eOR":		end-kbd-macro '			# F3
 	bind	' "\eOS":		call-last-kbd-macro '	# F4
-	bind -x	' "\e[15~":		" xdg-open . &>/dev/null" '	# F5, already in Alacritty config
+	bind -x	' "\e[15~":		" xdg-open . &>/dev/null" '	# F5, also in Alacritty config
 	# alt + q followed by key ("quick snippets")
 	bind	' "\eq\"":		"\"\"\C-b" '	# paired characters
 	bind	" \"\eq'\":		\"''\C-b\" "
