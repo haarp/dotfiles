@@ -147,7 +147,7 @@ alias yt-dlp-subs='yt-dlp --all-subs'
 function btrfs.set.zstd() {
 	if [[ $# != 1 ]]; then
 		echo "Recursively set dirs to be compressed with zstd on btrfs" >&2
-		echo 'Also run `btrfs fi defrag -r -czstd $dir` to actually do the compressing' >&2
+		echo 'Run `btrfs fi defrag -r -czstd $dir` to do the actual compressing' >&2
 		echo '`compsize` is also an useful tool' >&2
 		echo "Usage: $FUNCNAME <dir>" >&2
 		return 1
@@ -163,8 +163,7 @@ function cert() {
 # Sensible recursive chmod
 function chmodr() {
 	local mode="$1"; shift
-	local perm
-	local newmode newdirmode
+	local perm local newmode newdirmode
 
 	if [[ $# -lt 1 ]]; then
 		echo "chmod files recursively, setting matching dir permissions. Usage: $FUNCNAME <mode> <dir> [dir]..." >&2
