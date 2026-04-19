@@ -439,13 +439,7 @@ function lsofp() {
 
 # make make make.conf-aware ;)
 # to make autotools shit:
-#libtoolize
-#autoreconf
-#aclocal
-#autoconf
-#automake --add-missing --copy
-#./configure
-#make
+# libtoolize, autoreconf, aclocal, autoconf, automake --add-missing --copy, ./configure, make
 function make2() (
 	shopt -s extglob
 	source /etc/portage/make.conf
