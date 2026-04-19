@@ -653,8 +653,8 @@ function schedule() {
 	command="PATH='$PATH' DISPLAY='$DISPLAY' XAUTHORITY='$XAUTHORITY' DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS' "
 	command+="${@@Q} &>/dev/null"
 
-	random=$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM
-	crontab=$(crontab -l 2>/dev/null)
+	random="$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM"
+	crontab="$(crontab -l 2>/dev/null)"
 	crontab+=$'\n'"$minute $hour $day $month * "
 	crontab+="crontab -l 2>/dev/null | grep -v sched-$random | crontab - 2>/dev/null; "
 	crontab+="$command"
