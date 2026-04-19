@@ -45,7 +45,7 @@ work() {
 	[[ -w "$1" ]] || fail "$1" "no-write-permission"
 	[[ "$(dirname "$1")/" == *"fail/"* ]] && fail "$1" "possible-test-image"
 
-	case $(file -b --mime-type "$1") in # detect mime type to catch mislabeled file extensions
+	case $(file -b --mime-type "$1") in	# detect mime type to catch mislabeled file extensions
 		image/jpeg)
 		case $jpeg in
 			mozjpeg)
@@ -100,8 +100,8 @@ work() {
 	local newsize=$(wc -c <"$temp")
 	if [[ $newsize -lt $oldsize ]]; then
 		touch -r "$1" "$temp"
-		trap '' SIGHUP SIGINT SIGQUIT SIGTERM # don't interrupt while file is being written
-		cat "$temp" > "$1" || fail "$1" "writing-new-file" # use cat to preserve owner/perms
+		trap '' SIGHUP SIGINT SIGQUIT SIGTERM				# don't interrupt while file is being written
+		cat "$temp" > "$1" || fail "$1" "writing-new-file"	# use cat to preserve owner/perms
 		touch -r "$temp" "$1" || fail "$1" "restoring-timestamp"
 		trap - SIGHUP SIGINT SIGQUIT SIGTERM
 
@@ -158,7 +158,7 @@ fi
 total=0
 saved=0
 
-set -f			# disable shell globbing due to unquoted $pattern
+set -f				# disable shell globbing due to unquoted $pattern
 shopt -s lastpipe	# run last pipe element in current shell
 
 # make SURE to only run on type f
