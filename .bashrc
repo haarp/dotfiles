@@ -408,9 +408,8 @@ if [[ $- == *i* ]]; then
 	## Shell history options
 	if [[ "$HISTFILE" ]]; then	# only if there was something set to begin with
 		export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG (and secure against truncation)
-		[[ "$"-f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
+		[[ -f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
 	fi
-
 	# don't save history if HISTFILE is broken symlink (prevent its creation on unmounted ~/Private)
 	[[ -L "$HISTFILE" && ! -w "$HISTFILE" ]] && unset HISTFILE
 
