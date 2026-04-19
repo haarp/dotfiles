@@ -414,11 +414,11 @@ function iotop() {
 	if [[ $(sysctl -n kernel.task_delayacct) == 0 ]]; then
 		sysctl -q kernel.task_delayacct=1
 		command iotop "$@"
-		local return=$?
+		local return="$?"
 		sysctl -q kernel.task_delayacct=0
 	else
 		command iotop "$@"
-		local return=$?
+		local return="$?"
 	fi
 	return "$return"
 }
