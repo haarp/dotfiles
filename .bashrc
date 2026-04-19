@@ -410,20 +410,21 @@ if [[ $- == *i* ]]; then
 		export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG (and secure against truncation)
 		[[ "$"-f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
 	fi
-	export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
-	export HISTCONTROL="ignoreboth"	# ignore identical with previous or beginning with space
-	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
 
 	# don't save history if HISTFILE is broken symlink (prevent its creation on unmounted ~/Private)
 	[[ -L "$HISTFILE" && ! -w "$HISTFILE" ]] && unset HISTFILE
 
-	# save everything (use export!! subshells, screen, etc. MUST inherit these settings!)
+	# save everything (use export!! subshells, screen, etc. MUST inherit these!)
 	if vercmp "$BASH_VERSION" "4.3"
 		then export HISTSIZE="-1"		# commands
 		else export HISTSIZE="999999"	# old bash doesn't support -1
 	fi
 	export HISTFILESIZE="$HISTSIZE"	# lines
 	readonly HISTSIZE HISTFILESIZE
+
+	export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
+	export HISTCONTROL="ignoreboth"	# ignore identical with previous or beginning with space
+	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
 
 	# share history across all open terminals
 	##PROMPT_COMMAND+=('history -a; history -n')
