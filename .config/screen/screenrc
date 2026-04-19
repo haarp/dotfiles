@@ -1,8 +1,6 @@
 # dun care about copyright
 startup_message off
 
-# set term
-term screen-256color
 
 # scrollback x1000
 defscrollback 100000
