@@ -347,7 +347,7 @@ function curll() {
 		args+=("--connect-to $oldhost:$port:$newhost:$port")
 	done
 
-	curl ${args[@]} "$url" "$@"
+	curl ${args[*]} "$url" "$@"
 }
 
 # Grab site's cert info
