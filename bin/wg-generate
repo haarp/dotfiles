@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 # Generate Wireguard config
 
-if [ $# -lt 3 ]; then
+if [[ $# -lt 3 ]]; then
 	echo "Usage: ${0##*/} <remote:port> <remote pubkey> <ip w/o subnet>[,ip w/o subnet] [dns ip]" >&2
 	echo "client config will be printed to stdout, redirect to foo.conf as necessary."
 	exit 1
@@ -20,15 +20,15 @@ for ip in ${3//,/ }; do
 		config+="Address = $ip/32"$'\n'
 	fi
 done
-[ $4 ] && config+="DNS = $4"$'\n'
+[[ "$4" ]] && config+="DNS = $4"$'\n'
 config+=$'\n'"[Peer]
 PublicKey = $2
 AllowedIPs = 0.0.0.0/0,::/0
 Endpoint = $1"
 
-[ -t 1 ] && echo -e "\e[44mClient config (.conf format):\e[49m" >&2
+[[ -t 1 ]] && echo -e "\e[44mClient config (.conf format):\e[49m" >&2
 echo "$config"
-[ -t 1 ] && { qrencode "$config" -t UTF8 -o - >&2; echo -ne "\n\n" >&2; }
+[[ -t 1 ]] && { qrencode "$config" -t UTF8 -o - >&2; echo -ne "\n\n" >&2; }
 echo -e "\e[44mServer config (pubkey and allowed IPs):\e[49m" >&2
 echo "$pubkey" >&2
 for ip in ${3//,/ }; do

@@ -3,7 +3,7 @@
 # more customization: https://tomverbeure.github.io/video_timings_calculator
 # but X will not see the proper refresh rate for these...
 
-if [ $# -eq 5 -a "$1" = "-s" ]; then
+if [ $# -eq 5 ] && [ "$1" = "-s" ]; then
 	switch=1
 	shift
 elif [ $# -eq 4 ]; then

@@ -17,18 +17,19 @@ media_thumb() {
 	ffmpeg -i "$1" -an -vf scale="'if(gt(iw\,ih),$3,-1)':'if(gt(iw\,ih),-1,$3)'" -y "$2" &>/dev/null
 }
 text_thumb() {
+	local contents
 	[[ "$(stat -c %s "$1")" -gt 2000000 ]] && exit 2
-	local contents="$(<"$1")"
+	contents="$(<"$1")" && \
 	convert -size 210x290 -background white -pointsize 5 -border 10x10 -bordercolor gray80 caption:"${contents:0:1600}" "$2" &>/dev/null
 }
 model_thumb() {
 	case $(xdg-mime query filetype "$1") in
 		application/x-openscad)
-			openscad --imgsize $3,$3 -o "$2" "$1" &>/dev/null
+			openscad --imgsize "$3,$3" -o "$2" "$1" &>/dev/null
 			;;
 		# https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/STL_Import_and_Export
 		model/*|image/vnd.dxf)
-			echo "import(\"$1\", convexity=10);" | openscad --imgsize $3,$3 -o "$2" - &>/dev/null
+			echo "import(\"$1\", convexity=10);" | openscad --imgsize "$3,$3" -o "$2" - &>/dev/null
 			;;
 		*)
 			return 1
