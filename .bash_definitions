@@ -85,7 +85,7 @@ alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex
 alias l="ls -la"; alias lt="ls --sort=time"
 alias ls='ls --human --color=auto --classify --group-directories-first'
 alias lspci2='lspci -nnk'
-alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# mc: disable annoying mouse
+alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# disable annoying mouse
 alias mount2='findmnt --invert --pseudo'
 ##alias nmap='nmap -PE'			# use ICMP ping for host discovery
 alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
