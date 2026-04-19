@@ -178,8 +178,8 @@ function chmodr() {
 
 	case "$mode" in
 		[0-9][0-9][0-9])		;;
-		[0-9][0-9][0-9][0-9])	newmode="${mode:0:1}"; mode="${mode:1:3}";;
-		*)						echo "wtf is the mode '$mode'?" >&2; return 3;;
+		[0-9][0-9][0-9][0-9])	newmode="${mode:0:1}"; mode="${mode:1:3}" ;;
+		*)						echo "wtf is the mode '$mode'?" >&2; return 3 ;;
 	esac
 
 	for (( i=0; i<${#mode}; i++ )); do
