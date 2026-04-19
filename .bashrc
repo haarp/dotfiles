@@ -252,7 +252,7 @@ do
 		GIT_PS1_SHOWSTASHSTATE=1
 		GIT_PS1_SHOWUPSTREAM="verbose"
 		GIT_PS1_SHOWCONFLICTSTATE="yes"
-		_gen_git_prompt() {
+		function _gen_git_prompt() {
 			local prompt="$(__git_ps1 "%s")"
 
 			# ahead and behind upstream (Terminus has: ↑ ↓)
@@ -268,7 +268,7 @@ do
 
 			echo "$prompt"
 		}
-		_tosub() {
+		function _tosub() {
 			local s="$1" sub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
 			for c in "${!sub[@]}"; do s=${s//$c/${sub[c]}}; done
 			echo "$s"
@@ -492,7 +492,7 @@ fi
 ###LESS="$LESS --no-lessopen"
 
 ## custom command-not-found handler
-function command_not_found_handle {
+function command_not_found_handle() {
 	echo "What did you think \`$1\` was, dumb meatbag?!" >&2
 	return 127
 }

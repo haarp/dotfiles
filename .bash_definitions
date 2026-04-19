@@ -141,6 +141,7 @@ alias yt-dlp-subs='yt-dlp --all-subs'
 
 
 ## Functions
+# always use `function` or aliases with the same name break the definition
 
 # Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
 # Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
@@ -441,7 +442,7 @@ function sensors() {
 }
 
 # run iotop with task delay accounting
-function iotop {
+function iotop() {
 	if [[ $(sysctl -n kernel.task_delayacct) == 0 ]]; then
 		sysctl -q kernel.task_delayacct=1
 		command iotop "$@"
@@ -698,7 +699,7 @@ function orphans() {
 		return
 	fi
 
-##	analyze() {
+##	function analyze() {
 ##		local packages=$(equery -q belongs -ne "$1" | wc -l)
 ##		[[ $packages -eq 0 ]] && echo "$1"
 ##	}
@@ -752,7 +753,7 @@ function changelogs() {
 		# use simpler LESSOPEN to make it open compressed files but not do syntax-hilite
 		# sabotage `stat` to force lesspipe to open pipes
 		(
-			stat() { return 1; }; export -f stat
+			function stat() { return 1; }; export -f stat
 			LESSOPEN='|lesspipe %s' ${PAGER:-less} -f <(
 				# repo git changelog
 				local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
@@ -824,7 +825,7 @@ fi
 # (might also need __GLVND_DISALLOW_PATCHING=1 in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
 alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
 # Modern prime-run for native Nvidia setups (https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html)
-prime-run() {
+function prime-run() {
 	__NV_PRIME_RENDER_OFFLOAD=1 \
 	__GLX_VENDOR_LIBRARY_NAME=nvidia \
 	__VK_LAYER_NV_optimus=NVIDIA_only \
