@@ -4,6 +4,8 @@ from __future__ import print_function
 # HAARP whitelist
 allowed_browsers = [
 	'firefox',
+	'google-chrome',
+	'chromium',
 	'chromium-browser',
 	'vivaldi',
 	'mpv'
