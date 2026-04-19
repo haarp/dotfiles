@@ -141,7 +141,7 @@ if [[ ! "$ENV_HOME" ]]; then
 	if [[ $TERM == linux ]]; then
 		setfont ter-v14n	# Terminus (see /usr/share/consolefonts/README.terminus)
 		tput cvvis			# block-shaped cursor
-		TMOUT=1800			# log out after 30 min inactivity
+		TMOUT="1800"			# log out after 30 min inactivity
 	fi
 
 	## Empty (not remove!) mc histories/filepos on login
@@ -264,17 +264,17 @@ do
 				prompt="${prompt/${BASH_REMATCH[0]}/${BASH_REMATCH[1]:+⇡}$(_tosub ${BASH_REMATCH[1]})${BASH_REMATCH[2]:+⇣}$(_tosub ${BASH_REMATCH[2]})}"
 			fi
 
-			prompt=${prompt/\*/±}	# unstaged changes
-			prompt=${prompt/+/‡}	# staged changes
-			prompt=${prompt/\%/…}	# untracked files
-			prompt=${prompt/\$/■}	# stashed changes
-			prompt=${prompt/|CONFLICT/X}	# conflicts
+			prompt="${prompt/\*/±}"	# unstaged changes
+			prompt="${prompt/+/‡}"	# staged changes
+			prompt="${prompt/\%/…}"	# untracked files
+			prompt="${prompt/\$/■}"	# stashed changes
+			prompt="${prompt/|CONFLICT/X}"	# conflicts
 
 			echo "$prompt"
 		}
 		function _tosub() {
 			local s="$1" sub=(₀ ₁ ₂ ₃ ₄ ₅ ₆ ₇ ₈ ₉)
-			for c in "${!sub[@]}"; do s=${s//$c/${sub[c]}}; done
+			for c in "${!sub[@]}"; do s="${s//$c/${sub[c]}}"; done
 			echo "$s"
 		}
 		PROMPT_COMMAND+=('_git_prompt=$(_gen_git_prompt)')
@@ -309,7 +309,7 @@ PST2='\c [@\h] (\t) {$BASHPID}'
 PROMPT_COMMAND+=('printf "${bg[K]}↵${bg[x]}%$((COLUMNS-1))s\\r"')
 
 # Trim dirs displayed with `\w`
-PROMPT_DIRTRIM=3
+PROMPT_DIRTRIM="3"
 
 
 ## Shell flags
@@ -408,7 +408,7 @@ if [[ $- == *i* ]]; then
 	export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG (and secure against truncation)
 	[[ -f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
 	export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
-	export HISTCONTROL=ignoreboth	# ignore identical with previous or beginning with space
+	export HISTCONTROL="ignoreboth"	# ignore identical with previous or beginning with space
 	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
 
 	# don't save history if HISTFILE is broken symlink (prevent its creation on unmounted ~/Private)
@@ -416,10 +416,10 @@ if [[ $- == *i* ]]; then
 
 	# save everything (use export!! subshells, screen, etc. MUST inherit these settings!)
 	if vercmp "$BASH_VERSION" "4.3"
-		then export HISTSIZE=-1	# commands
-		else export HISTSIZE=999999	# old bash doesn't support -1
+		then export HISTSIZE="-1"		# commands
+		else export HISTSIZE="999999"	# old bash doesn't support -1
 	fi
-	export HISTFILESIZE=$HISTSIZE	# lines
+	export HISTFILESIZE="$HISTSIZE"	# lines
 	readonly HISTSIZE HISTFILESIZE
 
 	# share history across all open terminals
@@ -429,11 +429,11 @@ if [[ $- == *i* ]]; then
 	# workaround https://github.com/dvorka/hstr/issues/531 (needs `dev.tty.legacy_tiocsti=1`)
 	function hstrnotiocsti() {
 		{ READLINE_LINE="$( { </dev/tty hstr ${READLINE_LINE}; } 2>&1 1>&3 3>&- )"; } 3>&1;
-		READLINE_POINT=${#READLINE_LINE}
+		READLINE_POINT="${#READLINE_LINE}"
 	}
 	bind -x '"\C-r": "hstrnotiocsti"'	# bind to ctrl-r and F12
 	bind -x '"\C-[[24~": "hstrnotiocsti"'
-	export HSTR_CONFIG='prompt-bottom,hicolor,hide-basic-help'
+	export HSTR_CONFIG="prompt-bottom,hicolor,hide-basic-help"
 fi
 
 

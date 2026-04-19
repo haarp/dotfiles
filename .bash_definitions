@@ -197,7 +197,7 @@ function schedule() {
 	fi
 
 	local schedule
-	schedule=$(date "+%s" -d "$1") || return 2
+	schedule="$(date "+%s" -d "$1")" || return 2
 	if [[ $(( schedule - EPOCHSECONDS )) -lt 60 ]]; then
 		echo "Scheduled date lies less than a minute ahead, aborting!"
 		return 3
@@ -205,10 +205,10 @@ function schedule() {
 
 	local minute hour day month command random crontab
 
-	minute=$(date "+%M" -d "$1")
-	hour=$(date "+%H" -d "$1")
-	day=$(date "+%d" -d "$1")
-	month=$(date "+%m" -d "$1")
+	minute="$(date "+%M" -d "$1")"
+	hour="$(date "+%H" -d "$1")"
+	day="$(date "+%d" -d "$1")"
+	month="$(date "+%m" -d "$1")"
 	shift
 
 	command="PATH='$PATH' DISPLAY='$DISPLAY' XAUTHORITY='$XAUTHORITY' DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS' "
@@ -256,7 +256,7 @@ function editln() {
 	fi
 
 	local old new
-	old=$(readlink -v "$1") || return $?
+	old="$(readlink -v "$1")" || return $?
 
 	if [[ -n "$2" ]]; then
 		ln -vsfT -- "$2" "$1"
