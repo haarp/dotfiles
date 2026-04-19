@@ -8,7 +8,7 @@ altscreen on
 defscrollback 100000
 
 # keep finished screens alive
-zombie kr
+zombie qr
 
 # status line
 hardstatus alwayslastline
