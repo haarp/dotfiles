@@ -143,49 +143,494 @@ alias yt-dlp-subs='yt-dlp --all-subs'
 ## Functions
 # always use `function` or aliases with the same name break the definition
 
-# Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
-# Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
-# also: https://developers.yubico.com/PGP/Importing_keys.html
-function yubi() {
-	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
+# btrfs attribute set
+function btrfs.set.zstd() {
+	if [[ $# != 1 ]]; then
+		echo "Recursively set dirs to be compressed with zstd on btrfs" >&2
+		echo 'Also run `btrfs fi defrag -r -czstd $dir` to actually do the compressing' >&2
+		echo '`compsize` is also an useful tool' >&2
+		echo "Usage: $FUNCNAME <dir>" >&2
+		return 1
+	fi
+	find "$1" -exec btrfs property set {} compression zstd \;
+}
 
-	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
-		source "$SSH_AGENT_FILE" >/dev/null
-		return
+# Grab site's cert info
+function cert() {
+	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+}
 
-	elif [[ $1 == "kill" ]]; then	# Restart scdaemon when it fucks up
-				# https://bugs.launchpad.net/serverguide/+bug/1569019/comments/6
-				# https://dev.gnupg.org/T1081
-		if pgrep -u "$USER" scdaemon >/dev/null; then
-			echo "Killing scdaemon..."
-			##gpg-connect-agent "SCD KILLSCD" "SCD BYE" /bye
-			gpg-connect-agent "SCD RESET" "SCD BYE" /bye
-			for i in {3..1}; do echo -n "${i}.."; sleep 1; done; echo ""	# takes a while until it works again
+# Sensible recursive chmod
+function chmodr() {
+	local mode="$1"; shift
+	local perm
+	local newmode newdirmode
+
+	if [[ $# -lt 1 ]]; then
+		echo "chmod files recursively, setting matching dir permissions. Usage: $FUNCNAME <mode> <dir> [dir]..." >&2
+		return 1
+	fi
+	for d in "$@"; do
+		if [[ ! -d "$d" ]]; then
+			echo "Target '$d' not a dir!" >&2
+			return 2
 		fi
+	done
+
+	case "$mode" in
+		[0-9][0-9][0-9])		;;
+		[0-9][0-9][0-9][0-9])	newmode="${mode:0:1}"; mode="${mode:1:3}";;
+		*)						echo "wtf is the mode '$mode'?" >&2; return 3;;
+	esac
+
+	for (( i=0; i<${#mode}; i++ )); do
+		perm="${mode:i:1}"
+		newmode+="$perm"
+		newdirmode+="$(( perm | (perm != 0) ))"
+	done
+
+	echo "mode: $newmode, dirmode: $newdirmode" >&2
+
+	chmod "$newdirmode" "$@"; find "$@" -type d -print0 | xargs -r0 chmod "$newdirmode"
+	find "$@" '!' -type d '!' -type l -print0 | xargs -r0 chmod "$newmode"
+}
+
+# Curl host override
+function curll() {
+	if [[ $# -lt 2 || "$1" == '-'* || "$1" == *'/'* || "$2" == '-'* ]]; then
+		echo "Usage: $FUNCNAME <newhost> <URL> [curl args]" >&2
+		return 1
+	fi
+
+	local url="$2"
+	local oldhost="${url/http?(s):\/\//}"; oldhost="${oldhost%%/*}"
+	local newhost="$1"
+	shift 2
+
+	local args=() port
+	for port in 80 443 25 465; do
+		args+=("--connect-to $oldhost:$port:$newhost:$port")
+	done
+
+	curl ${args[*]} "$url" "$@"
+}
+
+# Convert between unix and dos line endings (stdin)
+function d2u() {
+	sed 's:\r::'
+}
+function u2d() {
+	sed 's:$:\r:'
+}
+
+# Add colors to diff
+function diff() {
+	# we colorize entire lines
+	# diff-highlight is part of git and additionally does intra-line highlights
+	# also see git config
+
+	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
+
+	command diff "$@" | { command -v diff-highlight >/dev/null && diff-highlight || cat; } | \
+	sed -e "s/\$/${fg[x]}/" \
+		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
+		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
+	return "${PIPESTATUS[0]}"
+}
+
+# Edit to cd
+function editcd() {
+	local newdir
+	read -rei "$PWD" newdir
+	cd -- "$newdir"
+}
+# Edit symlinks quickly (and optionally interactively)
+function editln() {
+	if [[ $# -eq 0 || $# -gt 2 ]]; then
+		echo "Usage: $FUNCNAME <symlink> [target]"
+		return 1
+	fi
+
+	local old new
+	old="$(readlink -v "$1")" || return $?
+
+	if [[ -n "$2" ]]; then
+		ln -vsfT -- "$2" "$1"
+	else
+		( cd "$(dirname "$1")"	# for tab completion
+		read -rei "$old" new
+		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "$1"
+		)
+	fi
+}
+# Edit variables quickly and interactively
+function editvar() {
+	if [[ ! $# -eq 1 ]]; then
+		echo "Usage: $FUNCNAME <variablename>"
+		return 1
+	fi
+
+	local newvar
+	read -rei "${!1}" newvar
+
+	if export | grep -q "declare -x $1="; then
+		export $1="$newvar"	# can't just use 'declare' as it creates function-local vars (??)
+	else
+		export -n $1="$newvar"	# set and unexport (wasn't exported to begin with)
+	fi
+}
+# Edit filenames quickly and interactively by calling mv with only one arg
+function mv() {
+	if [[ "$#" -eq 1 ]]; then
+		local new
+		read -rei "$1" new
+		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$new"
+	else
+		command mv "$@"
+		return
+	fi
+}
+
+# Gentoo-specific stuff
+# Sync portage tree and rebuild, etc.
+function sync-portage() {
+	lopri emerge --sync || return
+	etc-update
+	echo "emerge -avDuU -j4 world"
+	emerge -avDuU -j4 world #--changed-deps
+	etc-update
+	emerge -av1 -j4 @preserved-rebuild
+	lopri emerge -a --depclean
+	echo "eclean-dist -d -f -t3m"
+	lopri eclean-dist -d -f -t3m
+	echo "portpeek -a -r -z"
+	lopri portpeek -a -r -z
+}
+# Automagically show changelogs of last emerge session
+function changelogs() {
+	local num recent
+	if [[ $# -ge 1 ]]; then
+		# number of merges from command line
+		num="$1"
+	else
+		# number of merges from last emerge session
+		num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
+		num=${num#*of }; num=${num%) *}
+	fi
+	[[ $num -gt 0 ]] || return 1
+	# determine the packages behind them
+	recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
+
+	local name; for name in $recent; do
+		name=${name%-[0-9]*}	# strip version
+		purename=${name#*/}		# strip category
+
+		local reply; read -rp "Show $name? [y/n] " reply
+		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
+
+		# changelog files
+		local exists=()
+		local file; for file in "/var/db/repos/*/$name/ChangeLog" \
+		                        "/usr/share/doc/$purename"-[0-9]*/[nN][eE][wW][sS]* \
+		                        "/usr/share/doc/$purename"-[0-9]*/[cC][hH][aA][nN][gG][eE]*
+		do
+			[[ -f $file ]] && exists+=("$file")
+		done
+		# use simpler LESSOPEN to make it open compressed files but not do syntax-hilite
+		# sabotage `stat` to force lesspipe to open pipes
+		(
+			function stat() { return 1; }; export -f stat
+			LESSOPEN='|lesspipe %s' ${PAGER:-less} -f <(
+				# repo git changelog
+				local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
+					cd "$dir" && git log --color -- "$name" 2>/dev/null
+				done
+			) \
+			"${exists[@]}"
+		)
+	done
+}
+# Make genlop use rotated logfiles automatically
+function genlop() {
+	local log; for log in /var/log/emerge.log*; do
+		local logfiles="${logfiles} -f $log"
+	done
+	command genlop $logfiles "$@"
+}
+# Manifest multiple files
+function manifest() {
+	for file in "${@:-*.ebuild}";
+		do ebuild "$file" manifest;
+	done
+}
+# Display reason for masked packages
+function mask() {
+	awk -v "s=$1" '/^#/ && blockend { x = "" } 1 { blockend = 0 } /^#/ { x = x $0 "\n" } !/^#/ && $0 ~ s { print x "\n" $0 "\n" "\n" } /^$/ { blockend++ }' /usr/portage/profiles/package.mask | head -n-2
+}
+# Print orphaned files
+# FIXME: finds non-orphaned files with merged-usr
+# TODO: If lib/ fails, check /lib64 and vice-versa
+function orphans() {
+	if [[ $# -gt 1 ]]; then
+		echo "Print orphaned (not tracked by portage) files in a dir. Usage: $FUNCNAME [dir]"
 		return
 	fi
 
-	# Remember ssh-agent values in case we want to switch back later
-	if [[ ! -e "$SSH_AGENT_FILE" ]]; then
-		echo "SSH_AGENT_PID=$SSH_AGENT_PID" > "$SSH_AGENT_FILE"
-		echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$SSH_AGENT_FILE"
+##	function analyze() {
+##		local packages=$(equery -q belongs -ne "$1" | wc -l)
+##		[[ $packages -eq 0 ]] && echo "$1"
+##	}
+##	export -f analyze
+##	find "${1:-.}" -print0 | sort -z | xargs -r -0 -n1 -P$(nproc) bash -c 'analyze "$@"' _
+
+	# FIXME: doesn't link symlinks
+	# FIXME: fails on spaces in filenames
+	# FIXME: reduce argument list to qfile
+	local allthethings="$(find "${1:-.}" -print0 | sort -z | tr '\0' ' ')"
+	qfile -o $allthethings
+}
+
+# Highlight phrase(s) with (multiple) colors!
+# FIXME: still buffering a lot before showing
+# NOTE: don't bother w/ pure bash: no regex (only wildcards), chunking: incomplete highlights, not chunking: huge variables/bad performance
+function hilite() {
+	local phrase cmd palette=(r g y b m c R G Y B M C)
+	local sep=$'\037'	# separator for sed
+	local i=0
+	for phrase in "${@:?missing arg}"; do
+		# prevent phrases resembling parts of escape codes from breaking previous substitutions
+		# FIXME: doesn't cover regexes
+		for p in "${palette[@]}"; do
+			[[ "${bg[$p]}" == *"$phrase"* ]] && continue 2
+		done
+		cmd+="s${sep}\($phrase\)${sep}${bg[${palette[$i]}]}&${bg[x]}${sep}g;"
+		i=$(( (i+1) % ${#palette[@]} ))
+	done
+	sed -u "$cmd"
+}
+
+# run iotop with task delay accounting
+function iotop() {
+	if [[ $(sysctl -n kernel.task_delayacct) == 0 ]]; then
+		sysctl -q kernel.task_delayacct=1
+		command iotop "$@"
+		local return=$?
+		sysctl -q kernel.task_delayacct=0
+	else
+		command iotop "$@"
+		local return=$?
+	fi
+	return "$return"
+}
+
+# Process name for lsof
+function lsofp() {
+	local pids
+	pids=$(pgrep -d, "${1:?missing arg}") || return 1
+	shift
+
+	[[ "$pids" ]] || {
+		echo "No process found!" >&2
+		return 1
+	}
+
+	lsof -p "$pids" "$@"
+}
+
+# make make make.conf-aware ;)
+# to make autotools shit:
+#libtoolize
+#autoreconf
+#aclocal
+#autoconf
+#automake --add-missing --copy
+#./configure
+#make
+function make2() (
+	shopt -s extglob
+	source /etc/portage/make.conf
+	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
+)
+complete_clone make make2
+
+# Configure kernel with menuconfig
+function confkernel() (
+	cd /usr/src/linux \
+		&& make menuconfig
+)
+# Make and install kernel
+function makekernel() (
+	##cd /usr/src/linux && make2 && make modules_install && make install && emerge -av1 --jobs=4 @module-rebuild
+	cd /usr/src/linux && make2 && make2 modules_install && {
+		mv /efi/EFI/Gentoo/linux.old2.efi /efi/EFI/Gentoo/linux.old3.efi 2>/dev/null
+		mv /efi/EFI/Gentoo/linux.old1.efi /efi/EFI/Gentoo/linux.old2.efi 2>/dev/null
+		mv /efi/EFI/Gentoo/linux.old.efi /efi/EFI/Gentoo/linux.old1.efi 2>/dev/null
+		mv /efi/EFI/Gentoo/linux.efi /efi/EFI/Gentoo/linux.old.efi 2>/dev/null
+		cp -v arch/x86_64/boot/bzImage /efi/EFI/Gentoo/linux.efi;
+	} && \
+	emerge -av1 --jobs=4 @module-rebuild
+)
+function makekernel2() {
+	cp -v -n "$(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' \
+		| sort -r \
+		| head -n1 \
+		| cut -d' ' -f2-
+	)" /usr/src/linux/
+	makekernel
+}
+
+# Crappy make progress meter
+function makeprogress() {
+	local ccount ocount
+
+	if [[ ! $# -eq 1 ]]; then
+		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]"
+		return 1
 	fi
 
-	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
-		echo "Killing ssh-less gpg-agent..."
-		pkill -u "$USER" gpg-agent
-		while pgrep -u "$USER" gpg-agent >/dev/null; do	# wait until really gone
-			sleep 0.1
-		done
-	}
+	ccount="$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)"
+	if [[ $ccount = 0 ]]; then
+		echo "Can't calculate progress, no C files found!"
+	else
+		ocount="$(find "${1:-.}" -name "*.o" | wc -l)"
+		echo "$(( ocount * 100 / ccount ))% ($ocount / $ccount)"
+	fi
+}
 
-	pgrep -u "$USER" gpg-agent >/dev/null || {
-		echo "Starting gpg-agent..."
-		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
-	}
-	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
+# Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
+# early mc don't use existing files!
+function mc() {
+	local pwd pwd_file="${MC_TMPDIR:-${TMPDIR:-/tmp}}/mc.pwd.XXXXXX"
 
-	gpg-connect-agent updatestartuptty /bye	# fix pinentry (see ~/.gnupg/gpg-agent.conf for details)
+	command mc -P "$pwd_file" "$@"
+	local exit=$?
+
+	if [[ -r "$pwd_file" ]]; then
+		pwd="$(<"$pwd_file")"
+		rm "$pwd_file"
+		[[ -d "$pwd" && "$pwd" != "$PWD" ]] && cd -- "$pwd"
+	fi
+
+	return $exit
+}
+
+# mkdir and cd in one
+function mkcd() {
+	if [[ -d "${1:?missing arg}" ]]
+		then echo "$1 already exists, entering." >&2
+		else mkdir -p -- "$1"
+	fi
+	cd -- "$1"
+}
+
+# Enhance optirun with overclocking (needs >=nvidia-settings-337.19)
+# perf: pgrep/service is super slow, let's check the pidfile instead
+if [[ -e /proc/$( { < /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
+	function optirun() {
+		##local GPUOffset=135	# -> 880MHz
+		##local MemOffset=420	# -> 2220MHz
+
+		##( 	command optirun nvidia-settings -c :8 \
+		##	-a [gpu:0]/GPUGraphicsClockOffset[1]=$GPUOffset \
+		##	-a [gpu:0]/GPUMemoryTransferRateOffset[1]=$MemOffset \
+		##	2>/dev/null &
+		##)
+		command optirun "$@"
+	}
+	alias nvidia-settings='optirun nvidia-settings -c :8'
+fi
+# Fix primusrun (https://forums.gentoo.org/viewtopic-p-8380752.html#8380752)
+# (might also need __GLVND_DISALLOW_PATCHING=1 in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
+alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
+# Modern prime-run for native Nvidia setups (https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html)
+function prime-run() {
+	__NV_PRIME_RENDER_OFFLOAD=1 \
+	__GLX_VENDOR_LIBRARY_NAME=nvidia \
+	__VK_LAYER_NV_optimus=NVIDIA_only \
+	"$@"
+}
+
+# Simple benchmark, calculating pi to 4096 digits (or input)
+# source: https://tuxshell.blogspot.com/2009/08/bc-as-cpu-benchmark.html
+function pibench() {
+	time bc -l <<< "scale=${1:-4096}; a(1)*4" >/dev/null
+}
+
+# Ping the current gateway
+function pinggw() {
+	local default junk gw metric gateway oldmetric=999999
+	while read -r default junk gw junk junk junk junk junk junk junk metric; do
+		[[ $default == "default" ]] || continue
+		if [[ $metric -lt $oldmetric ]]; then
+			gateway="$gw"
+			oldmetric=$metric
+		fi
+	done <<< "$(ip route)"
+	if [[ ! "$gateway" ]]; then
+		echo "No internet gateways found!"
+		return 1
+	fi
+	echo "Pinging $gateway..."
+	ping "$gateway"
+}
+
+# Increase ping for a certain IP
+function pingpwn() {
+	if [[ $# -ne 2 ]]; then
+		if [[ ! $1 == "off" ]]; then
+			echo "Increase ping for a certain IP (not hostname). Usage: $FUNCNAME <ip> <latency> OR pingpwn off"
+			return 1
+		fi
+	fi
+	if [[ $EUID -ne 0 ]]; then
+		echo "Needs root rights!"
+		return 1
+	fi
+
+	if [[ $1 == "off" ]]; then
+		tc qdisc del dev eth0 root
+	else
+		tc qdisc add dev eth0 root handle 1: prio
+		tc qdisc add dev eth0 parent 1:3 handle 30: netem delay "${2}ms" 10ms distribution normal
+		tc filter add dev eth0 protocol ip parent 1:0 prio 3 u32 match ip dst "${1}/32" flowid 1:3
+		# global:
+		# tc qdisc add dev eth0 root netem delay 100ms
+		# tc qdisc replace dev eth0 root netem latency 100ms
+		# also packet loss:
+		# tc qdisc replace dev eth0 root netem loss 1.5% latency 100ms
+	fi
+}
+
+function remotescreen() {
+	if [[ $# -ne 1 ]]; then
+		echo "Shows someone's remote X screen locally. Usage: $FUNCNAME <sshhost>"
+		return 1
+	fi
+	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" \
+		'DISPLAY="$(echo /tmp/.X11-unix/X*)" &&
+		export DISPLAY=":${DISPLAY#/tmp/.X11-unix/X}" &&
+		xwd -root | \
+		convert -resize 50% xwd:- -define png:compression-level=9 png:-' | \
+		display -
+}
+complete_clone ssh remotescreen
+
+# Reverse a patch file (http://stackoverflow.com/a/3902431/5424487)
+function reversepatch() {
+	if [[ $# -ne 2 ]]; then
+		echo "Reverse a patch, saving it into the same file. Usage: $FUNCNAME <patch> <newpatch>"
+		echo "FIXME: Assumes only one file to be patched."
+		return
+	fi
+	if [[ ! -e "$1" ]]; then
+		echo "'$1' not found/readable!"
+		return 1
+	fi
+
+	sed -e "s/^+++/PPP${FUNCNAME}PPP/" -e "s/^---/MMM${FUNCNAME}MMM/" \
+		-e "s/@@ -\([0-9]\+,[0-9]\+\) +\([0-9]\+,[0-9]\+\) @@/@@ -\2 +\1 @@/" \
+		-e "s/^+/P${FUNCNAME}P/" -e "s/^-/+/" -e "s/^P${FUNCNAME}P/-/" \
+		-e "s/^PPP${FUNCNAME}PPP/---/" -e "s/^MMM${FUNCNAME}MMM/+++/" "$1" > "$2"
 }
 
 # Schedule one-off tasks that delete themselves from crontab after execution
@@ -236,202 +681,6 @@ function screen() {
 	script -q -c "screen $args" /dev/null
 }
 
-# Edit filenames quickly and interactively by calling mv with only one arg
-function mv() {
-	if [[ "$#" -eq 1 ]]; then
-		local new
-		read -rei "$1" new
-		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$new"
-	else
-		command mv "$@"
-		return
-	fi
-}
-
-# Edit symlinks quickly (and optionally interactively)
-function editln() {
-	if [[ $# -eq 0 || $# -gt 2 ]]; then
-		echo "Usage: $FUNCNAME <symlink> [target]"
-		return 1
-	fi
-
-	local old new
-	old="$(readlink -v "$1")" || return $?
-
-	if [[ -n "$2" ]]; then
-		ln -vsfT -- "$2" "$1"
-	else
-		( cd "$(dirname "$1")"	# for tab completion
-		read -rei "$old" new
-		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "$1"
-		)
-	fi
-}
-
-# Edit variables quickly and interactively
-function editvar() {
-	if [[ ! $# -eq 1 ]]; then
-		echo "Usage: $FUNCNAME <variablename>"
-		return 1
-	fi
-
-	local newvar
-	read -rei "${!1}" newvar
-
-	if export | grep -q "declare -x $1="; then
-		export $1="$newvar"	# can't just use 'declare' as it creates function-local vars (??)
-	else
-		export -n $1="$newvar"	# set and unexport (wasn't exported to begin with)
-	fi
-}
-
-# cd to dir by editing
-function cded() {
-	local newdir
-	read -rei "$PWD" newdir
-	cd -- "$newdir"
-}
-
-# Give information about arg command
-function wtf() {
-	local path realpath
-
-	whatis "$1" | tr -s ' '
-	type -a "$1"
-
-	path="$(which "$1" 2>/dev/null)" || return
-	realpath=$(realpath "$path")
-	if [[ "$path" != "$realpath" ]]; then
-		echo "$path is symlinked to $realpath"
-	fi
-	echo -n "package: "
-	if command -v equery >/dev/null; then equery belongs "$path"; fi
-	if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
-	if command -v rpm >/dev/null; then rpm -qf "$path"; fi
-}
-complete -c wtf
-
-# Highlight phrase(s) with (multiple) colors!
-# FIXME: still buffering a lot before showing
-# NOTE: don't bother w/ pure bash: no regex (only wildcards), chunking: incomplete highlights, not chunking: huge variables/bad performance
-function hilite() {
-	local phrase cmd palette=(r g y b m c R G Y B M C)
-	local sep=$'\037'	# separator for sed
-	local i=0
-	for phrase in "${@:?missing arg}"; do
-		# prevent phrases resembling parts of escape codes from breaking previous substitutions
-		# FIXME: doesn't cover regexes
-		for p in "${palette[@]}"; do
-			[[ "${bg[$p]}" == *"$phrase"* ]] && continue 2
-		done
-		cmd+="s${sep}\($phrase\)${sep}${bg[${palette[$i]}]}&${bg[x]}${sep}g;"
-		i=$(( (i+1) % ${#palette[@]} ))
-	done
-	sed -u "$cmd"
-}
-
-# Curl host override
-function curll() {
-	if [[ $# -lt 2 || "$1" == '-'* || "$1" == *'/'* || "$2" == '-'* ]]; then
-		echo "Usage: $FUNCNAME <newhost> <URL> [curl args]" >&2
-		return 1
-	fi
-
-	local url="$2"
-	local oldhost="${url/http?(s):\/\//}"; oldhost="${oldhost%%/*}"
-	local newhost="$1"
-	shift 2
-
-	local args=() port
-	for port in 80 443 25 465; do
-		args+=("--connect-to $oldhost:$port:$newhost:$port")
-	done
-
-	curl ${args[*]} "$url" "$@"
-}
-
-# Grab site's cert info
-function cert() {
-	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
-}
-
-# Recursively show dirs as tree
-function tree() {
-	ls -R "${1:-.}" | grep ":$" | sed -e "s/:$//" -e "s/[^-][^\/]*\//  /g"
-}
-
-# mkdir and cd in one
-function mkcd() {
-	if [[ -d "${1:?missing arg}" ]]
-		then echo "$1 already exists, entering." >&2
-		else mkdir -p -- "$1"
-	fi
-	cd -- "$1"
-}
-
-# btrfs attribute set
-function btrfs.set.zstd() {
-	if [[ $# != 1 ]]; then
-		echo "Recursively set dirs to be compressed with zstd on btrfs" >&2
-		echo 'Also run `btrfs fi defrag -r -czstd $dir` to actually do the compressing' >&2
-		echo '`compsize` is also an useful tool' >&2
-		echo "Usage: $FUNCNAME <dir>" >&2
-		return 1
-	fi
-	find "$1" -exec btrfs property set {} compression zstd \;
-}
-
-# Re-implement mc-wrapper.sh, but don't cd if we are already in the target dir (to preserve $OLDPWD)
-# early mc don't use existing files!
-function mc() {
-	local pwd pwd_file="${MC_TMPDIR:-${TMPDIR:-/tmp}}/mc.pwd.XXXXXX"
-
-	command mc -P "$pwd_file" "$@"
-	local exit=$?
-
-	if [[ -r "$pwd_file" ]]; then
-		pwd="$(<"$pwd_file")"
-		rm "$pwd_file"
-		[[ -d "$pwd" && "$pwd" != "$PWD" ]] && cd -- "$pwd"
-	fi
-
-	return $exit
-}
-
-# Process name for lsof
-function lsofp() {
-	local pids
-	pids=$(pgrep -d, "${1:?missing arg}") || return 1
-	shift
-
-	[[ "$pids" ]] || {
-		echo "No process found!" >&2
-		return 1
-	}
-
-	lsof -p "$pids" "$@"
-}
-
-# Try to reduce ss' whitespace spam (https://bugzilla.kernel.org/show_bug.cgi?id=119311)
-function ss() {
-	command ss "$@" | sed 's/[[:space:]]*$//'
-}
-
-# Add colors to diff
-function diff() {
-	# we colorize entire lines
-	# diff-highlight is part of git and additionally does intra-line highlights
-	# also see git config
-
-	[[ -t 1 || "$DIFF_COLOR" ]] || { command diff "$@"; return $?; }
-
-	command diff "$@" | { command -v diff-highlight >/dev/null && diff-highlight || cat; } | \
-	sed -e "s/\$/${fg[x]}/" \
-		-e "s/^@@/${fg[c]}&/" -e "s/^-/${fg[r]}&/" -e "s/^+/${fg[g]}&/" \
-		-e "s/^[0-9]/${fg[c]}&/" -e "s/^</${fg[r]}&/" -e "s/^>/${fg[g]}&/"
-	return "${PIPESTATUS[0]}"
-}
-
 # sort sensor chips
 function sensors() {
 	local prev_line=""; local sensor_names
@@ -442,111 +691,79 @@ function sensors() {
 	command sensors "$@" $(sort <<< "$sensor_names")
 }
 
-# run iotop with task delay accounting
-function iotop() {
-	if [[ $(sysctl -n kernel.task_delayacct) == 0 ]]; then
-		sysctl -q kernel.task_delayacct=1
-		command iotop "$@"
-		sysctl -q kernel.task_delayacct=0
-	else
-		command iotop "$@"
-	fi
+# Fix shellcheck's braindead use of tabs (https://github.com/koalaman/shellcheck/issues/3454)
+function shellcheck() {
+	command shellcheck "$@" --color=always | less -F --tabs=8
 }
 
-# make make make.conf-aware ;)
-# to make autotools shit:
-#libtoolize
-#autoreconf
-#aclocal
-#autoconf
-#automake --add-missing --copy
-#./configure
-#make
-function make2() (
-	shopt -s extglob
-	source /etc/portage/make.conf
-	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
-)
-complete_clone make make2
+# Network throughput testing
+# http://speedtest-ams2.digitalocean.com/
+# http://cachefly.cachefly.net/100mb.test
+alias speedtest='curl --parallel http://speedtest-fra1.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams2.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams3.digitalocean.com/5gb.test -o /dev/null'
+alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
+alias speedtest.erppc.down.slow='curl https://erppc.net/infinite.php?slow=1 -o /dev/null'
+alias speedtest.erppc.up='dd if=/dev/zero bs=1M status=none | curl -T - https://erppc.net/infinite.php -o /dev/null'
+function speedtest.httpserver() {
+	ip -o addr show scope global primary | awk "{print \$2,\$4}"
+	echo "Port 8000"
+	while true; do
+		{ echo -e 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\nContent-Disposition: attachment; filename="foo.bar"\n\n'; yes; } \
+			| pv -i 1 -W -F "Speed: %r | Total: %b" \
+			| nc -l -p 8000
 
-# Configure kernel with menuconfig
-function confkernel() (
-	cd /usr/src/linux \
-		&& make menuconfig
-)
-
-# Make and install kernel
-function makekernel() (
-	##cd /usr/src/linux && make2 && make modules_install && make install && emerge -av1 --jobs=4 @module-rebuild
-	cd /usr/src/linux && make2 && make2 modules_install && {
-		mv /efi/EFI/Gentoo/linux.old2.efi /efi/EFI/Gentoo/linux.old3.efi 2>/dev/null
-		mv /efi/EFI/Gentoo/linux.old1.efi /efi/EFI/Gentoo/linux.old2.efi 2>/dev/null
-		mv /efi/EFI/Gentoo/linux.old.efi /efi/EFI/Gentoo/linux.old1.efi 2>/dev/null
-		mv /efi/EFI/Gentoo/linux.efi /efi/EFI/Gentoo/linux.old.efi 2>/dev/null
-		cp -v arch/x86_64/boot/bzImage /efi/EFI/Gentoo/linux.efi;
-	} && \
-	emerge -av1 --jobs=4 @module-rebuild
-)
-function makekernel2() {
-	cp -v -n "$(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' \
-		| sort -r \
-		| head -n1 \
-		| cut -d' ' -f2-
-	)" /usr/src/linux/
-	makekernel
+		sleep 0.1
+	done
 }
-
-# Crappy make progress meter
-function makeprogress() {
-	local ccount ocount
-
-	if [[ ! $# -eq 1 ]]; then
-		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]"
+function speedtest.nc.down() {
+	if [[ $# -ne 1 ]]; then
+		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
 		return 1
 	fi
+	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 </dev/zero"
+	nc "$1" 44444 | pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
 
-	ccount="$(find "${1:-.}" \( -name "*.c" -o -name "*.cc" -o -name "*.cpp" -o -name "*.cxx" \) -print | wc -l)"
-	if [[ $ccount = 0 ]]; then
-		echo "Can't calculate progress, no C files found!"
-	else
-		ocount="$(find "${1:-.}" -name "*.o" | wc -l)"
-		echo "$(( ocount * 100 / ccount ))% ($ocount / $ccount)"
-	fi
 }
-
-# Sensible recursive chmod
-function chmodr() {
-	local mode="$1"; shift
-	local perm
-	local newmode newdirmode
-
+function speedtest.nc.up() {
+	if [[ $# -ne 1 ]]; then
+		echo "Measure upstream network throughput with netcat. Usage: $FUNCNAME <host>"
+		return 1
+	fi
+	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
+	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | nc "$1" 44444
+}
+complete -F _known_hosts speedtest.nc.down speedtest.nc.up
+# source: http://www.commandlinefu.com/commands/view/4434/live-ssh-network-throughput-test
+function speedtest.ssh.down() {
 	if [[ $# -lt 1 ]]; then
-		echo "chmod files recursively, setting matching dir permissions. Usage: $FUNCNAME <mode> <dir> [dir]..." >&2
+		echo "Measure downstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
 		return 1
 	fi
-	for d in "$@"; do
-		if [[ ! -d "$d" ]]; then
-			echo "Target '$d' not a dir!" >&2
-			return 2
-		fi
-	done
+	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat /dev/zero' | \
+		pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
+}
+function speedtest.ssh.up() {
+	if [[ $# -lt 1 ]]; then
+		echo "Measure upstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
+		return 1
+	fi
+	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | \
+		ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
+}
+complete_clone ssh speedtest.ssh.down speedtest.ssh.up
 
-	case "$mode" in
-		[0-9][0-9][0-9])		;;
-		[0-9][0-9][0-9][0-9])	newmode="${mode:0:1}"; mode="${mode:1:3}";;
-		*)						echo "wtf is the mode '$mode'?" >&2; return 3;;
-	esac
+# Try to reduce ss' whitespace spam (https://bugzilla.kernel.org/show_bug.cgi?id=119311)
+function ss() {
+	command ss "$@" | sed 's/[[:space:]]*$//'
+}
 
-	for (( i=0; i<${#mode}; i++ )); do
-		perm="${mode:i:1}"
-		newmode+="$perm"
-		newdirmode+="$(( perm | (perm != 0) ))"
-	done
-
-	echo "mode: $newmode, dirmode: $newdirmode" >&2
-
-	chmod "$newdirmode" "$@"; find "$@" -type d -print0 | xargs -r0 chmod "$newdirmode"
-	find "$@" '!' -type d '!' -type l -print0 | xargs -r0 chmod "$newmode"
+# Stream audio directly to a server
+# or use pa: pacmd load-module module-tunnel-sink server=$1
+function streamaudio() {
+	if [[ $# -ne 2 ]]; then
+		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>"
+		return
+	fi
+	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
 }
 
 # Swap names of two files
@@ -565,12 +782,9 @@ function swap() {
 	mv "$temp" "$2"
 }
 
-# Convert between unix and dos line endings (stdin)
-function d2u() {
-	sed 's:\r::'
-}
-function u2d() {
-	sed 's:$:\r:'
+# Recursively show dirs as tree
+function tree() {
+	ls -R "${1:-.}" | grep ":$" | sed -e "s/:$//" -e "s/[^-][^\/]*\//  /g"
 }
 
 # En-/Decode URL-encoded strings (stdin)
@@ -597,68 +811,6 @@ function urldecode() {
 	done
 }
 
-## Simple benchmark, calculating pi to 4096 digits (or input)
-## source: https://tuxshell.blogspot.com/2009/08/bc-as-cpu-benchmark.html
-function pibench() {
-	time bc -l <<< "scale=${1:-4096}; a(1)*4" >/dev/null
-}
-
-# Network throughput testing
-# http://speedtest-ams2.digitalocean.com/
-# http://cachefly.cachefly.net/100mb.test
-alias speedtest='curl --parallel http://speedtest-fra1.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams2.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams3.digitalocean.com/5gb.test -o /dev/null'
-alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
-alias speedtest.erppc.down.slow='curl https://erppc.net/infinite.php?slow=1 -o /dev/null'
-alias speedtest.erppc.up='dd if=/dev/zero bs=1M status=none | curl -T - https://erppc.net/infinite.php -o /dev/null'
-
-function speedtest.httpserver() {
-	ip -o addr show scope global primary | awk "{print \$2,\$4}"
-	echo "Port 8000"
-	while true; do
-		{ echo -e 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\nContent-Disposition: attachment; filename="foo.bar"\n\n'; yes; } \
-			| pv -i 1 -W -F "Speed: %r | Total: %b" \
-			| nc -l -p 8000
-
-		sleep 0.1
-	done
-}
-# source: http://www.commandlinefu.com/commands/view/4434/live-ssh-network-throughput-test
-function speedtest.ssh.down() {
-	if [[ $# -lt 1 ]]; then
-		echo "Measure downstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
-		return 1
-	fi
-	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat /dev/zero' | \
-		pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
-}
-function speedtest.ssh.up() {
-	if [[ $# -lt 1 ]]; then
-		echo "Measure upstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
-		return 1
-	fi
-	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | \
-		ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
-}
-complete_clone ssh speedtest.ssh.down speedtest.ssh.up
-function speedtest.nc.down() {
-	if [[ $# -ne 1 ]]; then
-		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
-		return 1
-	fi
-	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 </dev/zero"
-	nc "$1" 44444 | pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" >/dev/null
-
-}
-function speedtest.nc.up() {
-	if [[ $# -ne 1 ]]; then
-		echo "Measure upstream network throughput with netcat. Usage: $FUNCNAME <host>"
-		return 1
-	fi
-	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
-	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | nc "$1" 44444
-}
-complete -F _known_hosts speedtest.nc.down speedtest.nc.up
-
 # https://unix.stackexchange.com/a/254976/138699
 function wasteram() {
 	if [[ $# -ne 1 ]]; then
@@ -669,204 +821,70 @@ function wasteram() {
 	head -c "${1}m" /dev/zero | tail
 }
 
-function remotescreen() {
-	if [[ $# -ne 1 ]]; then
-		echo "Shows someone's remote X screen locally. Usage: $FUNCNAME <sshhost>"
-		return 1
+# Give information about arg command
+function wtf() {
+	local path realpath
+
+	whatis "$1" | tr -s ' '
+	type -a "$1"
+
+	path="$(which "$1" 2>/dev/null)" || return
+	realpath=$(realpath "$path")
+	if [[ "$path" != "$realpath" ]]; then
+		echo "$path is symlinked to $realpath"
 	fi
-	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" \
-		'DISPLAY="$(echo /tmp/.X11-unix/X*)" &&
-		export DISPLAY=":${DISPLAY#/tmp/.X11-unix/X}" &&
-		xwd -root | \
-		convert -resize 50% xwd:- -define png:compression-level=9 png:-' | \
-		display -
+	echo -n "package: "
+	if command -v equery >/dev/null; then equery belongs "$path"; fi
+	if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
+	if command -v rpm >/dev/null; then rpm -qf "$path"; fi
 }
-complete_clone ssh remotescreen
+complete -c wtf
 
-# Sync portage tree and rebuild, etc.
-function sync-portage() {
-	lopri emerge --sync || return
-	etc-update
-	echo "emerge -avDuU -j4 world"
-	emerge -avDuU -j4 world #--changed-deps
-	etc-update
-	emerge -av1 -j4 @preserved-rebuild
-	lopri emerge -a --depclean
-	echo "eclean-dist -d -f -t3m"
-	lopri eclean-dist -d -f -t3m
-	echo "portpeek -a -r -z"
-	lopri portpeek -a -r -z
-}
+# Activate Yubikey for current shell (note: xfce4-session usually starts gpg-agent, but without ssh support)
+# Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
+# also: https://developers.yubico.com/PGP/Importing_keys.html
+function yubi() {
+	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
 
-# Print orphaned files
-# FIXME: finds non-orphaned files with merged-usr
-# TODO: If lib/ fails, check /lib64 and vice-versa
-function orphans() {
-	if [[ $# -gt 1 ]]; then
-		echo "Print orphaned (not tracked by portage) files in a dir. Usage: $FUNCNAME [dir]"
+	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
+		source "$SSH_AGENT_FILE" >/dev/null
+		return
+
+	elif [[ $1 == "kill" ]]; then	# Restart scdaemon when it fucks up
+				# https://bugs.launchpad.net/serverguide/+bug/1569019/comments/6
+				# https://dev.gnupg.org/T1081
+		if pgrep -u "$USER" scdaemon >/dev/null; then
+			echo "Killing scdaemon..."
+			##gpg-connect-agent "SCD KILLSCD" "SCD BYE" /bye
+			gpg-connect-agent "SCD RESET" "SCD BYE" /bye
+			for i in {3..1}; do echo -n "${i}.."; sleep 1; done; echo ""	# takes a while until it works again
+		fi
 		return
 	fi
 
-##	function analyze() {
-##		local packages=$(equery -q belongs -ne "$1" | wc -l)
-##		[[ $packages -eq 0 ]] && echo "$1"
-##	}
-##	export -f analyze
-##	find "${1:-.}" -print0 | sort -z | xargs -r -0 -n1 -P$(nproc) bash -c 'analyze "$@"' _
-
-	# FIXME: doesn't link symlinks
-	# FIXME: fails on spaces in filenames
-	# FIXME: reduce argument list to qfile
-	local allthethings="$(find "${1:-.}" -print0 | sort -z | tr '\0' ' ')"
-	qfile -o $allthethings
-}
-
-# Make genlop use rotated logfiles automatically
-function genlop() {
-	local log; for log in /var/log/emerge.log*; do
-		local logfiles="${logfiles} -f $log"
-	done
-	command genlop $logfiles "$@"
-}
-
-# Automagically show changelogs of last emerge session
-function changelogs() {
-	local num recent
-	if [[ $# -ge 1 ]]; then
-		# number of merges from command line
-		num="$1"
-	else
-		# number of merges from last emerge session
-		num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
-		num=${num#*of }; num=${num%) *}
+	# Remember ssh-agent values in case we want to switch back later
+	if [[ ! -e "$SSH_AGENT_FILE" ]]; then
+		echo "SSH_AGENT_PID=$SSH_AGENT_PID" > "$SSH_AGENT_FILE"
+		echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$SSH_AGENT_FILE"
 	fi
-	[[ $num -gt 0 ]] || return 1
-	# determine the packages behind them
-	recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
 
-	local name; for name in $recent; do
-		name=${name%-[0-9]*}	# strip version
-		purename=${name#*/}		# strip category
-
-		local reply; read -rp "Show $name? [y/n] " reply
-		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
-
-		# changelog files
-		local exists=()
-		local file; for file in "/var/db/repos/*/$name/ChangeLog" \
-		                        "/usr/share/doc/$purename"-[0-9]*/[nN][eE][wW][sS]* \
-		                        "/usr/share/doc/$purename"-[0-9]*/[cC][hH][aA][nN][gG][eE]*
-		do
-			[[ -f $file ]] && exists+=("$file")
+	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
+		echo "Killing ssh-less gpg-agent..."
+		pkill -u "$USER" gpg-agent
+		while pgrep -u "$USER" gpg-agent >/dev/null; do	# wait until really gone
+			sleep 0.1
 		done
-		# use simpler LESSOPEN to make it open compressed files but not do syntax-hilite
-		# sabotage `stat` to force lesspipe to open pipes
-		(
-			function stat() { return 1; }; export -f stat
-			LESSOPEN='|lesspipe %s' ${PAGER:-less} -f <(
-				# repo git changelog
-				local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
-					cd "$dir" && git log --color -- "$name" 2>/dev/null
-				done
-			) \
-			"${exists[@]}"
-		)
-	done
-}
-
-# Display reason for masked packages
-function mask() {
-	awk -v "s=$1" '/^#/ && blockend { x = "" } 1 { blockend = 0 } /^#/ { x = x $0 "\n" } !/^#/ && $0 ~ s { print x "\n" $0 "\n" "\n" } /^$/ { blockend++ }' /usr/portage/profiles/package.mask | head -n-2
-}
-
-# Manifest multiple files
-function manifest() {
-	for file in "${@:-*.ebuild}";
-		do ebuild "$file" manifest;
-	done
-}
-
-# Ping the current gateway
-function pinggw() {
-	local default junk gw metric gateway oldmetric=999999
-	while read -r default junk gw junk junk junk junk junk junk junk metric; do
-		[[ $default == "default" ]] || continue
-		if [[ $metric -lt $oldmetric ]]; then
-			gateway="$gw"
-			oldmetric=$metric
-		fi
-	done <<< "$(ip route)"
-	if [[ ! "$gateway" ]]; then
-		echo "No internet gateways found!"
-		return 1
-	fi
-	echo "Pinging $gateway..."
-	ping "$gateway"
-}
-
-# Stream audio directly to a server
-# or use pa: pacmd load-module module-tunnel-sink server=$1
-function streamaudio() {
-	if [[ $# -ne 2 ]]; then
-		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>"
-		return
-	fi
-	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
-}
-
-# Enhance optirun with overclocking (needs >=nvidia-settings-337.19)
-# perf: pgrep/service is super slow, let's check the pidfile instead
-if [[ -e /proc/$( { < /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
-	function optirun() {
-		##local GPUOffset=135	# -> 880MHz
-		##local MemOffset=420	# -> 2220MHz
-
-		##( 	command optirun nvidia-settings -c :8 \
-		##	-a [gpu:0]/GPUGraphicsClockOffset[1]=$GPUOffset \
-		##	-a [gpu:0]/GPUMemoryTransferRateOffset[1]=$MemOffset \
-		##	2>/dev/null &
-		##)
-		command optirun "$@"
 	}
-	alias nvidia-settings='optirun nvidia-settings -c :8'
-fi
-# Fix primusrun (https://forums.gentoo.org/viewtopic-p-8380752.html#8380752)
-# (might also need __GLVND_DISALLOW_PATCHING=1 in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
-alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
-# Modern prime-run for native Nvidia setups (https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html)
-function prime-run() {
-	__NV_PRIME_RENDER_OFFLOAD=1 \
-	__GLX_VENDOR_LIBRARY_NAME=nvidia \
-	__VK_LAYER_NV_optimus=NVIDIA_only \
-	"$@"
+
+	pgrep -u "$USER" gpg-agent >/dev/null || {
+		echo "Starting gpg-agent..."
+		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
+	}
+	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
+
+	gpg-connect-agent updatestartuptty /bye	# fix pinentry (see ~/.gnupg/gpg-agent.conf for details)
 }
 
-# Increase ping for a certain IP
-function pingpwn() {
-	if [[ $# -ne 2 ]]; then
-		if [[ ! $1 == "off" ]]; then
-			echo "Increase ping for a certain IP (not hostname). Usage: $FUNCNAME <ip> <latency> OR pingpwn off"
-			return 1
-		fi
-	fi
-	if [[ $EUID -ne 0 ]]; then
-		echo "Needs root rights!"
-		return 1
-	fi
-
-	if [[ $1 == "off" ]]; then
-		tc qdisc del dev eth0 root
-	else
-		tc qdisc add dev eth0 root handle 1: prio
-		tc qdisc add dev eth0 parent 1:3 handle 30: netem delay "${2}ms" 10ms distribution normal
-		tc filter add dev eth0 protocol ip parent 1:0 prio 3 u32 match ip dst "${1}/32" flowid 1:3
-		# global:
-		# tc qdisc add dev eth0 root netem delay 100ms
-		# tc qdisc replace dev eth0 root netem latency 100ms
-		# also packet loss:
-		# tc qdisc replace dev eth0 root netem loss 1.5% latency 100ms
-	fi
-}
 
 # Digital Rain =D
 # https://bruxy.regnet.cz/web/linux/EN/matrix-sh/
@@ -912,27 +930,5 @@ function noise() {
 # Pretend you're busy =D
 alias busy='clear; hexdump /dev/urandom | while read line; do echo "$line"; sleep 0.$((RANDOM%6)); done'
 
-# Reverse a patch file (http://stackoverflow.com/a/3902431/5424487)
-function reversepatch() {
-	if [[ $# -ne 2 ]]; then
-		echo "Reverse a patch, saving it into the same file. Usage: $FUNCNAME <patch> <newpatch>"
-		echo "FIXME: Assumes only one file to be patched."
-		return
-	fi
-	if [[ ! -e "$1" ]]; then
-		echo "'$1' not found/readable!"
-		return 1
-	fi
-
-	sed -e "s/^+++/PPP${FUNCNAME}PPP/" -e "s/^---/MMM${FUNCNAME}MMM/" \
-		-e "s/@@ -\([0-9]\+,[0-9]\+\) +\([0-9]\+,[0-9]\+\) @@/@@ -\2 +\1 @@/" \
-		-e "s/^+/P${FUNCNAME}P/" -e "s/^-/+/" -e "s/^P${FUNCNAME}P/-/" \
-		-e "s/^PPP${FUNCNAME}PPP/---/" -e "s/^MMM${FUNCNAME}MMM/+++/" "$1" > "$2"
-}
-
-# Fix shellcheck's braindead use of tabs (https://github.com/koalaman/shellcheck/issues/3454)
-function shellcheck() {
-	command shellcheck "$@" --color=always | less -F --tabs=8
-}
 
 # vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4
