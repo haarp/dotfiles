@@ -487,7 +487,11 @@ function makekernel() (
 	emerge -av1 --jobs=4 @module-rebuild
 )
 function makekernel2() {
-	cp -v -n $(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' | sort -r | head -n1 | cut -d' ' -f2-) /usr/src/linux/
+	cp -v -n $(find /usr/src/linux-*/ -maxdepth 1 -name '.config' -printf '%T@ %p\n' \
+		| sort -r \
+		| head -n1 \
+		| cut -d' ' -f2-
+	) /usr/src/linux/
 	makekernel
 }
 
@@ -607,9 +611,9 @@ function speedtest.httpserver() {
 	ip -o addr show scope global primary | awk "{print \$2,\$4}"
 	echo "Port 8000"
 	while true; do
-		{ echo -e 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\nContent-Disposition: attachment; filename="foo.bar"\n\n'; yes; } |
-		pv -i 1 -W -F "Speed: %r | Total: %b" |
-		nc -l -p 8000
+		{ echo -e 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\nContent-Disposition: attachment; filename="foo.bar"\n\n'; yes; } \
+			| pv -i 1 -W -F "Speed: %r | Total: %b" \
+			| nc -l -p 8000
 
 		sleep 0.1
 	done
