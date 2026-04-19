@@ -1,6 +1,8 @@
 # dun care about copyright
 startup_message off
 
+# make fullscreen applications not remain in scrollback buffer after exit
+altscreen on
 
 # scrollback x1000
 defscrollback 100000
