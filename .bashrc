@@ -209,6 +209,10 @@ done
 unset _locales _fallback _cat
 
 
+## Version compare (returns 0 if $1 ≥ $2 )
+function vercmp() {	<<< "$2"$'\n'"$1" sort --check=quiet --version-sort && return 0 || return 1; }
+
+
 ## Colorful bash prompt with goodies
 ## wrap in \[ \] to prevent char offset
 ## NOTE: some weird unicode chars only work correctly with terminus-font or nerd-fonts
@@ -307,9 +311,6 @@ PROMPT_COMMAND+=('printf "${bg[K]}↵${bg[x]}%$((COLUMNS-1))s\\r"')
 # Trim dirs displayed with `\w`
 PROMPT_DIRTRIM=3
 
-
-## Version compare (returns 0 if $1 ≥ $2 )
-function vercmp() {	<<< "$2"$'\n'"$1" sort --check=quiet --version-sort && return 0 || return 1; }
 
 ## Shell flags
 set +o histexpand		# get rid off the fucking annoying `!!` expansion
