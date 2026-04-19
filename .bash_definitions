@@ -284,7 +284,7 @@ function mv() {
 	if [[ "$#" -eq 1 ]]; then
 		local new
 		read -rei "$1" new
-		[[ -n "$new" && "$new" != "$1" ]] && command mv -v -- "$1" "$new"
+		[[ -n "$new" && "$new" != "$1" ]] && command mv -vi -- "$1" "$new"
 	else
 		command mv "$@"
 		return
