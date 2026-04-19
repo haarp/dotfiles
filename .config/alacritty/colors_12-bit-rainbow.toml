@@ -32,3 +32,5 @@ blue    = '#0096c8'
 magenta = '#851175'
 cyan    = '#21c8b7'
 white   = '#dedede'
+
+# vim: set filetype=toml noexpandtab tabstop=4 shiftwidth=4
