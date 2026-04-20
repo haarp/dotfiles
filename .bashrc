@@ -269,7 +269,6 @@ do
 			prompt="${prompt/+/‡}"	# staged changes
 			prompt="${prompt/\%/…}"	# untracked files
 			prompt="${prompt/\$/■}"	# stashed changes
-			prompt="${prompt/|CONFLICT/X}"	# conflicts
 
 			echo "$prompt"
 		}
