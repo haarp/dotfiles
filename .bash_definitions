@@ -310,14 +310,9 @@ function sync-portage() {
 # Automagically show changelogs of last emerge session
 function changelogs() {
 	local num recent
-	if [[ $# -ge 1 ]]; then
-		# number of merges from command line
-		num="$1"
-	else
-		# number of merges from last emerge session
-		num="$(grep "completed emerge" /var/log/emerge.log | tail -n1)"
-		num=${num#*of }; num=${num%) *}
-	fi
+	# number of merges from arg/last emerge session
+	num="${1:-$(grep "completed emerge" /var/log/emerge.log | tail -n1)}"
+	num=${num#*of }; num=${num%) *}
 	[[ $num -gt 0 ]] || return 1
 	# determine the packages behind them
 	recent=$(grep "completed emerge" /var/log/emerge.log | tail -n"$num" | awk '{print $8}')
