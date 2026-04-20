@@ -29,7 +29,7 @@ alias df3='findmnt -D -t nosquashfs,notmpfs,nodevtmpfs'
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
 alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
 alias essh='envy ssh'; alias esudo='envy sudo'; alias esu='envy su'
-complete_clone ssh essh; complete_clone sudo esudo; complete_clone esu su
+comp_clone ssh essh; comp_clone sudo esudo; comp_clone esu su
 alias ffmpeg='ffmpeg -hide_banner'; alias ffprobe='ffprobe -hide_banner'; alias gdb='gdb -q'
 alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
 alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m\n\e[5m5:blink\e[0m \e[7m7:reverse-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n22: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"'	# list standard terminal colors
@@ -104,13 +104,13 @@ alias ssh-add='</dev/null ssh-add'	# "disable" terminal to force ssh-add to use 
 alias sshnokey='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
 alias scpnokey='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
 alias esshnokey='envy ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
-complete_clone ssh sshnokey esshnokey; complete_clone scp scpnokey
+comp_clone ssh sshnokey esshnokey; comp_clone scp scpnokey
 alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
-complete_clone killall stopall contall
+comp_clone killall stopall contall
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
 alias sc='systemctl'; alias jc='journalctl'
-complete_clone systemctl sc; complete_clone journalctl jc
+comp_clone systemctl sc; comp_clone journalctl jc
 alias umount.fuse='fusermount -u'
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
@@ -126,7 +126,7 @@ alias wine-purgemenu='rm -rv "$XDG_CONFIG_HOME"/menus/applications-merged/wine* 
 	"$XDG_DATA_HOME"/mime/{application,packages}/x-wine-extension-*'
 alias winedesktop='wine explorer /desktop=Wine,1024x768'
 alias xemerge='ACCEPT_KEYWORDS=** emerge'; alias demerge='emerge --nodeps'
-complete_clone emerge xemerge demerge
+comp_clone emerge xemerge demerge
 alias xorgmerge='emerge -av1 --jobs=4 @x11-module-rebuild'
 alias xev2='xev -event keyboard -event button | egrep --line-buffered -o "^ButtonPress|^ButtonRelease|^KeyPress|^KeyRelease|\(keysym.*\)|button [0-9]+" | sed -e "/Press/{N;s/\n/ /;}" -e "/Release/{N;s/\n/ /;}"'	# far less spammy
 alias yt-dlp='yt-dlp -o "%(title)s.%(ext)s" --embed-metadata'	# cleaner filename, chapter info and stuff
@@ -441,7 +441,7 @@ function make2() (
 	source /etc/portage/make.conf
 	nice -n"$PORTAGE_NICENESS" make ${MAKEOPTS//--load-average=+([0-9])/} "$@"
 )
-complete_clone make make2
+comp_clone make make2
 
 # Configure kernel with menuconfig
 function confkernel() (
@@ -609,7 +609,7 @@ function remotescreen() {
 		convert -resize 50% xwd:- -define png:compression-level=9 png:-' \
 			| display -
 }
-complete_clone ssh remotescreen
+comp_clone ssh remotescreen
 
 # Reverse a patch file (http://stackoverflow.com/a/3902431/5424487)
 function reversepatch() {
@@ -742,7 +742,7 @@ function speedtest.ssh.up() {
 	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | \
 		ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat >/dev/null'
 }
-complete_clone ssh speedtest.ssh.down speedtest.ssh.up
+comp_clone ssh speedtest.ssh.down speedtest.ssh.up
 
 # Try to reduce ss' whitespace spam (https://bugzilla.kernel.org/show_bug.cgi?id=119311)
 function ss() {

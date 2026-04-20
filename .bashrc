@@ -499,7 +499,7 @@ function command_not_found_handle() {
 
 ## Custom completions
 # clone completions from command $1 to $2 [$3, $4, ...]
-function complete_clone() {
+function comp_clone() {
 	local completion oldcmd="$1"
 	shift
 
@@ -515,7 +515,7 @@ function complete_clone() {
 }
 
 # misc additions
-complete_clone ssh salt-ssh
+comp_clone ssh salt-ssh
 
 
 ## Custom aliases and functions
