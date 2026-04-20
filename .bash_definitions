@@ -550,6 +550,12 @@ function pibench() {
 	time bc -l <<< "scale=${1:-4096}; a(1)*4" >/dev/null
 }
 
+# Get environment of a process
+# source: https://stackoverflow.com/a/3571047/5424487
+function pidenv() {
+	xargs -0 -n1 < "/proc/${1:-$PPID}/environ"
+}
+
 # Ping the current gateway
 function pinggw() {
 	local default junk gw metric gateway oldmetric=999999
