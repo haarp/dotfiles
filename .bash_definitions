@@ -223,6 +223,16 @@ function u2d() {
 	sed 's:$:\r:'
 }
 
+# Quick Docker container shell
+function dsh() {
+	docker exec -it "$@" /bin/bash
+}
+__docker_containers() {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	COMPREPLY=( $(compgen -W "$(docker __complete exec "$cur" 2>/dev/null | grep -v '^:[0-9]')" -- "$cur") )
+}
+complete -F __docker_containers dsh
+
 # Add colors to diff
 function diff() {
 	# we colorize entire lines
