@@ -490,13 +490,14 @@ export LESSOPEN='| s=%s; lp="$(lesspipe "$s")"; [[ "$lp" ]] && { echo "$lp"; exi
 # but makes it impossible to open compressed files...
 ###LESS="$LESS --no-lessopen"
 
-## custom command-not-found handler
+
+## Custom command-not-found handler
 function command_not_found_handle() {
 	echo "What did you think \`$1\` was, dumb meatbag?!" >&2
 	return 127
 }
 
-## custom completions
+## Custom completions
 # clone completions from command $1 to $2 [$3, $4, ...]
 function complete_clone() {
 	local completion oldcmd="$1"

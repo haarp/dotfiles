@@ -275,7 +275,7 @@ function editvar() {
 	read -rei "${!1}" new
 
 	if export | grep -q "declare -x $1="; then
-		export $1="$new"	# can't just use 'declare' as it creates function-local vars (??)
+		export $1="$new"	# can't just use `declare` as it creates function-local vars (??)
 	else
 		export -n $1="$new"	# set and unexport (wasn't exported to begin with)
 	fi
@@ -360,8 +360,8 @@ function genlop() {
 }
 # Manifest multiple files
 function manifest() {
-	for file in "${@:-*.ebuild}";
-		do ebuild "$file" manifest;
+	for file in "${@:-*.ebuild}"; do
+		ebuild "$file" manifest
 	done
 }
 # Display reason for masked packages
@@ -751,7 +751,7 @@ complete_clone ssh speedtest.ssh.down speedtest.ssh.up
 
 # Try to reduce ss' whitespace spam (https://bugzilla.kernel.org/show_bug.cgi?id=119311)
 function ss() {
-	command ss "$@" | sed 's/[[:space:]]*$//'
+	command ss "$@" | sed 's/[[:space:]]*$//'	# making ss' stdout not a temrinal helps, stripping trailing spaces too
 }
 
 # Stream audio directly to a server
