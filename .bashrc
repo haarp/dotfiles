@@ -224,17 +224,23 @@ PS1+='\[${f[x]}${f[b]}${fg[KK]}\]'
 # if exit status >0: exit code (useful symbol: ↯)
 PROMPT_COMMAND+=('_exit=$?')	# this needs to be the first cmd in PROMPT_COMMAND
 PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Y]}\]$_exit" )'
-# user/host depending on root or luser, darker color inside ssh ($EUID is bashism)
-if [[ $EUID == 0 ]]; then
-	if [[ $SSH_CONNECTION ]]
-		then PS1+='\[${bg[r]}\]\h'
-		else PS1+='\[${bg[R]}\]\h'
+# user/host depending on root or luser ($EUID is bashism)
+if [[ "$EUID" == 0 ]]; then
+	# darker color inside ssh
+	if [[ "$SSH_CONNECTION" ]]
+		then PS1+='\[${bg[r]}\]'
+		else PS1+='\[${bg[R]}\]'
 	fi
 else
-	if [[ $SSH_CONNECTION ]]
-		then PS1+='\[${bg[G]}\]\u\[${bg[g]}\]@\h'
-		else PS1+='\[${bg[G]}\]\u@\h'
+	if [[ "$SSH_CONNECTION" ]]
+		then PS1+='\[${bg[G]}\]\u\[${bg[g]}\]@'
+		else PS1+='\[${bg[G]}\]\u@'
 	fi
+fi
+# yellow text on production
+if [[ "$HOSTNAME" == *prod* ]]
+	then PS1+='\[${fg[Y]}\]\h\[${fg[KK]}\]'
+	else PS1+='\h'
 fi
 # if screen sessions >0: session count
 PS1+='$( shopt -s nullglob;
