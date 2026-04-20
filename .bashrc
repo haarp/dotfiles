@@ -182,7 +182,7 @@ else
 			echo $(uptime)
 			last=$(last -n 2 --fullnames --time-format iso "$USER")
 			read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
-			echo "Last login: $start from $addr on $tty"
+			echo "Last login: ${start/T/ } from $addr on $tty"
 			ip -o addr show scope global primary | while read -r num iface type ip junk; do
 				[[ "$iface" == *":"* ]] && continue	# old `ip` shows wrong ifaces with `scope global primary`
 				echo "$iface $ip"
