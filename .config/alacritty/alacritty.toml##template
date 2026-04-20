@@ -3,7 +3,7 @@
 {% endif %}
 import = [
 	# custom theme
-#	"~/.config/alacritty/alacritty-theme.git/themes/oxocarbon.toml",
+#	"~/.config/alacritty/alacritty-theme.git/themes/monokai_charcoal.toml",
 	"~/.config/alacritty/colors_12-bit-rainbow.toml",
   # cool themes:
   # blood_moon, hyper: very saturated, good contrasts
@@ -17,7 +17,7 @@ import = [
   # gnome_terminal: bluish hue, good contrast
   # iterm, kitty: good contrasts, accurate colors
   # midnight_haze: low contrast but pleasant pastel color choices
-  # monokai_charcoal: very very nice contrasts, high saturation
+  # monokai_charcoal: very very nice contrasts, high saturation, but swaps blue w/ magenta and magenta w/ red
   # omni: purple/pink focus, insanely bright green
   # oxocarbon: pink focus, nice looking, mediocre contrast
   # vesper: pink focus, ok-ish contrast
