@@ -98,7 +98,7 @@ alias reset='tput reset'	# reset but without pointless sleep (https://unix.stack
 alias resolve='getent hosts'; alias resolve4='getent ahostsv4'; alias resolve6='getent ahostsv6'	# resolve name like libc
 complete -F _known_hosts resolve resolve4 resolve6
 alias rng='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789" | head -c80; echo'		# alphanumeric w/o [lI1O0] ([:alnum:] otherwise)
-alias rng2='</dev/urandom tr -dc "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789 ~!@#$%^&*()_+-=\[\]{}|;\:,./<>?" | head -c80; echo'	# more chars
+alias rng2='</dev/urandom tr -dc "[:print:]" | head -c80; echo'	# all printable chars
 alias scp-resume='rsync --partial --progress --rsh=ssh'
 alias ssh-add='</dev/null ssh-add'	# "disable" terminal to force ssh-add to use ssh-askpass (https://unix.stackexchange.com/a/352492/138699)
 alias sshnokey='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
