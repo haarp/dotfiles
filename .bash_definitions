@@ -655,7 +655,7 @@ function schedule() {
 		return 3
 	fi
 
-	local minute hour day month command random crontab
+	local minute hour day month command crontab
 
 	minute="$(date "+%M" -d "$1")"
 	hour="$(date "+%H" -d "$1")"
@@ -666,10 +666,9 @@ function schedule() {
 	for v in PATH DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS; do command+="$v='${!v}' "; done
 	command+="${@@Q} &>/dev/null"
 
-	random="$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM"
 	crontab="$(crontab -l 2>/dev/null)"
 	crontab+=$'\n'"$minute $hour $day $month * "
-	crontab+="crontab -l 2>/dev/null | grep -v sched-$random | crontab - 2>/dev/null; "
+	crontab+="crontab -l 2>/dev/null | grep -v sched-$SRANDOM$RANDOM | crontab - 2>/dev/null; "
 	crontab+="$command"
 
 	echo "$crontab" | crontab -
