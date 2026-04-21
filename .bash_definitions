@@ -836,7 +836,7 @@ function wtf() {
 	whatis "$1" 2>/dev/null | tr -s ' '
 	type -a "$1" || return 2
 
-	path="$(which "$1" 2>/dev/null)" || return
+	path="$(which "$1" 2>/dev/null)" || return 0
 	realpath=$(realpath "$path")
 	if [[ "$path" != "$realpath" ]]; then
 		echo "$path is symlinked to $realpath"
