@@ -162,6 +162,7 @@ else
 	done; unset _dir
 
 	# Detect if we are an SSH session
+	# mainly used underneath sudo/su because they may strip previously set SSH_CONNECTION
 	if [[ ! $SSH_CONNECTION ]]; then
 		until [[ ${_ppid:-$PPID} == 1 ]]; do
 			read -r _pid _name _junk _ppid _junk < "/proc/${_ppid:-$PPID}/stat"
