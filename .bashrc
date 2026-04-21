@@ -487,11 +487,12 @@ export LESSOPEN='| s=%s; lp="$(lesspipe "$s")"; [[ "$lp" ]] && { echo "$lp"; exi
 
 ## Custom command-not-found handler
 function command_not_found_handle() {
+	local cmd="${f[u~]}${u[R]}$1${f[~u]}${u[x]}"
 	local responses=(
-		"The fuck did you think \`$1\` was, dumb meatbag?!"
-		"The arcane spirits reject your incantation: \`$1\`."
-		"\`$1\`? I barely know her!"
-		"If you gaze into \`$1\` long enough, it gazes back into you."
+		"The fuck did you think $cmd was, dumb meatbag?!"
+		"The arcane spirits reject your incantation: $cmd."
+		"$cmd? I barely know her!"
+		"If you gaze into $cmd long enough, it gazes back into you."
 	)
 	echo "${responses[ $RANDOM % ${#responses[@]} ]}" >&2
 	return 127
