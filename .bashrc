@@ -506,7 +506,7 @@ function command_not_found_handle() {
 		"\`$1\`? I barely know her!"
 		"If you gaze into \`$1\` long enough, it gazes back into you."
 	)
-	echo "${responses[$(($RANDOM % ${#responses[@]}))]}" >&2
+	echo "${responses[ $RANDOM % ${#responses[@]} ]}" >&2
 	return 127
 }
 
