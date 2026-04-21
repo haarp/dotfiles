@@ -481,7 +481,7 @@ export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=36:ln=32:bn=32:se=35"	# more vi
 export LESS="-RiMQ --follow-name --tabs=4"	# allow escapes, dynamic case on search, better prompt, no bell (can block on older less!), follow filename not inode, proper default tab width
 vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 581" && LESS+=" --use-color"	# distinct meta colors
 vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 632" && LESS+=" --wordwrap"	# wrap at word boundaries
-export SUDO="--preserve-env=SSH_CONNECTION,SSH_AUTH_SOCK"	# preserve some useful env
+SUDO="--preserve-env=SSH_CONNECTION,SSH_AUTH_SOCK"	# preserve some useful env
 export SUDO_PROMPT="[sudo] %p  "	# target username and lock char
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"
