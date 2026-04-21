@@ -828,6 +828,11 @@ function wasteram() {
 function wtf() {
 	local path realpath
 
+	if [[ $# -ne 1 ]]; then
+		echo "Print what the fuck a command is. Usage: $FUNCNAME <command>" >&2
+		return 1
+	fi
+
 	whatis "$1" | tr -s ' '
 	type -a "$1"
 
