@@ -259,7 +259,7 @@ function editcd() {
 # Edit symlinks quickly (and optionally interactively)
 function editln() {
 	if [[ $# -eq 0 || $# -gt 2 ]]; then
-		echo "Usage: $FUNCNAME <symlink> [target]"
+		echo "Usage: $FUNCNAME <symlink> [target]" >&2
 		return 1
 	fi
 
@@ -278,7 +278,7 @@ function editln() {
 # Edit variables quickly and interactively
 function editvar() {
 	if [[ ! $# -eq 1 ]]; then
-		echo "Usage: $FUNCNAME <variablename>"
+		echo "Usage: $FUNCNAME <variablename>" >&2
 		return 1
 	fi
 
@@ -308,14 +308,14 @@ function mv() {
 function sync-portage() {
 	lopri emerge --sync || return
 	etc-update
-	echo "emerge -avDuU -j4 world"
+	echo "emerge -avDuU -j4 world" >&2
 	emerge -avDuU -j4 world #--changed-deps
 	etc-update
 	emerge -av1 -j4 @preserved-rebuild
 	lopri emerge -a --depclean
-	echo "eclean-dist -d -f -t3m"
+	echo "eclean-dist -d -f -t3m" >&2
 	lopri eclean-dist -d -f -t3m
-	echo "portpeek -a -r -z"
+	echo "portpeek -a -r -z" >&2
 	lopri portpeek -a -r -z
 }
 # Automagically show changelogs of last emerge session
@@ -379,7 +379,7 @@ function mask() {
 # TODO: If lib/ fails, check /lib64 and vice-versa
 function orphans() {
 	if [[ $# -gt 1 ]]; then
-		echo "Print orphaned (not tracked by portage) files in a dir. Usage: $FUNCNAME [dir]"
+		echo "Print orphaned (not tracked by portage) files in a dir. Usage: $FUNCNAME [dir]" >&2
 		return
 	fi
 
@@ -485,7 +485,7 @@ function makeprogress() {
 	local ccount ocount
 
 	if [[ ! $# -eq 1 ]]; then
-		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]"
+		echo "Crappy make progress meter. Usage: $FUNCNAME [dir]" >&2
 		return 1
 	fi
 
@@ -585,12 +585,12 @@ function pinggw() {
 function pingpwn() {
 	if [[ $# -ne 2 ]]; then
 		if [[ ! $1 == "off" ]]; then
-			echo "Increase ping for a certain IP (not hostname). Usage: $FUNCNAME <ip> <latency> OR pingpwn off"
+			echo "Increase ping for a certain IP (not hostname). Usage: $FUNCNAME <ip> <latency> OR pingpwn off" >&2
 			return 1
 		fi
 	fi
 	if [[ $EUID -ne 0 ]]; then
-		echo "Needs root rights!"
+		echo "Needs root rights!" >&2
 		return 1
 	fi
 
@@ -610,7 +610,7 @@ function pingpwn() {
 
 function remotescreen() {
 	if [[ $# -ne 1 ]]; then
-		echo "Shows someone's remote X screen locally. Usage: $FUNCNAME <sshhost>"
+		echo "Shows someone's remote X screen locally. Usage: $FUNCNAME <sshhost>" >&2
 		return 1
 	fi
 	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" \
@@ -625,12 +625,12 @@ comp_clone ssh remotescreen
 # Reverse a patch file (http://stackoverflow.com/a/3902431/5424487)
 function reversepatch() {
 	if [[ $# -ne 2 ]]; then
-		echo "Reverse a patch, saving it into the same file. Usage: $FUNCNAME <patch> <newpatch>"
-		echo "FIXME: Assumes only one file to be patched."
+		echo "Reverse a patch, saving it into the same file. Usage: $FUNCNAME <patch> <newpatch>" >&2
+		echo "FIXME: Assumes only one file to be patched." >&2
 		return
 	fi
 	if [[ ! -e "$1" ]]; then
-		echo "'$1' not found/readable!"
+		echo "'$1' not found/readable!" >&2
 		return 1
 	fi
 
@@ -643,15 +643,15 @@ function reversepatch() {
 # Schedule one-off tasks that delete themselves from crontab after execution
 function schedule() {
 	if [[ $# -lt 2 ]]; then
-		echo "Schedule one-off task using cron with flexible datestring"
-		echo "Usage: $FUNCNAME '<datestring>' <command> [parm]..."
+		echo "Schedule one-off task using cron with flexible datestring" >&2
+		echo "Usage: $FUNCNAME '<datestring>' <command> [parm]..." >&2
 		return 1
 	fi
 
 	local schedule
 	schedule="$(date "+%s" -d "$1")" || return 2
 	if [[ $(( schedule - EPOCHSECONDS )) -lt 60 ]]; then
-		echo "Scheduled date lies less than a minute ahead, aborting!"
+		echo "Scheduled date lies less than a minute ahead, aborting!" >&2
 		return 3
 	fi
 
@@ -673,7 +673,7 @@ function schedule() {
 
 	echo "$crontab" | crontab -
 
-	echo "*** command scheduled for $(date "+%b %d %H:%M" -d "@$schedule") ***"
+	echo "*** command scheduled for $(date "+%b %d %H:%M" -d "@$schedule") ***" >&2
 }
 
 # Wrapper around screen to make it work with dropped privileges (https://serverfault.com/a/620149/315665)
@@ -707,7 +707,7 @@ alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
 alias speedtest.erppc.down.slow='curl https://erppc.net/infinite.php?slow=1 -o /dev/null'
 alias speedtest.erppc.up='dd if=/dev/zero bs=1M status=none | curl -T - https://erppc.net/infinite.php -o /dev/null'
 function speedtest.httpserver() {
-	ip -o addr show scope global primary | awk "{print \$2,\$4}"
+	ip -o addr show scope global primary | awk "{print \$2,\$4}" >&2
 	echo "Port 8000"
 	while true; do
 		{ echo -e 'HTTP/1.1 200 OK\nContent-Type: application/octet-stream\nContent-Disposition: attachment; filename="foo.bar"\n\n'; yes; } \
@@ -719,7 +719,7 @@ function speedtest.httpserver() {
 }
 function speedtest.nc.down() {
 	if [[ $# -ne 1 ]]; then
-		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>"
+		echo "Measure downstream network throughput with netcat. Usage: $FUNCNAME <host>" >&2
 		return 1
 	fi
 	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 </dev/zero"
@@ -728,7 +728,7 @@ function speedtest.nc.down() {
 }
 function speedtest.nc.up() {
 	if [[ $# -ne 1 ]]; then
-		echo "Measure upstream network throughput with netcat. Usage: $FUNCNAME <host>"
+		echo "Measure upstream network throughput with netcat. Usage: $FUNCNAME <host>" >&2
 		return 1
 	fi
 	read -rp "Run this on $1 now, then press enter to continue: nc -l -p 44444 >/dev/null"
@@ -738,7 +738,7 @@ complete -F _known_hosts speedtest.nc.down speedtest.nc.up
 # source: http://www.commandlinefu.com/commands/view/4434/live-ssh-network-throughput-test
 function speedtest.ssh.down() {
 	if [[ $# -lt 1 ]]; then
-		echo "Measure downstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
+		echo "Measure downstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..." >&2
 		return 1
 	fi
 	ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no "$@" 'cat /dev/zero' | \
@@ -746,7 +746,7 @@ function speedtest.ssh.down() {
 }
 function speedtest.ssh.up() {
 	if [[ $# -lt 1 ]]; then
-		echo "Measure upstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..."
+		echo "Measure upstream network throughput over SSH. Usage: $FUNCNAME <[user@]host> [other ssh args]..." >&2
 		return 1
 	fi
 	pv -i 2 -W -F "Cur: %r | Avg: %a | Tot: %b" /dev/zero | \
@@ -763,7 +763,7 @@ function ss() {
 # or use pa: pacmd load-module module-tunnel-sink server=$1
 function streamaudio() {
 	if [[ $# -ne 2 ]]; then
-		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>"
+		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>" >&2
 		return
 	fi
 	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
@@ -772,10 +772,10 @@ function streamaudio() {
 # Swap names of two files
 function swap() {
 	if [[ ! $# -eq 2 ]]; then
-		echo "Swap names of two files. Usage: $FUNCNAME <file> <file>"
+		echo "Swap names of two files. Usage: $FUNCNAME <file> <file>" >&2
 		return 1
 	elif [[ ! -e "$1" || ! -e "$2" ]]; then
-		echo "Cannot open $1 or $2!"
+		echo "Cannot open $1 or $2!" >&2
 		return 1
 	fi
 	local temp
@@ -817,7 +817,7 @@ function urldecode() {
 # https://unix.stackexchange.com/a/254976/138699
 function wasteram() {
 	if [[ $# -ne 1 ]]; then
-		echo "Waste RAM. May be be Ctrl+Ced once effect achieved. Usage: $FUNCNAME <megs>"
+		echo "Waste RAM. May be be Ctrl+Ced once effect achieved. Usage: $FUNCNAME <megs>" >&2
 		return 1
 	fi
 
@@ -858,7 +858,7 @@ function yubi() {
 				# https://bugs.launchpad.net/serverguide/+bug/1569019/comments/6
 				# https://dev.gnupg.org/T1081
 		if pgrep -u "$USER" scdaemon >/dev/null; then
-			echo "Killing scdaemon..."
+			echo "Killing scdaemon..." >&2
 			##gpg-connect-agent "SCD KILLSCD" "SCD BYE" /bye
 			gpg-connect-agent "SCD RESET" "SCD BYE" /bye
 			for i in {3..1}; do echo -n "${i}.."; sleep 1; done; echo ""	# takes a while until it works again
@@ -873,7 +873,7 @@ function yubi() {
 	fi
 
 	grep -q SSH_AUTH_SOCK "$XDG_CACHE_HOME/gpg-agent-info" 2>/dev/null || {
-		echo "Killing ssh-less gpg-agent..."
+		echo "Killing ssh-less gpg-agent..." >&2
 		pkill -u "$USER" gpg-agent
 		while pgrep -u "$USER" gpg-agent >/dev/null; do	# wait until really gone
 			sleep 0.1
@@ -881,7 +881,7 @@ function yubi() {
 	}
 
 	pgrep -u "$USER" gpg-agent >/dev/null || {
-		echo "Starting gpg-agent..."
+		echo "Starting gpg-agent..." >&2
 		gpg-agent --daemon --enable-ssh-support > "$XDG_CACHE_HOME/gpg-agent-info"
 	}
 	source "$XDG_CACHE_HOME/gpg-agent-info" || return 1
