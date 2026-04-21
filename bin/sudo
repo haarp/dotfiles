@@ -1,0 +1,11 @@
+#!/bin/bash
+# Make sudo preserve some useful env vars
+
+PRESERVE="SSH_CONNECTION,SSH_AUTH_SOCK"
+SUDO="/usr/bin/sudo"
+
+if "$SUDO" --help | grep -q -- '--preserve-env=list'; then
+	exec "$SUDO" --preserve-env="$PRESERVE" "$@"
+else
+	exec "$SUDO" "$@"
+fi
