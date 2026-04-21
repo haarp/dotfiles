@@ -905,7 +905,7 @@ function noise() {
 	echo -ne "\e[?25l"	# invisible cursor
 	tput smcup			# switch to alternate screen
 	while true; do
-		echo -ne "\e[$(( RANDOM % (LINES+1) ));$(( RANDOM % (COLUMNS+1) ))f${P[ $RANDOM%5 ]}"
+		echo -ne "\e[$(( RANDOM % (LINES+1) ));$(( RANDOM % (COLUMNS+1) ))f${P[ $RANDOM % ${#P[@]} ]}"
 	done
 }
 # Pretend you're busy =D
