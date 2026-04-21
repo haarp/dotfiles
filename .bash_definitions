@@ -28,7 +28,7 @@ alias df3='findmnt -D -t nosquashfs,notmpfs,nodevtmpfs'
 ##alias df='df -h'
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
 alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
-alias essh='envy ssh'; alias esudo='envy sudo'; alias esu='envy su'
+alias essh='envy ssh'; alias esudo='envy sudo $SUDO'; alias esu='envy su'
 comp_clone ssh essh; comp_clone sudo esudo; comp_clone esu su
 alias ffmpeg='ffmpeg -hide_banner'; alias ffprobe='ffprobe -hide_banner'; alias gdb='gdb -q'
 alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (https://github.com/netblue30/firejail/issues/3678)
@@ -109,6 +109,7 @@ alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
 comp_clone killall stopall contall
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
+alias sudo='sudo $SUDO'	# accept env var containing default settings (TODO: envy)
 alias sc='systemctl'; alias jc='journalctl'
 comp_clone systemctl sc; comp_clone journalctl jc
 alias umount.fuse='fusermount -u'
