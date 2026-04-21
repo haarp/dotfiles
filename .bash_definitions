@@ -838,9 +838,9 @@ function wtf() {
 		path="$realpath"
 	fi
 	echo -n "package: "
-	if command -v equery >/dev/null; then equery belongs "$path"; fi
-	if command -v dpkg >/dev/null; then dpkg -S "$path"; fi
-	if command -v rpm >/dev/null; then rpm -qf "$path"; fi
+	if command -v equery >/dev/null; then equery belongs "$path" "${path#/usr}"; fi
+	if command -v dpkg >/dev/null; then dpkg -S "$path" "${path#/usr}"; fi
+	if command -v rpm >/dev/null; then rpm -qf "$path" "${path#/usr}"; fi
 }
 complete -c wtf
 
