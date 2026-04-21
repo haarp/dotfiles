@@ -895,35 +895,7 @@ function yubi() {
 }
 
 
-# Digital Rain =D
-# https://bruxy.regnet.cz/web/linux/EN/matrix-sh/
-function matrix() {
-	trap 'trap - SIGINT; tput rmcup; echo -e "\e[?25h"; return' SIGINT
-
-	echo -e "\e[?25l"	# invisible cursor
-	tput smcup			# switch to alternate screen
-
-	local j d i
-
-	while true; do
-		(
-		j=$(( RANDOM % COLUMNS ))
-		d=$(( RANDOM % LINES ))
-
-		for i in $( seq 1 $((LINES-1)) ); do
-			char=$(printf '\\\\0%o' $(( (RANDOM % 57) + 33 )) )
-			echo -e "\e[$((i-1));${j}H${fg[green]}$char\033[$i;${j}H${fg[white]}$char"
-			sleep 0.1
-			[[ $i -ge $d ]] && echo -e "\e[$((i-d));${j}H "
-		done
-
-		for i in $( seq $((i-d)) $((LINES-1)) ); do
-			echo -e "\e[$i;${j}f "
-			sleep 0.1
-		done ) &
-		sleep 0.05
-	done
-}
+### https://github.com/attogram/bash-screensavers
 # Terminal noise =D
 function noise() {
 	local P=(' ' '░' '▒' '▓' '█')
