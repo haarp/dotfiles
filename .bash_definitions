@@ -833,7 +833,7 @@ function wtf() {
 		return 1
 	fi
 
-	whatis "$1" | tr -s ' '
+	whatis "$1" 2>/dev/null | tr -s ' '
 	type -a "$1"
 
 	path="$(which "$1" 2>/dev/null)" || return
