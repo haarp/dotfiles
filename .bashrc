@@ -463,11 +463,12 @@ export LESS_TERMCAP_se="${bg[x]}${fg[x]}"			# end mode
 export LESS_TERMCAP_us="${f[u]}${fg[g]}"			# begin underline
 export LESS_TERMCAP_ue="${f[~u]}${fg[x]}"			# end mode
 
-## Colorful mc, prefer Debian's thin skins
+## Colorful mc, different skin on production, prefer Debian's thin skins (upstreamed 4.8.32)
 if [[ $EUID -eq 0 ]]
 	then export MC_SKIN="modarin256root-defbg"
 	else export MC_SKIN="modarin256-defbg"
 fi
+[[ "$HOSTNAME" == *prod* ]] && MC_SKIN="${MC_SKIN/in256/con16}"
 [[ -f "/usr/share/mc/skins/$MC_SKIN-thin.ini" ]] && MC_SKIN+="-thin"
 
 ## Some aliasless defaults
