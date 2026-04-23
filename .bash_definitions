@@ -74,7 +74,7 @@ fi
 alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
 alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
 alias intercept='strace -ff -e trace=write -e write=1,2 -p'	# show some process' stdout/stderr
-alias ip='ip --color=auto'
+alias ip='COLORFGBG=";0" ip --color=auto'
 command -v external-ip >/dev/null && alias ipa='external-ip' || alias ipa='ipi' # also check out https://www.reddit.com/r/bash/comments/19839z9/curl_geofindme/
 alias iperppc='curl -s https://erppc.net/ip.php'
 alias ipg='dig @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg4='dig -4 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg6='dig -6 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'
