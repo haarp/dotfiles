@@ -424,7 +424,7 @@ if [[ $- == *i* ]]; then
 
 	export HISTTIMEFORMAT="%F_%T  "	# timestamp format in `history`
 	export HISTCONTROL="ignoreboth"	# ignore identical with previous or beginning with space
-	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
+	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:l:exit:logout:pwd:clear:reset"	# https://gist.github.com/Angles/3273505
 
 	# share history across all open terminals
 	##PROMPT_COMMAND+=('history -a; history -n')
