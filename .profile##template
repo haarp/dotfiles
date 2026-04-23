@@ -66,8 +66,9 @@ export MOZ_USE_XINPUT2=1
 export MOZ_GTK_TITLEBAR_DECORATION=system
 
 # Chromium: don't scale horribly; source system-wide settings too
+shopt -s extglob
 if [[ -d "/etc/chromium" ]]; then
-	for f in /etc/chromium/*; do [[ -f "$f" ]] && source "$f"; done
+	for f in /etc/chromium/!(master_preferences); do [[ -f "$f" ]] && source "$f"; done
 	export CHROMIUM_USER_FLAGS="$CHROMIUM_FLAGS"
 	CHROMIUM_USER_FLAGS+=" --force-device-scale-factor=1.33333"
 fi
