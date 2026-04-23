@@ -179,7 +179,8 @@ function mv() {
 
 # Grab site's cert info
 function cert() {
-	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null \
+		| openssl x509 -noout -text -certopt no_sigdump,no_pubkey
 }
 
 # Sensible recursive chmod
@@ -402,7 +403,7 @@ function orphans() {
 
 # Highlight phrase(s) with (multiple) colors!
 # FIXME: still buffering a lot before showing
-# NOTE: don't bother w/ pure bash: no regex (only wildcards), chunking: incomplete highlights, not chunking: huge variables/bad performance
+# NOTE: don't bother w/ pure bash: no regex (only wildcards), chunked: incomplete highlights, unchunked: huge variables/bad performance
 function hilite() {
 	local phrase cmd palette=(r g y b m c R G Y B M C)
 	local sep=$'\037'	# separator for sed
@@ -544,9 +545,11 @@ if [[ -e /proc/$( { < /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
 	alias nvidia-settings='optirun nvidia-settings -c :8'
 fi
 # Fix primusrun (https://forums.gentoo.org/viewtopic-p-8380752.html#8380752)
-# (might also need __GLVND_DISALLOW_PATCHING=1 in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
+# (might also need `__GLVND_DISALLOW_PATCHING=1` in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
 alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
-# Modern prime-run for native Nvidia setups (https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html)
+# Modern prime-run for native Nvidia setups
+# https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run
+# https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html
 function prime-run() {
 	__NV_PRIME_RENDER_OFFLOAD=1 \
 	__GLX_VENDOR_LIBRARY_NAME=nvidia \
@@ -769,7 +772,8 @@ function streamaudio() {
 		echo "Stream audio directly to a machine. Usage: $FUNCNAME <hostname> <audiofile>" >&2
 		return
 	fi
-	ffmpeg -i "$2" -f s16le - | ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
+	ffmpeg -i "$2" -f s16le - \
+		| ssh -o ClearAllForwardings=yes -o ForwardAgent=no -o ForwardX11=no -C "$1" 'aplay -f cd -'
 }
 
 # Swap names of two files
