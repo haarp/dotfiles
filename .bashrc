@@ -27,19 +27,23 @@ export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 ## Make CLI appplications use XDG paths (partial duplicate from .profile, for use in master and slave shells)
-export ANDROID_USER_HOME="${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}"
-export GNUPGHOME="${GNUPGHOME:-$XDG_DATA_HOME/gnupg}"
-export LESSHISTFILE="${LESSHISTFILE:-/dev/null}" # want no search history (but if I did: $XDG_STATE_HOME/lesshst)
-export MYSQL_HISTFILE="${MYSQL_HISTFILE:-$XDG_STATE_HOME/mysql_history}"
-export PSQL_HISTORY="${PSQL_HISTORY:-$XDG_STATE_HOME/psql_history}"
-export PYTHON_HISTORY="${PYTHON_HISTORY:-$XDG_STATE_HOME/python_history}"
-export RANDFILE="${RANDFILE:-$XDG_CACHE_HOME/rnd}"
-export RBENV_ROOT="${RBENV_ROOT:-$XDG_DATA_HOME/rbenv}"
-export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}"
-export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
-export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
-export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_HOME/vagrant}"
-export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
++export LESSHISTFILE="/dev/null"	# want no search history
+# but not for system/application users (according to Linux LSB UID specs)
+if [[ "$EUID" -ge 1000 ]]; then
+	export ANDROID_USER_HOME="${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}"
+	export GNUPGHOME="${GNUPGHOME:-$XDG_DATA_HOME/gnupg}"
+	export LESSHISTFILE="${LESSHISTFILE:-$XDG_STATE_HOME/lesshst}"	# but if I wanted search history
+	export MYSQL_HISTFILE="${MYSQL_HISTFILE:-$XDG_STATE_HOME/mysql_history}"
+	export PSQL_HISTORY="${PSQL_HISTORY:-$XDG_STATE_HOME/psql_history}"
+	export PYTHON_HISTORY="${PYTHON_HISTORY:-$XDG_STATE_HOME/python_history}"
+	export RANDFILE="${RANDFILE:-$XDG_CACHE_HOME/rnd}"
+	export RBENV_ROOT="${RBENV_ROOT:-$XDG_DATA_HOME/rbenv}"
+	export REDISCLI_HISTFILE="${REDISCLI_HISTFILE:-$XDG_STATE_HOME/rediscli_history}"
+	export SCREENRC="${SCREENRC:-$XDG_CONFIG_HOME/screen/screenrc}"
+	export SQLITE_HISTORY="${SQLITE_HISTORY:-$XDG_STATE_HOME/sqlite_history}"
+	export VAGRANT_HOME="${VAGRANT_HOME:-$XDG_DATA_HOME/vagrant}"
+	export W3M_DIR="${W3M_DIR:-$XDG_DATA_HOME/w3m}"
+fi
 
 ## Set PATH to include various dirs, if they exist and are not already included (later = higher priority)
 for _dir in /usr/games/bin /opt/bin /sbin /usr/sbin /usr/local/sbin ~/bin ~/.local/bin #/usr/lib/distcc/bin
@@ -400,7 +404,7 @@ if [[ $- == *i* ]]; then
 	bind "set visible-stats on"					# show character denoting file type in completions
 
 	## Shell history options
-	if [[ "$HISTFILE" ]]; then	# only if there was something set to begin with
+	if [[ "$HISTFILE" && "$EUID" -ge 1000 ]]; then	# only if it was set to begin with; and user is regular user
 		export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG (and secure against truncation)
 		[[ -f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
 	fi
