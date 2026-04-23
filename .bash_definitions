@@ -156,6 +156,27 @@ function btrfs.set.zstd() {
 	find "$1" -exec btrfs property set {} compression zstd \;
 }
 
+# cd quickly and interactively by calling cd with no args
+function cd() {
+	if [[ "$#" -eq 0 ]]; then
+		local new
+		read -rei "$PWD" new
+		[[ -n "$new" && "$new" != "$PWD" ]] && command cd -- "$new"
+	else
+		command cd "$@"
+	fi
+}
+# mv quickly and interactively by calling mv with only one arg
+function mv() {
+	if [[ "$#" -eq 1 ]]; then
+		local new
+		read -rei "$1" new
+		[[ -n "$new" && "$new" != "$1" ]] && command mv -vi -- "$1" "$new"
+	else
+		command mv "$@"
+	fi
+}
+
 # Grab site's cert info
 function cert() {
 	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null | openssl x509 -noout -text -certopt no_sigdump,no_pubkey
@@ -249,12 +270,6 @@ function diff() {
 	return "${PIPESTATUS[0]}"
 }
 
-# Edit to cd
-function editcd() {
-	local new
-	read -rei "$PWD" new
-	cd -- "$new"
-}
 # Edit symlinks quickly (and optionally interactively)
 function editln() {
 	if [[ $# -eq 0 || $# -gt 2 ]]; then
@@ -288,17 +303,6 @@ function editvar() {
 		export $1="$new"	# can't just use `declare` as it creates function-local vars (??)
 	else
 		export -n $1="$new"	# set and unexport (wasn't exported to begin with)
-	fi
-}
-# Edit filenames quickly and interactively by calling mv with only one arg
-function mv() {
-	if [[ "$#" -eq 1 ]]; then
-		local new
-		read -rei "$1" new
-		[[ -n "$new" && "$new" != "$1" ]] && command mv -vi -- "$1" "$new"
-	else
-		command mv "$@"
-		return
 	fi
 }
 
