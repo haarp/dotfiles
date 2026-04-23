@@ -486,7 +486,13 @@ export ZSTD_NBTHREADS="0"
 # Syntax highlighting for less
 # Debian's lesspipe won't do syntax highlighting, Gentoo's is incomplete; monkey-wrench in pygmentize
 # also, large files are slow to highlight, bail out early
-export LESSOPEN='| s=%s; lp="$(lesspipe "$s")"; [[ "$lp" ]] && { echo "$lp"; exit 0; }; [[ "$(stat -c %%s "$s" 2>/dev/null)" -gt 1000000 ]] && exit 2; pygmentize -g -O style=monokai "$s" 2>/dev/null || exit 1'
+export LESSOPEN='|
+	s=%s;
+	lp="$(lesspipe "$s")";
+	[[ "$lp" ]] && { echo "$lp"; exit 0; };
+	[[ "$(stat -c %%s "$s" 2>/dev/null)" -gt 1000000 ]] && exit 2;
+	pygmentize -g -O style=monokai "$s" 2>/dev/null || exit 1;
+'
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
 ###LESS="$LESS --no-lessopen"
