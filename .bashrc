@@ -136,7 +136,8 @@ if [[ ! "$ENV_HOME" ]]; then
 		source "$XDG_CACHE_HOME/ssh-agent-info"
 	fi
 
-	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env (won't show up in /proc/$pid/environ, still works)
+	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env
+	# (won't show up in /proc/$pid/environ, still works)
 	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
 	( for pid in $(pgrep -u "$USER" -x gvfsd); do
 		gdb -batch	-ex "attach $pid" \
@@ -152,7 +153,7 @@ if [[ ! "$ENV_HOME" ]]; then
 	fi
 
 	## Empty (not remove!) mc histories/filepos on login
-	# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 in ~/.config/mc/ini but without breaking mcedit search
+	# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 but without breaking mcedit search
 	[[ -e "$XDG_DATA_HOME/mc/history" ]] && : > "$XDG_DATA_HOME/mc/history"
 	[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && : > "$XDG_DATA_HOME/mc/filepos"
 
@@ -170,7 +171,7 @@ else
 
 	if [[ $- == *i* ]]; then
 		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
-		# only if we are a direct descendant of ssh (not using $SSH_CONNECTION avoids showing it again when using su/sudo)
+		# but only if we are a direct descendant of sshd to avoid showing it again when using su/sudo
 		# TODO: maybe iterate over `/etc/update-motd.d/`?
 		( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 			echo "${bg[m]}$(hostname -f)${bg[x]}"
@@ -376,8 +377,9 @@ if [[ $- == *i* ]]; then
 	bind	' "\eq[":		"[]\C-b" '
 	bind	' "\eq{":		"{}\C-b" '
 	bind	' "\eq(":		"()\C-b" '
-	bind	' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor (uses `backward-word`, letters/digits only. `shell-backward-word is too janky)
-	bind	' "\eqn":		">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '		# common phrases
+	bind	' "\eqq":		"\eb\"\ef\"" '	# quote word behind cursor
+											# (uses `backward-word`: letters/digits only. `shell-backward-word` is too janky)
+	bind	' "\eqn":		">/dev/null\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '	# common phrases
 	bind	' "\eqw":		"while true; do ; done\C-b\C-b\C-b\C-b\C-b\C-b" '
 	bind	' "\eqf":		"for f in *; do  \"$f\"; done\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b\C-b" '
 	bind	' "\eqF":		"find . -iname \"**\"\C-b\C-b" '
@@ -390,17 +392,18 @@ if [[ $- == *i* ]]; then
 	bind "set bell-style none"
 	bind "set blink-matching-paren on"			# briefly highlight matching bracket on insertion!
 	bind "set colored-stats on"					# colored completion list (using $LS_COLORS)
-												# FIXME: LS_COLORS is only read while initializing. would need a .inputrc >:(
+												# FIXME: LS_COLORS only read while initializing. would need .inputrc >:(
 												# https://unix.stackexchange.com/a/741843/138699
 	bind "set colored-completion-prefix on"		# color common elements in list on completing
-	bind "set completion-ignore-case on"		# ignore case on completions (but this fucks with already-typed entries!)
+	bind "set completion-ignore-case on"		# ignore case on completions (but fucks with already-typed entries!)
 	##bind "set completion-map-case on"			# equal - and _ on completions (also fucks with typed entries)
-	##bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion (but breaks all colors...)
+	##bind "set completion-prefix-display-length 5"	# ellipsize common prefixes longer than this during completion
+													# but breaks all colors...
 	bind "set completion-query-items 1024"
 	##bind "set echo-control-characters off"	# no ^C spam on Ctrl-C (but prevents useful feedback)
 	bind "set enable-bracketed-paste on"		# highlight pasted text and ignore special/potentially dangerous chars
-	##bind "set mark-modified-lines on"			# prefix prompt with `*` when going through history lines that have been modified
-	bind "set match-hidden-files off"			# don't show hidden files in completions unless requested by prepending .
+	##bind "set mark-modified-lines on"			# prefix prompt with `*` when going through modified history lines
+	bind "set match-hidden-files off"			# hide hidden files in completions unless requested by prepending `.`
 	bind "set page-completions off"				# no completion pager and don't ask to display smaller lists
 	bind "set revert-all-at-newline on"			# revert modified history lines on enter
 	##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
@@ -475,7 +478,7 @@ fi
 ## Some aliasless defaults
 export GCC_COLORS="error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01"	# warnings and errors
 export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=36:ln=32:bn=32:se=35"	# more visible filename
-export LESS="-RiMQ --follow-name --tabs=4"	# allow escapes, dynamic case on search, better prompt, no bell (can block on older less!), follow filename not inode, proper default tab width
+export LESS="-RiMQ --follow-name --tabs=4"	# color escapes, case-insensitive search, better prompt, no bell (blocks on older less!), follow filename not inode, tab width
 vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 581" && LESS+=" --use-color"	# distinct meta colors
 vercmp "$(less --version | grep -o 'less [0-9]\+')" "less 632" && LESS+=" --wordwrap"	# wrap at word boundaries
 export SUDO_PROMPT="[sudo] %p  "	# target username and lock char
