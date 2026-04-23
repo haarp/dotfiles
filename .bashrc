@@ -55,8 +55,11 @@ do
 done; unset _dir
 
 ## Set CDPATH (works like $PATH but for `cd`)
-## edit: NOPE, this also shows a bazillion tab-completion suggestions (https://unix.stackexchange.com/questions/224310/prevent-path-autocompletion-from-using-cdpath-in-bash)
-####CDPATH=".:~:/"
+CDPATH=".:~:/"
+# only show local tab-completions, unless no matches found (https://unix.stackexchange.com/a/244196)
+function _my_cd() { CDPATH='' _cd "$@"; [[ "$COMPREPLY" ]] || _cd "$@"; }
+complete -F _my_cd -o nospace cd
+CDPATH=".:~:/"
 
 ## Source rbenv after setting RBENV_ROOT and PATH
 if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
