@@ -485,7 +485,7 @@ export ZSTD_NBTHREADS="0"
 
 # Syntax highlighting for less
 # Debian's lesspipe won't do syntax highlighting, Gentoo's is incomplete; monkey-wrench in pygmentize
-# also, large files are slow to highlight, bail out early
+# also, large files are slow to highlight, limit size
 export LESSOPEN='|
 	s=%s;
 	lp="$(lesspipe "$s")";
