@@ -23,8 +23,6 @@ alias apt-upgrade='apt install --only-upgrade'
 command -v beep >/dev/null || alias beep='echo -ne "\a"'
 alias cp='cp --reflink=auto'	# CoW (old advcpmv disables reflink, so screw em)
 alias dd='dd status=progress'	# interactively show progress
-alias df2='findmnt -D'
-alias df3='findmnt -D -t nosquashfs,notmpfs,nodevtmpfs'
 ##alias df='df -h'
 alias diff='diff -W $COLUMNS'; alias sdiff='sdiff -W $COLUMNS'	# use term columns in side-by-side (-y)
 alias drop_caches='echo 3 > /proc/sys/vm/drop_caches'		# flush (drop) fs caches
@@ -86,7 +84,9 @@ alias l="ls -la"; alias lt="ls --sort=time"
 alias ls='ls --human --color=auto --classify --group-directories-first'
 alias lspci2='lspci -nnk'
 alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# disable annoying mouse
-alias mount2='findmnt --invert --pseudo'
+alias mount2='findmnt --real'
+	alias df2='findmnt -D'
+	alias df3='findmnt -D -t nosquashfs,nodevtmpfs,nofuse.portal'
 ##alias nmap='nmap -PE'			# use ICMP ping for host discovery
 alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→echo -e "\e[?7h", cut -c 1-$COLUMNS (will fuck up when control chars exist)
 ##alias pianobar='PULSE_LATENCY_MSEC=60 pianobar'	# fix latency (https://github.com/PromyLOPh/pianobar/issues/550)
