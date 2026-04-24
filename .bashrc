@@ -196,7 +196,8 @@ fi
 
 
 ## Reset locales that don't exist on a machine (make perl shut the fuck up, fix mc charset(LANG+LC_NUMERIC))
-# TODO: Ubuntu has `locale-check` for this. check it out?
+# TODO: Check out `locale-check`? https://git.launchpad.net/ubuntu/+source/base-files/tree/locale-check.c
+# eval $(locale-check C.UTF-8)
 _locales=$(locale -a 2>/dev/null) && _locales="${_locales//utf8/UTF-8}"
 for _fallback in "en_US.UTF-8" "C.UTF-8" "C"; do
 	[[ "$_locales" == *"$_fallback"* ]] && break
