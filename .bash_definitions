@@ -262,7 +262,7 @@ complete -F __docker_images dtemp
 function dsh() {
 	docker exec -it "$@" /bin/bash
 }
-__docker_containers() {
+function __docker_containers() {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	COMPREPLY=( $(compgen -W "$(docker __complete exec "$cur" 2>/dev/null | grep -v '^:[0-9]')" -- "$cur") )
 }
