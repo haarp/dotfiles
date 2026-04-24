@@ -244,6 +244,20 @@ function u2d() {
 	sed 's:$:\r:'
 }
 
+# Quick self-deleting Docker container
+function dtemp() {
+	if [[ $# -lt 2 ]]; then
+		echo "Run temporary self-deleting Docker container. Usage: $FUNCNAME <image> <command>" >&2
+		return 1
+	fi
+	docker run -it --rm "$@"
+}
+function __docker_images() {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	COMPREPLY=( $(compgen -W "$(docker __complete run "$cur" 2>/dev/null | grep -v '^:[0-9]')" -- "$cur") )
+}
+complete -F __docker_images dtemp
+
 # Quick Docker container shell
 function dsh() {
 	docker exec -it "$@" /bin/bash
