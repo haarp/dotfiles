@@ -169,6 +169,9 @@ else
 		PATH="$_dir:$PATH"
 	done; unset _dir
 
+	# Save history when remote session times out
+	trap -- 'exit=$?; history -a; kill -HUP 0; exit $exit' HUP
+
 	if [[ $- == *i* ]]; then
 		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
 		# but only if we are a direct descendant of sshd to avoid showing it again when using su/sudo
