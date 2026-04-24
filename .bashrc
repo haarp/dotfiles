@@ -528,8 +528,10 @@ function comp_clone() {
 	command -v "$oldcmd" >/dev/null || return 1
 
 	# this is much faster than __load_completion
-	[[ -f "/usr/share/bash-completion/completions/$oldcmd" ]] && source "/usr/share/bash-completion/completions/$oldcmd"
-	[[ -f "$XDG_DATA_HOME/bash-completion/completions/$oldcmd" ]] && source "$XDG_DATA_HOME/bash-completion/completions/$oldcmd"
+	[[ -f "/usr/share/bash-completion/completions/$oldcmd" ]] \
+		&& source "/usr/share/bash-completion/completions/$oldcmd"
+	[[ -f "$XDG_DATA_HOME/bash-completion/completions/$oldcmd" ]] \
+		&& source "$XDG_DATA_HOME/bash-completion/completions/$oldcmd"
 	completion="$(complete -p "$oldcmd" 2>/dev/null)"
 	[[ "$completion" ]] || return 2
 
