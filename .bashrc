@@ -415,7 +415,7 @@ if [[ $- == *i* ]]; then
 	bind "set visible-stats on"					# show character denoting file type in completions
 
 	## Shell history options
-	if [[ "$HISTFILE" && "$EUID" -ge 1000 ]]; then	# only if it was set to begin with; and user is regular user
+	if [[ "$HISTFILE" && ( "$EUID" -eq 0 || "$EUID" -ge 1000 ) ]]; then	# only if it was set to begin with; and user is regular user or root
 		export HISTFILE="$XDG_STATE_HOME/bash_history"	# XDG (and secure against truncation)
 		[[ -f "$HISTFILE" ]] || mkdir -p "${HISTFILE%/*}"
 	fi
