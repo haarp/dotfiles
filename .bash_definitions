@@ -92,7 +92,9 @@ alias nowrap='less -S -E -X'	# also: setterm --linewrap off, echo -e "\e[?7l"→
 alias ping='ping -D -O -n'; alias ping4='ping4 -D -O -n'; alias ping6='ping6 -D -O -n'	# show timestamp, show missed replies, don't do (misleadingly slow) reverse DNS lookups on each reply
 alias prettyjson='python -m json.tool'	# prettify json (alternative to `jq`)
 alias prettyxml='python -c "import sys, xml.dom.minidom as m; print(m.parse(sys.stdin).toprettyxml())"'	# prettify xml (stdin only)
+alias psql='sudo -u postgres psql'
 alias qrterm='qrencode -t UTF8 -o-'	# output to terminal
+alias redis-cli='REDISCLI_AUTH="$(awk "/^requirepass/ {print \$2}" /etc/redis/redis.conf)" redis-cli'
 alias reset='tput reset'	# reset but without pointless sleep (https://unix.stackexchange.com/a/335650/138699)
 alias resolve='getent hosts'; alias resolve4='getent ahostsv4'; alias resolve6='getent ahostsv6'	# resolve name like libc
 	complete -F _known_hosts resolve resolve4 resolve6
