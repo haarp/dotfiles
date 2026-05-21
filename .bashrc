@@ -61,11 +61,6 @@ function _my_cd() { CDPATH='' _cd "$@"; [[ "$COMPREPLY" ]] || _cd "$@"; }
 complete -F _my_cd -o nospace cd
 CDPATH=".:~:/"
 
-## Source rbenv after setting RBENV_ROOT and PATH
-if [[ -x "$RBENV_ROOT/bin/rbenv" ]]; then
-	source <("$RBENV_ROOT/bin/rbenv" init - --no-rehash bash)
-fi
-
 
 ## Colors! Formatting!
 # https://en.wikipedia.org/wiki/ANSI_escape_code
