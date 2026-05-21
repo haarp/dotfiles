@@ -536,7 +536,7 @@ function comp_clone() {
 comp_clone ssh salt-ssh
 
 
-## Source local files
+## Source local snippets
 for _file in ${ENV_HOME:-$HOME}/.config/bashrc.d/*
 do
 	[[ -e "$_file" ]] && source "$_file"
@@ -608,5 +608,6 @@ PROMPT_COMMAND+=('unset _timer')
 ## Performance profiling tail
 #set +x
 #exec 2>&3 3>&-
+
 
 # vim: set filetype=sh noexpandtab tabstop=4 shiftwidth=4 wrap
