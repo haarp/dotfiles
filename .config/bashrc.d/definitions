@@ -73,7 +73,7 @@ if vercmp "$(python3 --version 2>/dev/null)" "Python 3.8"; then
 else
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server'	## [--bind 127.0.0.1]
 fi
-alias icon-picker='exo-desktop-item-edit -c ~'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
+alias icon-picker='exo-desktop-item-edit -c /dev/null --name foo'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
 alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
 alias intercept='strace -ff -e trace=write -e write=1,2 -p'	# show some process' stdout/stderr
 alias ip='COLORFGBG=";0" ip --color=auto'
