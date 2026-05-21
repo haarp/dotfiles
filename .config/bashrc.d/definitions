@@ -713,17 +713,14 @@ function sensors() {
 		[[ "$prev_line" == "" ]] && sensor_names+="$line"$'\n'
 		prev_line="$line"
 	done <<< "$(command sensors "$@")"
-	local arg args whitelist_next
+	local arg prev_arg args
 	for arg in "$@"; do
-		if [[ "$arg" == "-c" || "$arg" == "--config-file" ]]; then
-			whitelist_next=1
+		if [[ "$arg" == -* ]]; then
 			args+=("$arg")
-		elif [[ "$arg" == -* ]]; then
+		elif [[ "$prev_arg" == "-c" || "$prev_arg" == "--config-file" ]]; then
 			args+=("$arg")
-		elif [[ "$whitelist_next" == 1 ]]; then
-			args+=("$arg")
-			whitelist_next=0
 		fi
+		prev_arg="$arg"
 	done
 	command sensors "${args[@]}" $(sort <<< "$sensor_names")
 }

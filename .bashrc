@@ -542,9 +542,13 @@ function comp_clone() {
 comp_clone ssh salt-ssh
 
 
-## Custom aliases and functions
-shopt -s expand_aliases	# for non-interactive shells
-if [[ -e "${ENV_HOME:-$HOME}/.bash_definitions" ]]; then source "${ENV_HOME:-$HOME}/.bash_definitions"; fi
+## Source local files
+for _file in ${ENV_HOME:-$HOME}/.config/bashrc.d/*
+do
+	[[ -e "$_file" ]] && source "$_file"
+done
+unset _file
+shopt -s expand_aliases    # for non-interactive shells
 
 
 ## Timers and terminal title
