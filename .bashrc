@@ -13,8 +13,7 @@
 [[ $MC_SID ]] && return
 
 ## Source various files, if they exist, in given order
-for _file in	/etc/profile /etc/bash/bashrc /etc/bash.bashrc \
-				/usr/share/bash-completion/bash_completion
+for _file in	/etc/profile /usr/share/bash-completion/bash_completion
 do
 	[[ -f "$_file" ]] && source "$_file"
 done
