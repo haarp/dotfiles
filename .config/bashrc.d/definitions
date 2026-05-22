@@ -35,7 +35,7 @@ alias firejail='firejail --rmenv=LS_COLORS --rmenv=LC_BASHRC'	# make it work (ht
 alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-all \e[1m1:bold/highint\e[0m \e[2m2:dim\e[0m \e[3m3:italic\e[0m \e[4m4:underline\e[0m\n\e[5m5:blink\e[0m \e[7m7:reverse-fg-bg\e[0m 8:\e[8mhide\e[0m(hide) \e[9m9:cross-out\e[0m\n22: disable bold/dim, 2Z:disable above"; echo "X: 3=fg-normal, 9=fg-highintensity, 4=bg-normal, 10=bg-highintensity"; echo "Y:"; for i in {0..7}; do echo -e "\e[3${i}mnormal-$i\e[0m  \e[4${i}mnormal-$i\e[0m  \e[9${i}mhighint-$i\e[0m  \e[10${i}mhighint-$i\e[0m \e[3${i}m\e[2mdim-$i\e[0m  \e[4${i}m\e[2mdim-$i\e[0m"; done; unset i; echo "9=reset"; echo "Powerline symbols:"; echo "\uE0B0: , \uE0B1: , \uE0B2: , \uE0B3: , \uE0A0: , \uE0A1: , \uE0A2: "'	# list standard terminal colors and stuff
 alias glxgears='vblank_mode=0 glxgears'	# no vsync
 alias grep="grep --color=auto"; alias egrep="grep -E"; alias fgrep="grep -F"
-	alias zgrep='zgrep --color=auto';  alias zegrep="zgrep -E"; alias zfgrep="zgrep -F"
+	alias zgrep='zgrep --color=auto'; alias zegrep="zgrep -E"; alias zfgrep="zgrep -F"
 	alias hgrep='history | grep'	# history grep
 alias hexdump='hexdump -C'	# better display
 alias hexencode='od -A none -t x1'
@@ -358,9 +358,9 @@ function changelogs() {
 
 		# changelog files
 		local exists=()
-		local file; for file in "/var/db/repos/*/$name/ChangeLog" \
-		                        "/usr/share/doc/$purename"-[0-9]*/[nN][eE][wW][sS]* \
-		                        "/usr/share/doc/$purename"-[0-9]*/[cC][hH][aA][nN][gG][eE]*
+		local file; for file in	"/var/db/repos/*/$name/ChangeLog" \
+								"/usr/share/doc/$purename"-[0-9]*/[nN][eE][wW][sS]* \
+								"/usr/share/doc/$purename"-[0-9]*/[cC][hH][aA][nN][gG][eE]*
 		do
 			[[ -f $file ]] && exists+=("$file")
 		done

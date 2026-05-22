@@ -542,7 +542,7 @@ do
 	[[ -e "$_file" ]] && source "$_file"
 done
 unset _file
-shopt -s expand_aliases    # for non-interactive shells
+shopt -s expand_aliases	# for non-interactive shells
 
 
 ## Timers and terminal title
