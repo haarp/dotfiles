@@ -126,7 +126,8 @@ if [[ ! "$ENV_HOME" ]]; then
 	elif kill -0 "$(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo "$SSH_AGENT_PID")" 2>/dev/null; then
 		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
 	else
-		ssh-agent > "$XDG_CACHE_HOME/ssh-agent-info"
+		# NOTE: ssh-agent ignores TMPDIR, probably due to being suid (https://stackoverflow.com/q/50006439)
+		ssh-agent -a "/run/user/$UID/ssh-agent.sock" > "$XDG_CACHE_HOME/ssh-agent-info"
 		source "$XDG_CACHE_HOME/ssh-agent-info"
 	fi
 
