@@ -188,7 +188,7 @@ else
 	# Source user bash_profile/bashrc too, if bashrc isn't the same as us (loops!)
 	grep -q "Aut inveniam viam aut faciam" ~/.bashrc &>/dev/null || {
 		if [[ -e ~/.bash_profile ]]; then
-			source ~/.bash_profile
+			source ~/.bash_profile | sed -e '/^$/d' -e 's/^[[:space:]]*//'
 		elif [[ -e ~/.bashrc ]]; then
 			source ~/.bashrc
 		fi
