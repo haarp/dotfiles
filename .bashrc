@@ -119,7 +119,7 @@ function setcursorcolor() { echo -ne "\e]12;${1:?missing arg}\a"; }
 if [[ ! "$ENV_HOME" ]]; then
 	## Master Shell
 
-	# Start SSH agent if there isn't one already running (note: xfce4-session usually starts it)
+	# Start SSH agent if there isn't one already running (NOTE: xfce4-session usually starts it)
 	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
 	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
 		:
