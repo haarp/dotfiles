@@ -499,6 +499,7 @@ export LESSOPEN='|
 	[[ "$(stat -c %%s "$s" 2>/dev/null)" -gt 1000000 ]] && exit 2;
 	pygmentize -g -O style=monokai "$s" 2>/dev/null || exit 1;
 '
+unset LESSCLOSE
 # Security! (http://seclists.org/fulldisclosure/2014/Nov/74)
 # but makes it impossible to open compressed files...
 ###LESS="$LESS --no-lessopen"
