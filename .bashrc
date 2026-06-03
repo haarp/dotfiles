@@ -185,8 +185,14 @@ else
 		[[ -s "$MAILPATH" ]] && echo "You have mail in $MAILPATH"
 	fi
 
-	# Source user bashrc too, if it isn't the same as us (loops!)
-	[[ -f ~/.bashrc ]] && { grep -q "Aut inveniam viam aut faciam" ~/.bashrc || source ~/.bashrc; }
+	# Source user bash_profile/bashrc too, if bashrc isn't the same as us (loops!)
+	grep -q "Aut inveniam viam aut faciam" ~/.bashrc &>/dev/null || {
+		if [[ -e ~/.bash_profile ]]; then
+			source ~/.bash_profile
+		elif [[ -e ~/.bashrc ]]; then
+			source ~/.bashrc
+		fi
+	}
 fi
 
 
