@@ -154,9 +154,6 @@ if [[ ! "$ENV_HOME" ]]; then
 
 else
 	## Slave Shells
-	# Source user bashrc too, if it isn't the same as us (loops!)
-	[[ -f ~/.bashrc ]] && { grep -q "Aut inveniam viam aut faciam" ~/.bashrc || source ~/.bashrc; }
-
 	# Include ENV_HOME bins in PATH
 	for _dir in "$ENV_HOME/bin" "$ENV_HOME/.local/bin"
 	do
@@ -187,6 +184,9 @@ else
 		[[ "$MAILPATH" ]] || MAILPATH="/var/mail/$USER"
 		[[ -s "$MAILPATH" ]] && echo "You have mail in $MAILPATH"
 	fi
+
+	# Source user bashrc too, if it isn't the same as us (loops!)
+	[[ -f ~/.bashrc ]] && { grep -q "Aut inveniam viam aut faciam" ~/.bashrc || source ~/.bashrc; }
 fi
 
 
