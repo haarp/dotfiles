@@ -175,7 +175,7 @@ else
 			last=$(last -n 2 --fullnames --time-format iso "$USER")
 			read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 			[[ "$addr" ]] && echo "Last login: ${start/T/ } from $addr on $tty"
-			for ip in 4 6; do ip -br --color=always -$ip addr show scope global primary; done
+			for ip in 4 6; do ip -br -c -$ip addr show scope global primary; done
 		fi )
 		# and mail
 		[[ "$MAILPATH" ]] || MAILPATH="/var/mail/$USER"
