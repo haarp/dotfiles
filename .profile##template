@@ -45,6 +45,7 @@ export NO_AT_BRIDGE=1
 export QT_ENABLE_HIGHDPI_SCALING=0
 export QT_SCREEN_SCALE_FACTORS=1.0
 # Make QT copy GTK's style (needs dev-qt/qtstyleplugins?) (https://wiki.archlinux.org/title/Uniform_look_for_Qt_and_GTK_applications#QGtk3Style)
+# or `qt5-style-plugins`?
 export QT_QPA_PLATFORMTHEME=gtk3
 # Make QT not scan Wifi all the fucking time (https://www.lesswrong.com/posts/8hxvfZiqH24oqyr6y/wireless-is-a-trap https://apple.stackexchange.com/a/312388)
 export QT_BEARER_POLL_TIMEOUT=-1
