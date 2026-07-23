@@ -116,6 +116,21 @@ declare -A c=(	# cursor styles
 function setcursorcolor() { echo -ne "\e]12;${1:?missing arg}\a"; }
 
 
+## Custom command-not-found handler
+# put before most commands to avoid "did you mean" spam
+function command_not_found_handle() {
+	local cmd="${f[u~]}${u[R]}$1${f[~u]}${u[x]}"
+	local responses=(
+		"What did you think $cmd was, dumb meatbag?!"
+		"The arcane spirits reject your incantation: $cmd."
+		"$cmd? I barely know her!"
+		"If you gaze into $cmd long enough, it gazes back into you."
+	)
+	echo "${responses[ $RANDOM % ${#responses[@]} ]}" >&2
+	return 127
+}
+
+
 if [[ ! "$ENV_HOME" ]]; then
 	## Master Shell
 
@@ -508,19 +523,6 @@ unset LESSCLOSE
 # but makes it impossible to open compressed files...
 ###LESS="$LESS --no-lessopen"
 
-
-## Custom command-not-found handler
-function command_not_found_handle() {
-	local cmd="${f[u~]}${u[R]}$1${f[~u]}${u[x]}"
-	local responses=(
-		"What did you think $cmd was, dumb meatbag?!"
-		"The arcane spirits reject your incantation: $cmd."
-		"$cmd? I barely know her!"
-		"If you gaze into $cmd long enough, it gazes back into you."
-	)
-	echo "${responses[ $RANDOM % ${#responses[@]} ]}" >&2
-	return 127
-}
 
 ## Custom completions
 # clone completions from command $1 to $2 [$3, $4, ...]
