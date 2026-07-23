@@ -67,7 +67,7 @@
 	tags = tag
 
 	# undo shit
-	unstage = reset -q HEAD --
+	unstage = reset --quiet HEAD --
 	discard = checkout --
 	uncommit = reset --mixed HEAD~
 	amend = commit --amend
