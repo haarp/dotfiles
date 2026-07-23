@@ -8,7 +8,9 @@ include "%L"						# import the default Compose file for the locale
 include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 
 ### Custom
-# Superscript
+
+# Script
+## Superscript
 <Multi_key> <asciicircum> <0>			: "⁰"
 <Multi_key> <asciicircum> <1>			: "¹"
 <Multi_key> <asciicircum> <2>			: "²"
@@ -73,8 +75,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <asciicircum> <x>			: "ˣ"
 <Multi_key> <asciicircum> <y>			: "ʸ"
 <Multi_key> <asciicircum> <z>			: "ᶻ"
-
-# Subscript
+## Subscript
 <Multi_key> <underscore> <0>			: "₀"
 <Multi_key> <underscore> <1>			: "₁"
 <Multi_key> <underscore> <2>			: "₂"
@@ -110,70 +111,73 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <underscore> <x>			: "ₓ"
 
 # Greek letters (same as Emacs)
-<Multi_key> <asterisk> <a>					: "α"	# GREEK SMALL LETTER ALPHA
-<Multi_key> <asterisk> <b>					: "β"	# GREEK SMALL LETTER BETA
+## Lowercase
+<Multi_key> <asterisk> <a>					: "α"	# alpha
+<Multi_key> <asterisk> <b>					: "β"	# beta
 <Multi_key> <asciicircum> <asterisk> <b>	: "ᵝ"
 <Multi_key> <underscore> <asterisk> <b>		: "ᵦ"
-<Multi_key> <asterisk> <c>					: "ψ"	# GREEK SMALL LETTER PSI
-<Multi_key> <asterisk> <d>					: "δ"	# GREEK SMALL LETTER DELTA
+<Multi_key> <asterisk> <c>					: "ψ"	# psi
+<Multi_key> <asterisk> <d>					: "δ"	# delta
 <Multi_key> <asciicircum> <asterisk> <d>	: "ᵟ"
-<Multi_key> <asterisk> <e>					: "ε"	# GREEK SMALL LETTER EPSILON
-<Multi_key> <asterisk> <f>					: "φ"	# GREEK SMALL LETTER PHI
+<Multi_key> <asterisk> <e>					: "ε"	# epsilon
+<Multi_key> <asterisk> <f>					: "φ"	# phi
 <Multi_key> <asciicircum> <asterisk> <f>	: "ᵠ"
 <Multi_key> <underscore> <asterisk> <f>		: "ᵩ"
-<Multi_key> <asterisk> <g>					: "γ"	# GREEK SMALL LETTER GAMMA
+<Multi_key> <asterisk> <g>					: "γ"	# gamma
 <Multi_key> <asciicircum> <asterisk> <g>	: "ᵞ"
 <Multi_key> <underscore> <asterisk> <g>		: "ᵧ"
-<Multi_key> <asterisk> <h>					: "η"	# GREEK SMALL LETTER ΕΤΑ
-<Multi_key> <e> <f> <f>						: "η"	# GREEK SMALL LETTER ΕΤΑ
-<Multi_key> <asterisk> <i>					: "ι"	# GREEK SMALL LETTER ΙΟΤΑ
-<Multi_key> <asterisk> <j>					: "ξ"	# GREEK SMALL LETTER XI
-<Multi_key> <asterisk> <k>					: "κ"	# GREEK SMALL LETTER KAPPA
-<Multi_key> <asterisk> <l>					: "λ"	# GREEK SMALL LETTER LAMBDA
-<Multi_key> <asterisk> <m>					: "μ"	# GREEK SMALL LETTER MU
-<Multi_key> <m> <u>							: "μ"	# GREEK SMALL LETTER MU
-<Multi_key> <asterisk> <n>					: "ν"	# GREEK SMALL LETTER NU
-<Multi_key> <asterisk> <o>					: "ο"	# GREEK SMALL LETTER OMICRON
-<Multi_key> <asterisk> <p>					: "π"	# GREEK SMALL LETTER PI
-<Multi_key> <p> <i>							: "π"	# GREEK SMALL LETTER PI
-<Multi_key> <asterisk> <r>					: "ρ"	# GREEK SMALL LETTER RHO
+<Multi_key> <asterisk> <h>					: "η"	# eta
+<Multi_key> <e> <f> <f>						: "η"
+<Multi_key> <asterisk> <i>					: "ι"	# iota
+<Multi_key> <asterisk> <j>					: "ξ"	# xi
+<Multi_key> <asterisk> <k>					: "κ"	# kappa
+<Multi_key> <asterisk> <l>					: "λ"	# lambda
+<Multi_key> <asterisk> <m>					: "μ"	# mu
+<Multi_key> <m> <u>							: "μ"
+<Multi_key> <bar> <u>						: "μ"
+<Multi_key> <asterisk> <n>					: "ν"	# nu
+<Multi_key> <asterisk> <o>					: "ο"	# omicron
+<Multi_key> <asterisk> <p>					: "π"	# pi
+<Multi_key> <p> <i>							: "π"
+<Multi_key> <asterisk> <r>					: "ρ"	# rho
 <Multi_key> <underscore> <asterisk> <r>		: "ᵨ"
-<Multi_key> <asterisk> <s>					: "σ"	# GREEK SMALL LETTER SIGMA
-<Multi_key> <asterisk> <t>					: "τ"	# GREEK SMALL LETTER TAU
-<Multi_key> <asterisk> <u>					: "θ"	# GREEK SMALL LETTER THETA
+<Multi_key> <asterisk> <s>					: "σ"	# sigma
+<Multi_key> <asterisk> <t>					: "τ"	# tau
+<Multi_key> <asterisk> <u>					: "θ"	# theta
 <Multi_key> <asciicircum> <asterisk> <u>	: "ᶿ"
-<Multi_key> <asterisk> <v>					: "ω"	# GREEK SMALL LETTER OMEGA
-<Multi_key> <asterisk> <w>					: "ς"	# GREEK SMALL LETTER FINAL SIGMA
-<Multi_key> <asterisk> <x>					: "χ"	# GREEK SMALL LETTER CHI
+<Multi_key> <asterisk> <v>					: "ω"	# omega
+<Multi_key> <asterisk> <w>					: "ς"	# final sigma
+<Multi_key> <asterisk> <x>					: "χ"	# chi
 <Multi_key> <asciicircum> <asterisk> <x>	: "ᵡ"
 <Multi_key> <underscore> <asterisk> <x>		: "ᵪ"
-<Multi_key> <asterisk> <y>					: "υ"	# GREEK SMALL LETTER UPSILON
-<Multi_key> <asterisk> <z>					: "ζ"	# GREEK SMALL LETTER ZETA
-<Multi_key> <asterisk> <A>					: "Α"	# GREEK CAPITAL LETTER ALPHA
-<Multi_key> <asterisk> <B>					: "Β"	# GREEK CAPITAL LETTER BETA
-<Multi_key> <asterisk> <C>					: "Ψ"	# GREEK CAPITAL LETTER PSI
-<Multi_key> <asterisk> <D>					: "Δ"	# GREEK CAPITAL LETTER DELTA
-<Multi_key> <asterisk> <E>					: "Ε"	# GREEK CAPITAL LETTER EPSILON
-<Multi_key> <asterisk> <F>					: "Φ"	# GREEK CAPITAL LETTER PHI
-<Multi_key> <asterisk> <G>					: "Γ"	# GREEK CAPITAL LETTER GAMMA
-<Multi_key> <asterisk> <H>					: "Η"	# GREEK CAPITAL LETTER ΕΤΑ
-<Multi_key> <asterisk> <I>					: "Ι"	# GREEK CAPITAL LETTER ΙΟΤΑ
-<Multi_key> <asterisk> <J>					: "Ξ"	# GREEK CAPITAL LETTER XI
-<Multi_key> <asterisk> <K>					: "Κ"	# GREEK CAPITAL LETTER KAPPA
-<Multi_key> <asterisk> <L>					: "Λ"	# GREEK CAPITAL LETTER LAMBDA
-<Multi_key> <asterisk> <M>					: "Μ"	# GREEK CAPITAL LETTER MU
-<Multi_key> <asterisk> <N>					: "Ν"	# GREEK CAPITAL LETTER NU
-<Multi_key> <asterisk> <O>					: "Ο"	# GREEK CAPITAL LETTER OMICRON
-<Multi_key> <asterisk> <P>					: "Π"	# GREEK CAPITAL LETTER PI
-<Multi_key> <asterisk> <R>					: "Ρ"	# GREEK CAPITAL LETTER RHO
-<Multi_key> <asterisk> <S>					: "Σ"	# GREEK CAPITAL LETTER SIGMA
-<Multi_key> <asterisk> <T>					: "Τ"	# GREEK CAPITAL LETTER TAU
-<Multi_key> <asterisk> <U>					: "Θ"	# GREEK CAPITAL LETTER THETA
-<Multi_key> <asterisk> <V>					: "Ω"	# GREEK CAPITAL LETTER OMEGA
-<Multi_key> <o> <h> <m>						: "Ω"	# GREEK CAPITAL LETTER OMEGA
-<Multi_key> <asterisk> <X>					: "Χ"	# GREEK CAPITAL LETTER CHI
-<Multi_key> <asterisk> <Y>					: "Υ"	# GREEK CAPITAL LETTER UPSILON
-<Multi_key> <asterisk> <Z>					: "Ζ"	# GREEK CAPITAL LETTER ZETA
+<Multi_key> <asterisk> <y>					: "υ"	# upsilon
+<Multi_key> <asterisk> <z>					: "ζ"	# zeta
+## Uppercase
+<Multi_key> <asterisk> <A>					: "Α"	# alpha
+<Multi_key> <asterisk> <B>					: "Β"	# beta
+<Multi_key> <asterisk> <C>					: "Ψ"	# psi
+<Multi_key> <asterisk> <D>					: "Δ"	# delta
+<Multi_key> <asterisk> <E>					: "Ε"	# epsilon
+<Multi_key> <asterisk> <F>					: "Φ"	# phi
+<Multi_key> <asterisk> <G>					: "Γ"	# gamma
+<Multi_key> <asterisk> <H>					: "Η"	# eta
+<Multi_key> <asterisk> <I>					: "Ι"	# iota
+<Multi_key> <asterisk> <J>					: "Ξ"	# xi
+<Multi_key> <asterisk> <K>					: "Κ"	# kappa
+<Multi_key> <asterisk> <L>					: "Λ"	# lambda
+<Multi_key> <asterisk> <M>					: "Μ"	# mu
+<Multi_key> <asterisk> <N>					: "Ν"	# nu
+<Multi_key> <asterisk> <O>					: "Ο"	# omicron
+<Multi_key> <asterisk> <P>					: "Π"	# pi
+<Multi_key> <asterisk> <R>					: "Ρ"	# rho
+<Multi_key> <asterisk> <S>					: "Σ"	# sigma
+<Multi_key> <asterisk> <T>					: "Τ"	# tau
+<Multi_key> <asterisk> <U>					: "Θ"	# theta
+<Multi_key> <asterisk> <V>					: "Ω"	# omega
+<Multi_key> <o> <h> <m>						: "Ω"
+<Multi_key> <asterisk> <X>					: "Χ"	# chi
+<Multi_key> <asterisk> <Y>					: "Υ"	# upsilon
+<Multi_key> <asterisk> <Z>					: "Ζ"	# zeta
 
 # Arrows
 <Multi_key> <less> <minus>				: "←"
@@ -192,7 +196,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 # Math
 <Multi_key> <0> <0>					: "∞"
 <Multi_key> <i> <n> <f>				: "∞"
-<Multi_key> <minus> <plus> 			: "∓"	# replaces plusminus on this
+<Multi_key> <minus> <plus> 			: "∓"	# replaces plusminus
 <Multi_key> <exclam> <equal>		: "≠"
 <Multi_key> <asciitilde> <equal>	: "≈"
 <Multi_key> <equal> <asciitilde>	: "≈"
@@ -204,6 +208,10 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <greater> <equal>		: "≥"
 <Multi_key> <parenleft> <E>			: "∈"
 <Multi_key> <E> <parenleft>			: "∈"
+<Multi_key> <exclam> <parenleft> <E>: "∉"
+<Multi_key> <exclam> <E> <parenleft>: "∉"
+<Multi_key> <s> <q> <r> <t>			: "√"
+<Multi_key> <c> <b> <r> <t>			: "∛"
 <Multi_key> <s> <u> <m>				: "∑"
 <Multi_key> <i> <n> <t>				: "∫"
 <Multi_key> <bar> <C>				: "ℂ"	# complex numbers
@@ -211,6 +219,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <bar> <Q>				: "ℚ"	# rational numbers
 <Multi_key> <bar> <R>				: "ℝ"	# real numbers
 <Multi_key> <bar> <Z>				: "ℤ"	# integers
+<Multi_key> <bar> <P>				: "ℙ"	# primes
 
 # Bitcoin
 <Multi_key> <b> <t> <c>				: "₿"
@@ -219,6 +228,7 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <bar> <B>				: "₿"
 
 # Spaces
+<Multi_key> <space> <space>			: " "	# Non-breaking space
 <Multi_key> <n> <b> <s> <p>			: " "	# Non-breaking space
 <Multi_key> <space> <0>				: "​"	# Zero-width space
 <Multi_key> <minus> <space>			: "­"	# Soft hyphen
@@ -229,8 +239,8 @@ include "%S/en_US.UTF-8/Compose"	# import UTF-8 Compose sequences
 <Multi_key> <a> <t> <o> <m>					: "⚛"
 <Multi_key> <r> <a> <d>						: "☢"
 <Multi_key> <b> <i> <o>						: "☣"
-<Multi_key> <z> <a> <p>						: "↯"
-<Multi_key> <h> <v>							: "⚡"
+<Multi_key> <h> <v>							: "↯"
+<Multi_key> <z> <a> <p>						: "⚡"
 <Multi_key> <c> <c> <c> <p>					: "☭"
 <Multi_key> <6> <6> <6>						: "⛧"
 <Multi_key> <o> <minus> <plus>				: "♀"
