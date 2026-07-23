@@ -258,7 +258,7 @@ else
 fi
 # yellow text on production
 if [[ "$HOSTNAME" == *prod* ]]
-	then PS1+='\[${fg[Y]}\]\h\[${fg[KK]}\]'
+	then PS1+='\[${fg[y]}\]\h\[${fg[KK]}\]'
 	else PS1+='\h'
 fi
 # if screen sessions >0: session count
