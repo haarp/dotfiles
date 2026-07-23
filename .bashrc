@@ -317,9 +317,9 @@ PS1+='\[${f[x]}\]'
 PS2='\[${fg[Y]}\]\[${fg[x]}\]'
 
 # Terminal title used while idle (prompt-like)
-PST1='[\u@$(hostname -f)]: \w $( _format_seconds $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
+PST1='[\u@$(hostname -f)]: \w $( _format_seconds $(($SECONDS - ${_timer:-0})) )(\D{%a} \t) {$BASHPID}'
 # Terminal title used while running command (prompt-like)
-PST2='\c [@\h] (\t) {$BASHPID}'
+PST2='\c [@\h] (\D{%a} \t) {$BASHPID}'
 
 
 # Re-enable echo with each prompt (view term settings with stty -a)
