@@ -67,6 +67,7 @@ alias hs='echo "Saving history now!"; history -a'
 	alias whoops='echo "Purging from memory history: $(fc -l -n -1)"; history -d -1; history -d -1'	# purge last command from history (and whoops itself)
 	alias suicide='nh; exit'	# exit without saving history
 	alias hgrep='history | grep'	# history grep
+	alias ghist='less ~/.bash_history'  # show generic history
 if vercmp "$(python3 --version 2>/dev/null)" "Python 3.8"; then
 	# https://stackoverflow.com/a/55501674/5424487
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server --bind ::'
