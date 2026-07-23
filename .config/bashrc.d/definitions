@@ -185,6 +185,11 @@ function mv() {
 function cert() {
 	openssl x509 -noout -text -certopt no_sigdump,no_pubkey < "${1:?missing filename}"
 }
+# Grab site's cert info
+function certs() {
+	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null \
+		| openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+}
 
 # Sensible recursive chmod
 function chmodr() {
