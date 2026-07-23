@@ -13,6 +13,21 @@ TYPE="$5"
 image_thumb() {
 	convert -thumbnail "$3" "$1" "$2" &>/dev/null
 }
+gimp_thumb() {
+	echo "
+		(let* ( (img (car (gimp-file-load RUN-NONINTERACTIVE \"$1\" \"$1\"))) )
+			(gimp-image-merge-visible-layers img CLIP-TO-IMAGE)
+			(gimp-image-scale img ${3%x*} ${3#*x})
+			(file-png-save RUN-NONINTERACTIVE
+				img
+				(car (gimp-image-get-active-layer img))
+				\"$2\" \"$2\"
+				0 9 0 0 0 0 0)
+			(gimp-image-delete img)
+		)
+		(gimp-quit 0)
+	" | gimp -i -b - &>/dev/null
+}
 media_thumb() {
 	ffmpeg -i "$1" -an -vf scale="'if(gt(iw\,ih),$3,-1)':'if(gt(iw\,ih),-1,$3)'" -y "$2" &>/dev/null
 }
@@ -44,6 +59,14 @@ fail() {
 }
 
 case $TYPE in
+	# generic images
+	image)
+		image_thumb "$INPUT" "$OUTPUT" "$SIZE"
+		;;
+	# Gimp XCFs
+	gimp)
+		gimp_thumb "$INPUT" "$OUTPUT" "$SIZE"
+		;;
 	# cover art for audio files
 	cover)
 		media_thumb "$INPUT" "$OUTPUT" "$SIZE"
