@@ -36,7 +36,6 @@ alias format='echo "\\e[ZmFOO OR \\e[XYmFOO"; echo "Z:"; echo -e "\e[0m0:reset-a
 alias glxgears='vblank_mode=0 glxgears'	# no vsync
 alias grep="grep --color=auto"; alias egrep="grep -E"; alias fgrep="grep -F"
 	alias zgrep='zgrep --color=auto'; alias zegrep="zgrep -E"; alias zfgrep="zgrep -F"
-	alias hgrep='history | grep'	# history grep
 alias hexdump='hexdump -C'	# better display
 alias hexencode='od -A none -t x1'
 alias hexencode2='od -A none -t x2'
@@ -67,6 +66,7 @@ alias hs='echo "Saving history now!"; history -a'
 	alias nh='echo "History saving disabled!"; unset HISTFILE'
 	alias whoops='echo "Purging from memory history: $(fc -l -n -1)"; history -d -1; history -d -1'	# purge last command from history (and whoops itself)
 	alias suicide='nh; exit'	# exit without saving history
+	alias hgrep='history | grep'	# history grep
 if vercmp "$(python3 --version 2>/dev/null)" "Python 3.8"; then
 	# https://stackoverflow.com/a/55501674/5424487
 	alias httpserver='ip -o addr show scope global primary | awk "{print \$2,\$4}"; python3 -m http.server --bind ::'
