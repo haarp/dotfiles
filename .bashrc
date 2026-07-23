@@ -468,7 +468,7 @@ fi
 
 ## Personal preferences
 [[ $- == *i* ]] && tabs -4
-export EDITOR="mcedit -d"	# see aliases below
+which mcedit >/dev/null && export EDITOR="mcedit -d"	# see aliases below
 # FIXME: viewer in mc shows previous dir's terminal title
 export PAGER="less"
 
