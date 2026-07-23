@@ -181,10 +181,9 @@ function mv() {
 	fi
 }
 
-# Grab site's cert info
+# Show cert file's info
 function cert() {
-	openssl s_client -connect "${1:?missing url}":443 -servername "$1" </dev/null \
-		| openssl x509 -noout -text -certopt no_sigdump,no_pubkey
+	openssl x509 -noout -text -certopt no_sigdump,no_pubkey < "${1:?missing filename}"
 }
 
 # Sensible recursive chmod
