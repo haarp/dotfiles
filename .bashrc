@@ -317,7 +317,7 @@ PS1+='\[${f[x]}\]'
 PS2='\[${fg[Y]}\]\[${fg[x]}\]'
 
 # Terminal title used while idle (prompt-like)
-PST1='[\u@\h]: \w $( _format_seconds $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
+PST1='[\u@$(hostname -f)]: \w $( _format_seconds $(($SECONDS - ${_timer:-0})) )(\t) {$BASHPID}'
 # Terminal title used while running command (prompt-like)
 PST2='\c [@\h] (\t) {$BASHPID}'
 
