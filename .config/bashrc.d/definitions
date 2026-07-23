@@ -734,9 +734,7 @@ function shellcheck() {
 }
 
 # Network throughput testing
-# http://speedtest-ams2.digitalocean.com/
-# http://cachefly.cachefly.net/100mb.test
-alias speedtest='curl --parallel http://speedtest-fra1.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams2.digitalocean.com/5gb.test -o /dev/null http://speedtest-ams3.digitalocean.com/5gb.test -o /dev/null'
+alias speedtest='curl --parallel http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null'
 alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
 alias speedtest.erppc.down.slow='curl https://erppc.net/infinite.php?slow=1 -o /dev/null'
 alias speedtest.erppc.up='dd if=/dev/zero bs=1M status=none | curl -T - https://erppc.net/infinite.php -o /dev/null'
