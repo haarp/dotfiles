@@ -222,6 +222,9 @@ PROMPT_COMMAND=()
 PS1=''
 # reset to all bold black text
 PS1+='\[${f[x]}${f[b]}${fg[KK]}\]'
+# Debian chroot
+[[ ! "$debian_chroot" ]] && [[ -r /etc/debian_chroot ]] && debian_chroot="$(< /etc/debian_chroot)"
+PS1+="${debian_chroot:+\[${bg[w]}\]($debian_chroot)}"
 # if exit status >0: exit code (useful symbol: ↯)
 PROMPT_COMMAND+=('_exit=$?')	# this needs to be the first cmd in PROMPT_COMMAND
 PS1+='$( [[ $_exit -gt 0 ]] && echo -n "\[${bg[Y]}\]$_exit" )'
