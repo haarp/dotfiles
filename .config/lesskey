@@ -1,10 +1,10 @@
 # man lesskey
 
-# F2, c : toggle line wrapping/chop
-\eOQ	toggle-option S
-c		toggle-option S
+# F2, c : toggle line wrapping aka chop (without confirmation)
+\eOQ	toggle-option ^PS
+c		toggle-option ^PS
 
-# F3, F10: quit like mcview
+# F3, F10: quit as in mcview
 \eOR	quit
 \e[21~	quit
 
