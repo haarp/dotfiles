@@ -159,7 +159,7 @@ if [[ ! "$ENV_HOME" ]]; then
 	if [[ $TERM == linux ]]; then
 		setfont ter-v14n	# Terminus (see /usr/share/consolefonts/README.terminus)
 		tput cvvis			# block-shaped cursor
-		TMOUT="1800"			# log out after 30 min inactivity
+		TMOUT="1800"		# log out after 30 min inactivity
 	fi
 
 	## Empty (not remove!) mc histories/filepos on login
