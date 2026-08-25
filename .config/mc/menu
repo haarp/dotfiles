@@ -1,37 +1,38 @@
 shell_patterns=0
 
+# see `man mc` "Edit Menu File"
+# also see https://github.com/MidnightCommander/mc/blob/master/misc/mc.menu.in
+
 +
 ! Create empty file
-	f=%{filename}
+	f=%{Filename}
 	touch "$f"
 
-+ t d
-3 Compress the current subdirectory (tar.gz)
-	Pwd=`basename %d /`
-	echo -n "Name of the compressed file (without extension) [$Pwd]: "
-	read tar
-	[ "$tar"x = x ] && tar="$Pwd"
-	cd .. && \
-	tar cf - "$Pwd" | gzip -f9 > "$tar.tar.gz" && \
-	echo "../$tar.tar.gz created."
++ (t d & ! t t) | t t
+c Recursive chmod dir(s) with chmodr
+	mode=%{Octal *file* mode}
+	export mode
+	unset MC_SID
+	bash -i -c 'chmodr "$mode" %s'
 
-6 Compress the current subdirectory (tar.xz)
-	Pwd=`basename %d /`
-	echo -n "Name of the compressed file (without extension) [$Pwd]: "
-	read tar
-	[ "$tar"x = x ] && tar="$Pwd"
-	cd .. && \
-	tar cf - "$Pwd" | xz -f > "$tar.tar.xz" && \
-	echo "../$tar.tar.xz created."
++
+3 Compress file(s) (tar.gz)
+	pwd=$(basename %d /)
+	read -r -p "Archive name (without extension) [$pwd]: " name
+	[ -z "$name" ] && name="$pwd"
+	tar cf "$name.tar.gz" -z %s
 
-+ t r & ! t t
-a Append file to opposite
-	cat "%f" >> "%D/%f"
++
+6 Compress file(s) (tar.xz)
+	pwd=$(basename %d /)
+	read -r -p "Archive name (without extension) [$pwd]: " name
+	[ -z "$name" ] && name="$pwd"
+	tar cf "$name.tar.xz" -J %s
 
-+ t t
-A Append files to opposite files
-	for i in %t ; do
-		cat "$i" >> "%D/$i"
++ t r | t t
+A Append files(s) to opposite file(s) of same name
+	for f in %s ; do
+		cat "$f" >> "%D/$f"
 	done
 
 + t r & ! t t
