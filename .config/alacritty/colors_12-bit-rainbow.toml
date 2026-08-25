@@ -1,36 +1,36 @@
 # https://iamkate.com/data/12-bit-rainbow/
 
 [colors.primary]
-foreground        = '#cdcdcd'
-background        = '#040404'
-bright_foreground = "#efefef"
+foreground        = '#dddddd'
+background        = '#111111'
+bright_foreground = "#eeeeee"
 
 [colors.cursor]
-cursor = '#eedd00'
+cursor = '#ee00aa'
 text   = '#000000'
 
 [colors.selection]
-background = '#606060'
-text       = '#ffffff'
+text       = '#222222'
+background = '#bbaa00'
 
 [colors.normal]
-black   = '#2d2d2d'
+black   = '#333333'
 red     = '#aa3355'
 green   = '#44dd88'
 yellow  = '#ee9944'
 blue    = '#3366bb'
 magenta = '#663399'
 cyan    = '#00bbcc'
-white   = '#bcbcbc'
+white   = '#bbbbbb'
 
 [colors.bright]
-black   = '#4f4f4f'
+black   = '#555555'
 red     = '#cc6666'
 green   = '#99dd55'
 yellow  = '#eedd00'
 blue    = '#0099cc'
 magenta = '#881177'
 cyan    = '#22ccbb'
-white   = '#dedede'
+white   = '#cccccc'
 
 # vim: set filetype=toml noexpandtab tabstop=4 shiftwidth=4
