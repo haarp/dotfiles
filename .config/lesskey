@@ -11,6 +11,10 @@ c		toggle-option ^PS
 # F7: search w/ wraparound (https://unix.stackexchange.com/a/621514)
 \e[18~	forw-search ^W
 
-# , .: switch files
+# comma, period: switch files
 ,		prev-file
 .		next-file
+
+# shift+pgup/pgdn: scroll 5 pages at once
+\e[5;2~	noaction bbbbb
+\e[6;2~	noaction fffff
