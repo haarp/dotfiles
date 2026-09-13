@@ -187,7 +187,7 @@ else
 			echo "${bg[m]}$(hostname -f)${bg[x]}"
 			echo "$(source /etc/os-release && echo "$PRETTY_NAME") - $(uname -sr)"
 			echo $(uptime)
-			last=$(last -n 2 --fullnames --time-format iso "$USER")
+			last=$(last --help 2>&1 | grep -qe '-n' && last -n 2 --fullnames --time-format iso "$USER")
 			read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 			[[ "$addr" ]] && echo "Last login: ${start/T/ } from $addr on $tty"
 			for ip in 4 6; do ip -br -c -$ip addr show scope global primary; done \
@@ -226,7 +226,7 @@ unset _locales _fallback _cat
 
 
 ## Version compare (returns 0 if $1 ≥ $2 )
-function vercmp() {	<<< "$2"$'\n'"$1" sort --check=quiet --version-sort && return 0 || return 1; }
+function vercmp() {	<<< "$2"$'\n'"$1" sort -c -V 2>/dev/null && return 0 || return 1; }
 
 
 ## Colorful bash prompt with goodies
@@ -467,15 +467,17 @@ fi
 
 
 ## Personal preferences
-[[ $- == *i* ]] && tabs -4
+[[ $- == *i* ]] && which tabs >/dev/null && tabs -4
 which mcedit >/dev/null && export EDITOR="mcedit -d"	# see aliases below
 # FIXME: viewer in mc shows previous dir's terminal title
 export PAGER="less"
 
 ## Colorful ls
-if [[ -r "$XDG_CONFIG_HOME/DIR_COLORS" ]]
-	then source <(dircolors -b "$XDG_CONFIG_HOME/DIR_COLORS")
-	else source <(dircolors -b)
+if which dircolors >/dev/null; then
+	if [[ -r "$XDG_CONFIG_HOME/DIR_COLORS" ]]
+		then source <(dircolors -b "$XDG_CONFIG_HOME/DIR_COLORS")
+		else source <(dircolors -b)
+	fi
 fi
 
 ## Colorful less and manpages (https://unix.stackexchange.com/a/108840)
@@ -500,8 +502,10 @@ fi
 export GCC_COLORS="error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01"	# warnings and errors
 export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=36:ln=32:bn=32:se=35"	# more visible filename
 export LESS="-RiMQ --follow-name --tabs=4"	# color escapes, case-insensitive search, better prompt, no bell (blocks on older less!), follow filename not inode, tab width
-vercmp "$(less --version | head -n1)" "less 581" && LESS+=" --use-color"	# distinct meta colors
-vercmp "$(less --version | head -n1)" "less 632" && LESS+=" --wordwrap"		# wrap at word boundaries
+lessver="$(less --version 2>/dev/null | head -n1)"
+vercmp "$lessver" "less 581" && LESS+=" --use-color"	# distinct meta colors
+vercmp "$lessver" "less 632" && LESS+=" --wordwrap"		# wrap at word boundaries
+unset lessver
 export SUDO_PROMPT="[sudo] %p  "	# target username and padlock char
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"

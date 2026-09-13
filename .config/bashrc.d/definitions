@@ -84,8 +84,12 @@ alias iperppc='curl -s https://erppc.net/ip.php'
 alias ipg='dig @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg4='dig -4 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'; alias ipg6='dig -6 @ns1.google.com o-o.myaddr.l.google.com TXT +short | tr -d \"'
 alias ipi='curl -s https://icanhazip.com'; alias ipi4='curl -s https://ipv4.icanhazip.com'; alias ipi6='curl -s https://ipv6.icanhazip.com'
 alias lessraw='less --no-lessopen'	# don't interpret anything, don't open in hex mode
-alias l="ls -la"; alias lt="ls --sort=time"
-alias ls='ls --human --color=auto --classify --group-directories-first'
+if ls --help 2>&1 | grep -qe '--classify'; then
+	alias ls='ls -h --color=auto --group-directories-first --classify'
+else
+	alias ls='ls -h --color=auto --group-directories-first'
+fi
+	alias l="ls -la"; alias lt="ls --sort=time"
 alias lspci2='lspci -nnk'
 alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# disable annoying mouse
 alias mount2='findmnt --real -t nosquashfs,nofuse.portal'
