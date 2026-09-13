@@ -134,12 +134,14 @@ function command_not_found_handle() {
 if [[ ! "$ENV_HOME" ]]; then
 	## Master Shell
 
-	# Start SSH agent if there isn't one already running (NOTE: xfce4-session usually starts it)
-	# try to read it from config if we don't have it but agent is running (e.g. vt, ssh login)
+	# SSH agent
+	# already running?
 	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
 		:
+	# try to read from info file if we lack the env vars but it's running (e.g. vt, ssh login)
 	elif kill -0 "$(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo "$SSH_AGENT_PID")" 2>/dev/null; then
 		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
+	# otherwise start it
 	else
 		# NOTE: ssh-agent ignores TMPDIR, probably due to being suid (https://stackoverflow.com/q/50006439)
 		ssh-agent -a "${XDG_RUNTIME_DIR:-/run/user/$UID/ssh-agent.sock}" > "$XDG_CACHE_HOME/ssh-agent-info"
