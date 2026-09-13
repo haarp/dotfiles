@@ -142,7 +142,7 @@ if [[ ! "$ENV_HOME" ]]; then
 		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
 	else
 		# NOTE: ssh-agent ignores TMPDIR, probably due to being suid (https://stackoverflow.com/q/50006439)
-		ssh-agent -a "/run/user/$UID/ssh-agent.sock" > "$XDG_CACHE_HOME/ssh-agent-info"
+		ssh-agent -a "${XDG_RUNTIME_DIR:-/run/user/$UID/ssh-agent.sock}" > "$XDG_CACHE_HOME/ssh-agent-info"
 		source "$XDG_CACHE_HOME/ssh-agent-info"
 	fi
 
