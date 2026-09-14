@@ -189,7 +189,7 @@ else
 			echo "${bg[m]}$(hostname -f)${bg[x]}"
 			echo "$(source /etc/os-release && echo "$PRETTY_NAME") - $(uname -sr)"
 			echo $(uptime)
-			last=$(last --help 2>&1 | grep -qe '-n' && last -n 2 --fullnames --time-format iso "$USER")
+			last=$(last -n 2 --fullnames --time-format iso "$USER" 2>/dev/null)
 			read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 			[[ "$addr" ]] && echo "Last login: ${start/T/ } from $addr on $tty"
 			for ip in 4 6; do ip -br -c -$ip addr show scope global primary; done \
