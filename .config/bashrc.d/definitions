@@ -314,9 +314,9 @@ function editln() {
 	if [[ -n "$2" ]]; then
 		ln -vsfT -- "$2" "$1"
 	else
-		( cd "$(dirname "$1")"	# for tab completion
+		( cd "$(dirname "$1")" >/dev/null	# for tab completion
 		read -rei "$old" new
-		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "$1"
+		[[ -n "$new" && ! "$new" == "$old" ]] && ln -vsfn -- "$new" "${1##*/}"
 		)
 	fi
 }
