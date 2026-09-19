@@ -130,6 +130,9 @@ function command_not_found_handle() {
 	return 127
 }
 
+## Version compare (returns 0 if $1 ≥ $2 )
+function vercmp() {	<<< "$2"$'\n'"$1" sort -c -V 2>/dev/null && return 0 || return 1; }
+
 
 if [[ ! "$ENV_HOME" ]]; then
 	## Master Shell
@@ -225,10 +228,6 @@ do
 	[[ "${!_cat}" && ! "$_locales" == *"${!_cat}"* ]] && unset "$_cat"
 done
 unset _locales _fallback _cat
-
-
-## Version compare (returns 0 if $1 ≥ $2 )
-function vercmp() {	<<< "$2"$'\n'"$1" sort -c -V 2>/dev/null && return 0 || return 1; }
 
 
 ## Colorful bash prompt with goodies
