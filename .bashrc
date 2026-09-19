@@ -503,10 +503,10 @@ fi
 export GCC_COLORS="error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01"	# warnings and errors
 export GREP_COLORS="ms=01;31:mc=01;31:sl=:cx=:fn=36:ln=32:bn=32:se=35"	# more visible filename
 export LESS="-RiMQ --follow-name --tabs=4"	# color escapes, case-insensitive search, better prompt, no bell (blocks on older less!), follow filename not inode, tab width
-lessver="$(less --version 2>/dev/null | head -n1)"
-vercmp "$lessver" "less 581" && LESS+=" --use-color"	# distinct meta colors
-vercmp "$lessver" "less 632" && LESS+=" --wordwrap"		# wrap at word boundaries
-unset lessver
+_lessver="$(less --version 2>/dev/null | head -n1)"
+vercmp "$_lessver" "less 581" && LESS+=" --use-color"	# distinct meta colors
+vercmp "$_lessver" "less 632" && LESS+=" --wordwrap"	# wrap at word boundaries
+unset _lessver
 export SUDO_PROMPT="[sudo] %p  "	# target username and padlock char
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"
