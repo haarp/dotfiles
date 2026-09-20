@@ -25,8 +25,10 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
 export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 
-## Make CLI appplications use XDG paths (partial duplicate from .profile, for use in master and slave shells)
+
 export LESSHISTFILE="/dev/null"	# want no search history
+
+## Make CLI appplications use XDG paths (partial duplicate from .profile, for use in master and slave shells)
 # but not for system/application users (according to Linux LSB UID specs)
 if [[ ( "$EUID" -eq 0 || "$EUID" -ge 1000 ) ]]; then
 	export ANDROID_USER_HOME="${ANDROID_USER_HOME:-$XDG_DATA_HOME/android}"
