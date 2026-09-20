@@ -189,7 +189,6 @@ else
 	if [[ $- == *i* ]]; then
 		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
 		# but only if we are a direct descendant of sshd to avoid showing it again when using su/sudo
-		# TODO: maybe iterate over `/etc/update-motd.d/`?
 		( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 			echo "${bg[m]}$(hostname -f)${bg[x]}"
 			echo "$(source /etc/os-release && echo "$PRETTY_NAME") - $(uname -sr)"
@@ -197,6 +196,12 @@ else
 			last=$(last -n 2 --fullnames --time-format iso "$USER" 2>/dev/null)
 			read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
 			[[ "$addr" ]] && echo "Last login: ${start/T/ } from $addr on $tty"
+			shopt -s nullglob; for m in /etc/update-motd.d/*; do
+				case "${m##*/}" in
+					00-header|10-help-text|10-uname) continue;;
+					*) "$m";;
+				esac
+			done
 			for ip in 4 6; do ip -br -c -$ip addr show scope global primary; done \
 				| awk '{a[$1]=a[$1]$0 ORS;if(!s[$1]++)o[++n]=$1}END{for(i=1;i<=n;i++)printf a[o[i]]}'
 		fi )
