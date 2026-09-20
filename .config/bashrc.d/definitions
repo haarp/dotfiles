@@ -381,7 +381,7 @@ function changelogs() {
 		purename=${name#*/}		# strip category
 
 		local reply; read -rp "Show $name? [y/n] " reply
-		[[ $reply = [yY] || $reply = [yY][eE][sS] ]] || continue
+		[[ $reply == [yY] || $reply == [yY][eE][sS] ]] || continue
 
 		# changelog files
 		local exists=()
