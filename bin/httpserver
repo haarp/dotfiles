@@ -1,64 +1,82 @@
 #!/usr/bin/env python3
 #
-# Start local HTTP server, serving files from CWD.
-# Will try case-insensitive matches if exact matches are not found.
+# Start local HTTP or HTTPS server, serving files from CWD
+# will try case-insensitive matches if exact matches are not found
 # https://f95zone.to/threads/small-python-script-to-run-local-case-insensitive-web-server.189695/
+# TODO: IPv6 bind support (`socket.gaierror: [Errno -9] Address family for hostname not supported`)
 
-from http.server import HTTPServer, SimpleHTTPRequestHandler, test
-import os.path
-import os
+import os, argparse
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 class NoMatch(Exception):
-    pass
-
+	pass
 
 def find_match(folder: str, part: str):
-    if os.path.exists(os.path.join(folder, part)):
-        return part
+	if os.path.exists(os.path.join(folder, part)):
+		return part
 
-    needle = part.lower()
-    print(f"Looking for {needle} in {folder}")
-    candidates = [f for f in os.listdir(folder) if f.lower() == needle]
+	needle = part.lower()
+	print(f"Looking for {needle} in {folder}")
+	candidates = [f for f in os.listdir(folder) if f.lower() == needle]
 
-    if len(candidates) > 1:
-        print(f"{folder}/{part}: multiple candidates {candidates}")
-        raise NoMatch()
-    elif len(candidates) == 0:
-        print(f"{folder}/{part}: no candidates {candidates}")
-        raise NoMatch()
-    else:
-        print(f"{folder}/{part}: Found {candidates[0]}")
-        return candidates[0]
-
+	if len(candidates) > 1:
+		print(f"{folder}/{part}: multiple candidates {candidates}")
+		raise NoMatch()
+	elif len(candidates) == 0:
+		print(f"{folder}/{part}: no candidates {candidates}")
+		raise NoMatch()
+	else:
+		print(f"{folder}/{part}: Found {candidates[0]}")
+		return candidates[0]
 
 class CaseInsensitiveRequestHandler(SimpleHTTPRequestHandler):
+	def translate_path(self, path):
+		safe = super().translate_path(path)
+		if os.path.exists(safe):
+			return safe
 
-    def translate_path(self, path):
-        safe = super().translate_path(path)
-        if os.path.exists(safe):
-            return safe
+		print(f"Cannot find {safe}")
 
-        print(f"Cannot find {safe}")
+		rel = os.path.relpath(safe, self.directory)
+		parts = rel.split(os.path.sep)
 
-        rel = os.path.relpath(safe, self.directory)
-        parts = rel.split(os.path.sep)
+		print(f"Looking for {rel}, as parts {parts}")
 
-        print(f"Looking for {rel}, as parts {parts}")
+		builder = self.directory
+		try:
+			for part in parts:
+				match = find_match(builder, part)
+				builder = os.path.join(builder, match)
+			print(f"Build result: {builder}")
+			return builder
+		except NoMatch:
+			return safe
 
 
-        builder = self.directory
-        try:
-            for part in parts:
-                match = find_match(builder, part)
-                builder = os.path.join(builder, match)
-            print(f"Build result: {builder}")
-            return builder
-        except NoMatch:
-            return safe
+parser = argparse.ArgumentParser(
+	formatter_class=argparse.ArgumentDefaultsHelpFormatter
+)
+parser.add_argument("--bind", default="127.0.0.1", help="bind address")
+parser.add_argument("--port", type=int, default=8000, help="listen port")
+parser.add_argument("--keyfile", help="only needed for HTTPS")
+parser.add_argument("--certfile", help="only needed for HTTPS")
+parser.add_argument("--cabundle", help="optional for HTTPS")
 
-PORT = 8080
+args = parser.parse_args()
 
-if __name__ == "__main__":
-    with HTTPServer(("", PORT), CaseInsensitiveRequestHandler) as httpd:
-        print(f"Serving at http://localhost:{PORT}/")
-        httpd.serve_forever()
+httpd = HTTPServer((args.bind, args.port), CaseInsensitiveRequestHandler)
+
+if args.keyfile and args.certfile:
+	import ssl
+
+	context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+	context.load_cert_chain(certfile=args.certfile, keyfile=args.keyfile)
+	if args.cabundle:
+		context.load_verify_locations(cafile=args.cabundle)
+	httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+
+	print(f"Serving at https://{args.bind}:{args.port}/")
+else:
+	print(f"Serving at http://{args.bind}:{args.port}/")
+
+httpd.serve_forever()
