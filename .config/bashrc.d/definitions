@@ -745,6 +745,13 @@ function shellcheck() {
 	command shellcheck "$@" --color=always | less -F --tabs=8
 }
 
+# Edit mailbox's sieve
+function sieve() {
+	local user="$(secret-tool search app Sieve_mailbox 2>&1 | awk '/UserName/{print $3}')"
+	local password="$(secret-tool lookup app "Sieve_mailbox")"
+	sieve-connect --server imap.mailbox.org --user "$user" --passwordfd 3 3<<< "$password" --remotesieve "Open-Xchange" --edit
+}
+
 # Network throughput testing
 alias speedtest='curl --parallel http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null'
 alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
