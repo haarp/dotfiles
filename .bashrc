@@ -184,7 +184,7 @@ else
 	done; unset _dir
 
 	# Save history when remote session times out
-	trap -- 'exit=$?; history -a; kill -HUP 0; exit $exit' HUP
+	trap -- 'exit=$?; trap - HUP; history -a; kill -HUP 0; exit $exit' HUP
 
 	if [[ $- == *i* ]]; then
 		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
