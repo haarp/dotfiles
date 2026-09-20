@@ -195,6 +195,23 @@ function certs() {
 	openssl x509 -checkend 0 -noout <<< "$cert" &>/dev/null \
 	&& echo "Status: ${bg[g]}VALID${bg[x]}" >&2 || echo "Status: ${bg[r]}INVALID${bg[x]}" >&2
 }
+# Check cert file's validity using httpserver
+function certcheck() {
+	local key_path="${1:?missing key filename}"
+	local cert_path="${2:?missing cert filename}"
+	local domain="${3:?missing domain}"
+
+	httpserver --port 4443 --keyfile "$key_path" --certfile "$cert_path" >/dev/null & sleep 0.25
+	curl -vs -o /dev/null --resolve "$domain:4443:127.0.0.1" "https://$domain:4443"; local out="$?"
+	kill "$!"
+	if [[ $out == 60 ]]; then
+		echo "${bg[r]}FAIL!${bg[x]}"
+		return 60
+	else
+		echo "${bg[g]}SCUCCESS${bg[x]}"
+		return 0
+	fi
+}
 
 # Sensible recursive chmod
 function chmodr() {
