@@ -336,6 +336,9 @@ PST2='\c [@\h] (\D{%a} \t) {$BASHPID}'
 # FIXME: this breaks RET?
 ##PROMPT_COMMAND+='stty echo;'
 
+# Discard unconsumed keypresses when showing prompt
+PROMPT_COMMAND+=('(read -t 0.01 -N 1000)')
+
 # Add final newline when running command missed it (if you don't change terminal width afterwards)
 # https://news.ycombinator.com/item?id=23520240 https://www.vidarholen.net/contents/blog/?p=878
 ##PROMPT_COMMAND+=('printf "⏎%$((COLUMNS-1))s\\r\\033[K"')
