@@ -91,7 +91,7 @@ else
 fi
 	alias l="ls -la"; alias lt="ls --sort=time"
 alias lspci2='lspci -nnk'
-alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"	# disable annoying mouse
+which mc >/dev/null && { alias mc="mc -d"; alias mcdiff="mcdiff -d"; alias mcedit="mcedit -d"; alias mcview="mcview -d"; }	# disable annoying mouse
 alias mount2='findmnt --real -t nosquashfs,nofuse.portal'
 	alias df2='findmnt -D -t nosquashfs,nodevtmpfs,nofuse.portal'
 ##alias nmap='nmap -PE'			# use ICMP ping for host discovery
