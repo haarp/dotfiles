@@ -202,8 +202,9 @@ else
 					*) "$m";;
 				esac
 			done
-			for ip in 4 6; do ip -br -c -$ip addr show scope global primary; done \
-				| awk '{a[$1]=a[$1]$0 ORS;if(!s[$1]++)o[++n]=$1}END{for(i=1;i<=n;i++)printf a[o[i]]}'
+			which ip 2>/dev/null \
+				&& for ipv in 4 6; do ip -br -c -$ipv addr show scope global primary; done \
+					| awk '{a[$1]=a[$1]$0 ORS;if(!s[$1]++)o[++n]=$1}END{for(i=1;i<=n;i++)printf a[o[i]]}'
 		fi )
 		# and mail
 		[[ "$MAILPATH" ]] || MAILPATH="/var/mail/$USER"
