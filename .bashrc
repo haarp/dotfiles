@@ -191,7 +191,7 @@ else
 		# but only if we are a direct descendant of sshd to avoid showing it again when using su/sudo
 		( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
 			echo "${bg[m]}$(hostname -f)${bg[x]}"
-			echo "$(source /etc/os-release && echo "$PRETTY_NAME") - $(uname -sr)"
+			echo "$(source /etc/os-release 2>/dev/null && echo "$PRETTY_NAME") - $(uname -sr)"
 			echo $(uptime)
 			last=$(last -n 2 --fullnames --time-format iso "$USER" 2>/dev/null)
 			read -r user tty addr start junk end dur <<< "${last#*$'\n'}"	# skip first line (it's us!)
