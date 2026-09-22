@@ -478,7 +478,7 @@ fi
 
 
 ## Personal preferences
-[[ $- == *i* ]] && which tabs >/dev/null && tabs -4
+[[ $- == *i* ]] && which tabs 2>/dev/null && tabs -4
 which mcedit >/dev/null && export EDITOR="mcedit -d"	# see aliases below
 # FIXME: viewer in mc shows previous dir's terminal title
 export PAGER="less"
