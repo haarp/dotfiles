@@ -202,7 +202,7 @@ else
 					*) "$m";;
 				esac
 			done
-			which ip 2>/dev/null \
+			which ip &>/dev/null \
 				&& for ipv in 4 6; do ip -br -c -$ipv addr show scope global primary; done \
 					| awk '{a[$1]=a[$1]$0 ORS;if(!s[$1]++)o[++n]=$1}END{for(i=1;i<=n;i++)printf a[o[i]]}'
 		fi )
@@ -479,7 +479,7 @@ fi
 
 
 ## Personal preferences
-[[ $- == *i* ]] && which tabs 2>/dev/null && tabs -4
+[[ $- == *i* ]] && which tabs &>/dev/null && tabs -4
 which mcedit >/dev/null && export EDITOR="mcedit -d"	# see aliases below
 # FIXME: viewer in mc shows previous dir's terminal title
 export PAGER="less"
