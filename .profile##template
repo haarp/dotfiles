@@ -54,9 +54,6 @@ export QT_BEARER_POLL_TIMEOUT=-1
 # also chattr +i the fucking Nextcloud_sync.log, QT_LOGGING_RULES doesn't affect it
 export QT_LOGGING_RULES='*=false'
 
-# Java: Try to make GTK+ style work. Maybe.
-export _JAVA_OPTIONS+=" -Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -Dswing.crossplatformlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel"
-
 # SSH: use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
 export SSH_ASKPASS=ssh-askpass-wrapper
 export SSH_ASKPASS_REQUIRE=force
