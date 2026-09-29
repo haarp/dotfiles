@@ -11,7 +11,7 @@ export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
 export ELECTRUMDIR="$XDG_DATA_HOME/electrum"
 export GNUPGHOME="$XDG_DATA_HOME/gnupg"
 export ICEAUTHORITY="$XDG_CACHE_HOME/ICEauthority"
-export _JAVA_OPTIONS="-Duser.home=\"$XDG_DATA_HOME\""	# creates .java there, good enough
+export JDK_JAVA_OPTIONS="-Duser.home=\"$XDG_DATA_HOME\""	# creates .java there, good enough
 export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
 export RANDFILE="$XDG_CACHE_HOME/rnd"	# openssl
 export XCOMPOSEFILE="$XDG_CONFIG_HOME/X11/XCompose"
