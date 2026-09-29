@@ -764,6 +764,9 @@ function sieve() {
 	local user="$(secret-tool search app Sieve_mailbox 2>&1 | awk '/UserName/{print $3}')"
 	local password="$(secret-tool lookup app "Sieve_mailbox")"
 	sieve-connect --server imap.mailbox.org --user "$user" --passwordfd 3 3<<< "$password" --remotesieve "Open-Xchange" --edit
+	local exit=$?
+	rm /tmp/??????????.sieve	# sieve-connect doesn't delete temp files (https://github.com/philpennock/sieve-connect/issues/19)
+	return $exit
 }
 
 # Network throughput testing
