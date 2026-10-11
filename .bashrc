@@ -442,6 +442,7 @@ if [[ $- == *i* ]]; then
 	##bind "set show-all-if-ambiguous on"		# only press tab once for a list (this is spammy)
 	bind "set skip-completed-text on"			# less annoying completion in the middle of a word
 	bind "set visible-stats on"					# show character denoting file type in completions
+	bind "set revert-all-at-newline on"			# don't store edits of previous history items (https://superuser.com/a/302252)
 
 	## Shell history options
 	if [[ "$HISTFILE" && ( "$EUID" -eq 0 || "$EUID" -ge 1000 ) ]]; then	# only if it was set to begin with; and user is regular user or root
