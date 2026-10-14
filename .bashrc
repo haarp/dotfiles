@@ -519,7 +519,10 @@ _lessver="$(less --version 2>/dev/null | head -n1)"
 vercmp "$_lessver" "less 581" && LESS+=" --use-color"	# distinct meta colors
 vercmp "$_lessver" "less 632" && LESS+=" --wordwrap"	# wrap at word boundaries
 unset _lessver
-export SUDO_PROMPT="[sudo] %p  "	# target username and padlock char
+if [[ $(sudo --version) == sudo-rs* ]]
+	then export SUDO_PROMPT="%p"	# target username
+	else export SUDO_PROMPT="[sudo] %p  "	# and padlock char
+fi
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
 export WHOIS_OPTIONS="-H"
 export XZ_DEFAULTS="--threads=0"
