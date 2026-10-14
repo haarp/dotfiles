@@ -55,8 +55,8 @@ export QT_BEARER_POLL_TIMEOUT=-1
 export QT_LOGGING_RULES='*=false'
 
 # SSH: use my ssh-askpass, force it for consistency (see https://bugzilla.mindrot.org/show_bug.cgi?id=69)
-export SSH_ASKPASS=ssh-askpass-wrapper
-export SSH_ASKPASS_REQUIRE=force
+###export SSH_ASKPASS=ssh-askpass-wrapper
+###export SSH_ASKPASS_REQUIRE=force
 
 # Firefox: Smooth scrolling
 export MOZ_USE_XINPUT2=1
