@@ -922,7 +922,7 @@ complete -c wtf
 # Source: https://florin.myip.org/blog/easy-multifactor-authentication-ssh-using-yubikey-neo-tokens
 # also: https://developers.yubico.com/PGP/Importing_keys.html
 function yubi() {
-	local SSH_AGENT_FILE="$XDG_CACHE_HOME/ssh-agent-info"
+	local SSH_AGENT_FILE="$HOME/.ssh/agent/ssh-agent-info"
 
 	if [[ $1 == "off" ]]; then	# Try to switch back to ssh-agent
 		source "$SSH_AGENT_FILE" >/dev/null

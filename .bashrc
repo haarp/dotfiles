@@ -144,13 +144,13 @@ if [[ ! "$ENV_HOME" ]]; then
 	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
 		:
 	# try to read from info file if we lack the env vars but it's running (e.g. vt, ssh login)
-	elif kill -0 "$(source "$XDG_CACHE_HOME/ssh-agent-info" &>/dev/null && echo "$SSH_AGENT_PID")" 2>/dev/null; then
-		source "$XDG_CACHE_HOME/ssh-agent-info" >/dev/null
+	elif kill -0 "$(source "$HOME/.ssh/agent/ssh-agent-info" &>/dev/null && echo "$SSH_AGENT_PID")" 2>/dev/null; then
+		source "$HOME/.ssh/agent/ssh-agent-info" >/dev/null
 	# otherwise start it
 	else
 		# NOTE: ssh-agent ignores TMPDIR, probably due to being suid (https://stackoverflow.com/q/50006439)
-		ssh-agent -a "${XDG_RUNTIME_DIR:-/run/user/$UID/ssh-agent.sock}" > "$XDG_CACHE_HOME/ssh-agent-info"
-		source "$XDG_CACHE_HOME/ssh-agent-info"
+		ssh-agent -a "$HOME/.ssh/agent/ssh-agent.sock" > "$HOME/.ssh/agent/ssh-agent-info"
+		source "$HOME/.ssh/agent/ssh-agent-info"
 	fi
 
 	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env
