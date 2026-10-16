@@ -56,7 +56,7 @@ read -u "$xprop_fd" pid || exit 1
 
 pid=${pid#_NET_WM_PID(CARDINAL) = }
 kill -0 "$pid" 2>/dev/null || {
-	echo "PID \`$pid\` unusable!"
+	notify-send -i dialog-error "${0##*/}" "PID \`$pid\` unusable!"
 	exit 1
 }
 
