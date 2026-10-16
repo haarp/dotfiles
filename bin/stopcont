@@ -21,34 +21,40 @@ pidtree() (
 	done
 )
 
-# gotta make this a process group killer
-# or various xinputs would be left over afterwards
-exit() {
-##	kill -- -$$
-	# fuck you, fuck this, i don't give a fuck anymore, just kill everything
-	killall xprop xinput 2>/dev/null
-	command exit "$@"
+# Reads raw key events from all keyboards
+# and kills the given PID on ESC (keycode 9)
+# Fed via fd $esc_fd
+watch_esc() {
+	local line type=''
+	while read -r line <&"$esc_fd"; do
+		case "$line" in
+			"EVENT type "*)
+				type=${line##*(}
+				type=${type%)};;
+			"detail: 9")
+				if [[ "$type" == RawKeyPress ]]; then
+					kill "$1" 2>/dev/null
+					return
+				fi;;
+		esac
+	done
 }
 
+exec {xprop_fd}< <(xprop _NET_WM_PID)
+xprop_pid=$!
 
-# allow keyboard cancel
-# keyboard names may be duplicates :<
-kbds=(); while read -r id; do
-	id="${id#∼ }"	# remove weird shit from name of "floating" switched off devices
-	xinput list --name-only "$id" | grep -qi 'keyboard' && kbds+=("$id")
-done <<< "$(xinput list --id-only)"
-for kbd in "${kbds[@]}"; do
-	# we can't get xinput's pid in this pipe :<
-	xinput test "$kbd" | while read -r line; do
-		if [[ "$line" == "key release 9" ]]; then
-			exit 1
-		fi
-	done &
-done
+exec {esc_fd}< <(stdbuf -oL xinput test-xi2 --root)
+xinput_pid=$!
 
-pid=$(xprop _NET_WM_PID)
+watch_esc "$xprop_pid" &
+watcher_pid=$!
+
+trap 'kill "$xprop_pid" "$xinput_pid" "$watcher_pid" 2>/dev/null' EXIT
+
+# read pid from xprop, or die when pipe closes
+read -u "$xprop_fd" pid || exit 1
+
 pid=${pid#_NET_WM_PID(CARDINAL) = }
-[[ "$pid" ]] || exit 1
 kill -0 "$pid" 2>/dev/null || {
 	echo "PID \`$pid\` unusable!"
 	exit 1
