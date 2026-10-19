@@ -572,25 +572,6 @@ function mkcd() {
 	cd -- "$1"
 }
 
-# Enhance optirun with overclocking (needs >=nvidia-settings-337.19)
-# perf: pgrep/service is super slow, let's check the pidfile instead
-if [[ -e /proc/$( { < /run/bumblebee.pid; } &>/dev/null)/exe ]]; then
-	function optirun() {
-		##local GPUOffset=135	# -> 880MHz
-		##local MemOffset=420	# -> 2220MHz
-
-		##( 	command optirun nvidia-settings -c :8 \
-		##	-a [gpu:0]/GPUGraphicsClockOffset[1]=$GPUOffset \
-		##	-a [gpu:0]/GPUMemoryTransferRateOffset[1]=$MemOffset \
-		##	2>/dev/null &
-		##)
-		command optirun "$@"
-	}
-	alias nvidia-settings='optirun nvidia-settings -c :8'
-fi
-# Fix primusrun (https://forums.gentoo.org/viewtopic-p-8380752.html#8380752)
-# (might also need `__GLVND_DISALLOW_PATCHING=1` in the future: https://github.com/gsgatlin/primus/commit/6ff7b3ee8c38830a72b5fc087d6f4f12cf421920)
-alias primusrun='LD_LIBRARY_PATH="/usr/lib/opengl/nvidia/lib:/usr/lib64/opengl/nvidia/lib:$LD_LIBRARY_PATH" primusrun'
 # Modern prime-run for native Nvidia setups
 # https://github.com/archlinux/svntogit-packages/blob/packages/nvidia-prime/trunk/prime-run
 # https://download.nvidia.com/XFree86/Linux-x86_64/460.67/README/primerenderoffload.html
