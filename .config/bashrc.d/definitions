@@ -751,7 +751,12 @@ function sieve() {
 }
 
 # Network throughput testing
-alias speedtest='curl --parallel http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null http://cachefly.cachefly.net/100mb.test -o /dev/null'
+# alternatives:
+	# $(echo "http://cachefly.cachefly.net/100mb.test -o /dev/null"{,,,})
+	# https://{fsn1,nbg1,hel1}-speed.hetzner.com/{1,10}GB.bin
+	# https://speedtest.sasag.ch/files/1GB.zip
+	# http://speedtest.belwue.net/1G
+alias speedtest='curl --parallel https://fsn1-speed.hetzner.com/10GB.bin -o /dev/null'
 alias speedtest.erppc.down='curl https://erppc.net/infinite.php -o /dev/null'
 alias speedtest.erppc.down.slow='curl https://erppc.net/infinite.php?slow=1 -o /dev/null'
 alias speedtest.erppc.up='dd if=/dev/zero bs=1M status=none | curl -T - https://erppc.net/infinite.php -o /dev/null'
