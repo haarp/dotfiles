@@ -3,40 +3,51 @@ shell_patterns=0
 # see `man mc` "Edit Menu File"
 # also see https://github.com/MidnightCommander/mc/blob/master/misc/mc.menu.in
 
++ ! t t
+o xdg-open file
+	xdg-open %s
+
 +
 ! Create empty file
 	f=%{Filename}
-	touch "$f"
+	[ -e "$f" ] || touch "$f" || \
+	{ echo -n 'Press enter...'; read key; }
 
 + (t d & ! t t) | t t
 c Recursive chmod dir(s) with chmodr
 	mode=%{Octal *file* mode}
 	export mode
 	unset MC_SID
-	bash -i -c 'chmodr "$mode" %s'
+	bash -i -c 'chmodr "$mode" %s' || \
+	{ echo -n 'Press enter...'; read key; }
 
 +
 3 Compress file(s) (tar.gz)
 	pwd=$(basename %d /)
 	read -r -p "Archive name (without extension) [$pwd]: " name
 	[ -z "$name" ] && name="$pwd"
-	tar cf "$name.tar.gz" -z %s
+	tar cf "$name.tar.gz" -z %s || \
+	{ echo -n 'Press enter...'; read key; }
 
 +
 6 Compress file(s) (tar.xz)
 	pwd=$(basename %d /)
 	read -r -p "Archive name (without extension) [$pwd]: " name
 	[ -z "$name" ] && name="$pwd"
-	tar cf "$name.tar.xz" -J %s
+	tar cf "$name.tar.xz" -J %s || \
+	{ echo -n 'Press enter...'; read key; }
+
+## TODO: diff files like below
 
 + t r | t t
-A Append files(s) to opposite file(s) of same name
+a Append files(s) to opposite file(s) of same name
 	for f in %s ; do
-		cat "$f" >> "%D/$f"
+		cat "$f" >> "%D/$f" || \
+		{ echo -n 'Press enter...'; read key; }
 	done
 
 + t r & ! t t
-d Delete file if a copy exists in the other directory.
+d Delete file if a copy exists in the other directory
 	if [ %d = %D ]; then
 		echo "The two directories must be different."
 		exit 1
@@ -46,15 +57,13 @@ d Delete file if a copy exists in the other directory.
 			rm %f && echo %f": DELETED."
 		else
 			echo %f" and "%D/%f" differ: NOT deleted."
-			echo -n "Press RETURN "
-			read key
 		fi
 	else
 		echo %f": No copy in "%D/%f": NOT deleted."
 	fi
 
 + t t
-D Delete tagged files if a copy exists in the other directory.
+d Delete tagged files if copies exist in the other directory
 	if [ %d = %D ]; then
 		echo "The two directores must be different."
 		exit 1
