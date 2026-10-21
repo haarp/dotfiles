@@ -61,6 +61,7 @@ d Delete file if a copy exists in the other directory
 	else
 		echo %f": No copy in "%D/%f": NOT deleted."
 	fi
+	{ echo -n 'Press enter...'; read key; }
 
 + t t
 d Delete tagged files if copies exist in the other directory
@@ -81,3 +82,4 @@ d Delete tagged files if copies exist in the other directory
 			echo "$i has no copy in "%D": NOT deleted."
 		fi
 	done
+	{ echo -n 'Press enter...'; read key; }
