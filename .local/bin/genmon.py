@@ -9,23 +9,36 @@
 # <txtclick>The command to be executed when clicking on the text</txtclick>
 #
 # TODO: top 3 most active processes in popup?
+# TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!1 check out /sys/class/powercap/intel-rapl:0/constraint_*_power_limit_uw
 
-
+from time import time, sleep
 from glob import glob
+from os import getuid, path
 from subprocess import Popen, PIPE
 
-# steal these from thinkfan.py
 def is_module_loaded( name ):
 	for line in open( "/proc/modules" ):
 		if line.startswith(name):
 			return True
 	return False
-def get_cpu_temp():
-	"""Return CPU temp in °C, -100 on failure"""
 
+def cpu_collection():
+	statsfile = "/dev/shm/genmon-" + str(getuid())
+
+	## Speeds (do first)
+	speeds = []
+	cur_freqs = glob("/sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq")
+	sleep(0.15)	# allow CPU to settle right before freq measurement
+	for file in cur_freqs:
+		speeds.append( int( open(file).read() )/1000 )
+
+	min_speed = int( open( "/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq" ).read() )//1000
+	max_speed = int( open( "/sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq" ).read() )//1000
+
+	## Temperature
 	try:
 		# (sometimes) nicely averaged
-		return int( open( glob("/sys/devices/platform/thinkpad_hwmon/hwmon/*/temp1_input")[0] ).read() )//1000
+		temp = int( open( glob("/sys/devices/platform/thinkpad_hwmon/hwmon/*/temp1_input")[0] ).read() )//1000
 	except Exception as err:
 		print( str(err), file=sys.stderr )
 
@@ -33,23 +46,15 @@ def get_cpu_temp():
 		for dir in glob("/sys/class/hwmon/hwmon*"):
 			if( "coretemp" in open( dir + "/name" ).read() ) or ( "k10temp" in open( dir + "/name" ).read() ):
 				try:
-					return int( open( dir + "/temp1_input" ).read() )//1000
+					temp = int( open( dir + "/temp1_input" ).read() )//1000
 				except Exception as err:
 					print( str(err), file=sys.stderr )
-					return -100
+					temp = -100
 
-def cpu_collection():
-	statsfile = "/dev/shm/genmon-haarp"
-
-	# do first
-	# TODO: get some averaging in here? otherwise it fluctuates wildly under load of ourselves
-	speeds = []
-	for file in glob("/sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq"):
-		speeds.append( int( open(file).read() )/1000 )
-
+	## Power
 	try:
 		# needs root access starting with https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=19f6d91bdad42200aac557a683c17b1f65ee6c94
-		joules = Popen( ["sudo", "/bin/cat", "/sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/energy_uj"], stdout=PIPE )
+		joules = Popen( ["/usr/bin/sudo", "/bin/cat", "/sys/devices/virtual/powercap/intel-rapl/intel-rapl:0/energy_uj"], stdout=PIPE )
 		joules = int( joules.stdout.read() )/1000000
 	except:
 		joules = 0
@@ -57,8 +62,7 @@ def cpu_collection():
 	# retrieve old stats
 	try:
 		oldjoules = float( open( statsfile ).readline() )
-		##interval = time.time() - os.path.getmtime( statsfile )
-		interval = 4	# HACK: increase accuracy
+		interval = time() - path.getmtime( statsfile )
 	except:	# initial state
 		oldjoules = 0
 		interval = -1
@@ -68,24 +72,26 @@ def cpu_collection():
 		str(joules) + "\n"
 	)
 
-	# calculations
+	# Vendor
+	for line in open( "/proc/cpuinfo" ).readlines():
+		if "vendor_id" in line:
+			vendor = line.split(": ")[1].strip()
+			break
+
+	## Calculations
+	speed = max(speeds)
+	speed_percentage = 100 * (speed-min_speed)/(max_speed-min_speed)
 	watts = (joules-oldjoules) / interval
 	if watts < 0:	# wraps around on occasion
 		watts = 0
 
-	return ( watts, max(speeds) )
+	return ( vendor, temp, watts, speed, speed_percentage )
 
 def gpu_collection():
-	flavor = ""; state = False; temp = -1; watts = -1
+	vendor = ""; state = -1; temp = -1; watts = -1
 
-	if is_module_loaded("bbswitch"):
-		try:
-			state = "ON" in open("/proc/acpi/bbswitch").read()
-			# TODO: temp, watts?
-		except:
-			pass
-	elif is_module_loaded("nvidia"):
-		flavor = "nvidia"
+	if is_module_loaded("nvidia"):
+		vendor = "nvidia"
 		for pci in glob( "/sys/bus/pci/devices/*" ):
 			# could be 0x030200 too
 			if "0x10de" in open(pci + "/vendor").read() and "0x030000" in open(pci + "/class").read():
@@ -96,6 +102,7 @@ def gpu_collection():
 				if state:
 					# continuously querying the gpu prevents it from sleeping in the first place
 					# so only query it when external monitors are enabled (= definitely not trying to sleep)
+					# TODO: improve
 					xrandr = Popen( ["xrandr", "--current"], stdout=PIPE )
 					xrandr = str( xrandr.stdout.read() )
 					if not "DP-1-0 connected" in xrandr \
@@ -104,7 +111,6 @@ def gpu_collection():
 						break
 
 					try:
-						# `nvidia-settings -q '[gpu:0]/GPUCoreTemp' -t` also works, but is slower
 						temp = Popen( ["nvidia-smi", "--format=csv,noheader,nounits", "--query-gpu=temperature.gpu"], stdout=PIPE )
 						watts = Popen( ["nvidia-smi", "--format=csv,noheader,nounits", "--query-gpu=power.draw"], stdout=PIPE )
 						temp = int( temp.stdout.read() )
@@ -113,24 +119,10 @@ def gpu_collection():
 						temp = -1
 						watts = -1
 				break
-	elif is_module_loaded("nouveau"):
-		flavor = "nvidia"
-		try:
-			state = "Pwr" in open("/sys/kernel/debug/vgaswitcheroo/switch").readlines()[1]
-		except:
-			pass
-		if state:
-			try:
-				for dir in glob("/sys/class/hwmon/hwmon*"):
-					if "nouveau" in open( dir + "/name" ).read():
-						temp = int( open( dir + "/temp1_input" ).read() )/1000
-						break
-			except:
-				pass
 	elif is_module_loaded("amdgpu"):
-		flavor = "amd"
+		vendor = "amd"
 		try:
-			state = True	# TODO
+			state = 1	# TODO
 		except:
 			pass
 		if state:
@@ -146,7 +138,7 @@ def gpu_collection():
 						break
 			except:
 				pass
-	return ( state, temp, watts, flavor )
+	return ( state, vendor, temp, watts )
 
 def battery_collection():
 	percent = int( open( "/sys/class/power_supply/BAT0/capacity" ).read() )
@@ -177,15 +169,18 @@ def tenth(arg):
 
 
 ##### Collection #####
-cputemp = get_cpu_temp()	# do first as following will heat up the chip
-cpuwatts, cpuspeed = cpu_collection()
-gpustate, gputemp, gpuwatts, gpuflavor = gpu_collection()
+cpuvendor, cputemp, cpuwatts, cpuspeed, cpuspeed_percentage = cpu_collection()
+gpustate, gpuvendor, gputemp, gpuwatts = gpu_collection()
 battstate, battpercent, battwatts = battery_collection()
 
-cpucolor=" fgcolor='MediumSeaGreen'"	# TODO
-if gpuflavor == "nvidia":
+if cpuvendor == "GenuineIntel":
+	cpucolor=" fgcolor='SteelBlue'"
+elif cpuvendor == "AthenticAMD":
+	cpucolor=" fgcolor='FireBrick'"
+else: cpucolor = ""
+if gpuvendor == "nvidia":
 	gpucolor = " fgcolor='YellowGreen'"
-elif gpuflavor == "amd":
+elif gpuvendor == "amd":
 	gpucolor = " fgcolor='FireBrick'"
 else:
 	gpucolor = ""
@@ -202,8 +197,10 @@ elif gpuwatts > 0:
 	gpu = "\n<span"+gpucolor+">{:2.0f}°C {:2.1f}W</span>".format( gputemp, gpuwatts )
 elif gputemp > 0:
 	gpu = "\n<span"+gpucolor+">{:2.0f} °C</span>".format( gputemp )
-elif gpustate:
+elif gpustate == 1:
 	gpu = "\n<span"+gpucolor+"> GPU ON</span>"
+elif gpustate == 0:
+	gpu = "\n<span"+gpucolor+"> GPU off</span>"
 else:
 	gpu = ""
 
@@ -233,4 +230,5 @@ else:
 
 ##### Output #####
 print( "<txt>" + cpu + gpu + batt + "</txt>" )
+print( "<bar>" + str(cpuspeed_percentage)  + "</bar>" )
 print( "<tool>" + "Load(1,5,15m): " + loadavg + "\n" + "CPU: max " + cpuspeedF + "MHz\nFan: " + fanspeed + "rpm (" + fanpwm + ")</tool>" )
