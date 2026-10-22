@@ -12,8 +12,8 @@ c		toggle-option ^PS
 \e[18~	forw-search ^W
 
 # comma, period: switch files
-,		prev-file
-.		next-file
+[		prev-file
+]		next-file
 
 # shift+pgup/pgdn: scroll 5 pages at once
 \e[5;2~	noaction bbbbb
