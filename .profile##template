@@ -58,8 +58,6 @@ export QT_LOGGING_RULES='*=false'
 ###export SSH_ASKPASS=ssh-askpass-wrapper
 ###export SSH_ASKPASS_REQUIRE=force
 
-# Firefox: Smooth scrolling
-export MOZ_USE_XINPUT2=1
 # Firefox: Fix stuck tooltips (https://bugzilla.mozilla.org/show_bug.cgi?id=1569439#c25)
 export MOZ_GTK_TITLEBAR_DECORATION=system
 
