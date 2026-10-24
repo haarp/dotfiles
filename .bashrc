@@ -190,7 +190,7 @@ else
 		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
 		# but only if we are a direct descendant of sshd to avoid showing it again when using su/sudo
 		( if [[ $(< /proc/$PPID/stat) =~ sshd|dropbear ]]; then
-			echo "${bg[m]}$(hostname -f)${bg[x]}"
+			echo "${f[b]}${fg[M]}$(hostname -f)${fg[x]}${f[~bd]}"
 			echo "$(source /etc/os-release 2>/dev/null && echo "$PRETTY_NAME") - $(uname -sr)"
 			echo $(uptime)
 			last=$(last -n 2 --fullnames --time-format iso "$USER" 2>/dev/null)
@@ -317,7 +317,7 @@ do
 done; unset _gp
 # show git prompt and adapt final triangle color
 PS1+='$( [[ "${_git_prompt[@]}" ]] &&
-	echo "\[${f[~bd]}${bg[M]}${fg[y]}\]$_git_prompt\[${bg[x]}${fg[M]}\]" ||
+	echo "\[${f[~bd]}${bg[m]}\]$_git_prompt\[${bg[x]}${fg[m]}\]" ||
 	echo "\[${bg[x]}${fg[B]}\]" )'
 # right-pointing triangle, and reset formatting
 PS1+='\[${f[x]}\]'

@@ -3,8 +3,8 @@
 {% endif %}
 import = [
 	# custom theme
-#	"~/.config/alacritty/alacritty-theme.git/themes/monokai_charcoal.toml",
-	"~/.config/alacritty/colors_12-bit-rainbow.toml",
+	"~/.config/alacritty/alacritty-theme.git/themes/modus_vivendi.toml",
+#	"~/.config/alacritty/colors_12-bit-rainbow.toml",
   # cool themes:
   # blood_moon, hyper: very saturated, good contrasts
   # breeze: very good contrast, mostly accurate colors
@@ -17,6 +17,7 @@ import = [
   # gnome_terminal: bluish hue, good contrast
   # iterm, kitty: good contrasts, accurate colors
   # midnight_haze: low contrast but pleasant pastel color choices
+  # modus_vivendi: good colors, contrast, magenta is very nice pink
   # monokai_charcoal: very very nice contrasts, high saturation, but swaps blue w/ magenta and magenta w/ red
   # omni: purple/pink focus, insanely bright green
   # oxocarbon: pink focus, nice looking, mediocre contrast
@@ -30,7 +31,7 @@ import = [
   # wombat: saturated, excellent contrasts!
   # zenburn: pleasant low brightness, bad contrast
   # favs:
-  # Cobalt2, oxocarbon, monokai_charcoal
+  # Cobalt2, oxocarbon, modus_vivendi, monokai_charcoal
 ]
 
 [env]
