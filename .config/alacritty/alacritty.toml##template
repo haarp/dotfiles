@@ -4,8 +4,8 @@
 import = [
 	# custom theme
 	"~/.config/alacritty/alacritty-theme.git/themes/modus_vivendi.toml",
-#	"~/.config/alacritty/colors_12-bit-rainbow.toml",
   # cool themes:
+  # 12-bit_rainbow: so good that i actually ported it =)
   # blood_moon, hyper: very saturated, good contrasts
   # breeze: very good contrast, mostly accurate colors
   # campbell: very good contrast EXCEPT dark blue, accurate colors
@@ -31,8 +31,9 @@ import = [
   # wombat: saturated, excellent contrasts!
   # zenburn: pleasant low brightness, bad contrast
   # favs:
-  # Cobalt2, oxocarbon, modus_vivendi, monokai_charcoal
+  # 12-bit_rainbow, Cobalt2, oxocarbon, modus_vivendi, monokai_charcoal
 ]
+
 
 [env]
 TERM = "xterm-256color"
@@ -62,6 +63,10 @@ size = 10.0
 draw_bold_text_with_bright_colors = true	# `ip` from `iproute2` assumes bold colors are bright
 [colors.cursor]
 cursor = "#ee00ee"
+text   = '#000000'
+[colors.selection]
+text       = '#222222'
+background = '#bbaa00'
 
 [bell]
 animation = "Ease"
