@@ -400,6 +400,7 @@ if [[ $- == *i* ]]; then
 	bind	' "\eOQ":		start-kbd-macro '		# F2
 	bind	' "\eOR":		end-kbd-macro '			# F3
 	bind	' "\eOS":		call-last-kbd-macro '	# F4
+	[[ $EUID -eq 0 ]] || \
 	bind -x	' "\e[15~":		" xdg-open . &>/dev/null" '	# F5, also in Alacritty config
 	# alt + q followed by key ("quick snippets")
 	bind	' "\eq\"":		"\"\"\C-b" '	# paired characters
