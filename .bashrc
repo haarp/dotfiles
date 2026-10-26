@@ -55,12 +55,9 @@ do
 	PATH="$_dir:$PATH"
 done; unset _dir
 
-## Set CDPATH (works like $PATH but for `cd`)
-CDPATH=".:~:/"
 # only show local tab-completions, unless no matches found (https://unix.stackexchange.com/a/244196)
 function _my_cd() { CDPATH='' _cd "$@"; [[ "$COMPREPLY" ]] || _cd "$@"; }
 complete -F _my_cd -o nospace cd
-CDPATH=".:~:/"
 
 
 ## Colors! Formatting!
