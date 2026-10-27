@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Start ssh-agent before dbus-launch so gvfsd receives $SSH_AUTH_SOCK
+# https://bugs.gentoo.org/738244
+# xfce4-session won't start dupe ssh-agent if one is already running
+if [ -z "$SSH_AUTH_SOCK" ] && command -v ssh-agent 2>&1 >/dev/null; then
+	eval "$(ssh-agent -s)"
+
+	# kill ssh-agent on session end (needs >=util-linux-2.41)
+	if command -v waitpid >/dev/null; then
+		(
+			waitpid "$$" 2>/dev/null
+			kill "$SSH_AGENT_PID" 2>/dev/null
+		) &
+	fi
+fi

@@ -135,38 +135,14 @@ function vercmp() {	<<< "$2"$'\n'"$1" sort -c -V 2>/dev/null && return 0 || retu
 
 if [[ ! "$ENV_HOME" ]]; then
 	## Master Shell
-
-	# SSH agent
-	# already running?
-	if [[ "$SSH_AUTH_SOCK" ]] && kill -0 "$SSH_AGENT_PID" 2>/dev/null; then
-		:
-	# try to read from info file if we lack the env vars but it's running (e.g. vt, ssh login)
-	elif kill -0 "$(source "$HOME/.ssh/agent/ssh-agent-info" &>/dev/null && echo "$SSH_AGENT_PID")" 2>/dev/null; then
-		source "$HOME/.ssh/agent/ssh-agent-info" >/dev/null
-	# otherwise start it
-	else
-		# NOTE: ssh-agent ignores TMPDIR, probably due to being suid (https://stackoverflow.com/q/50006439)
-		ssh-agent -a "$HOME/.ssh/agent/ssh-agent.sock" > "$HOME/.ssh/agent/ssh-agent-info"
-		source "$HOME/.ssh/agent/ssh-agent-info"
-	fi
-
-	# Make gvfsd aware of ssh-agent by injecting SSH_AUTH_SOCK into its env
-	# (won't show up in /proc/$pid/environ, still works)
-	# (https://forums.gentoo.org/viewtopic-t-954590-start-0.html, https://bugs.gentoo.org/738244)
-	( for pid in $(pgrep -u "$USER" -x gvfsd); do
-		gdb -batch	-ex "attach $pid" \
-					-ex "call (int) putenv(\"SSH_AUTH_SOCK=$SSH_AUTH_SOCK\")" \
-					-ex "detach" &>/dev/null
-	done & disown )
-
-	## Do some things on a Linux console
+	# Do some things on a Linux console
 	if [[ $TERM == linux ]]; then
 		setfont ter-v14n	# Terminus (see /usr/share/consolefonts/README.terminus)
 		tput cvvis			# block-shaped cursor
 		TMOUT="1800"		# log out after 30 min inactivity
 	fi
 
-	## Empty (not remove!) mc histories/filepos on login
+	# Empty (not remove!) mc histories/filepos on login
 	# like setting num_history_items_recorded=0 and filepos_max_saved_entries=0 but without breaking mcedit search
 	[[ -e "$XDG_DATA_HOME/mc/history" ]] && : > "$XDG_DATA_HOME/mc/history"
 	[[ -e "$XDG_DATA_HOME/mc/filepos" ]] && : > "$XDG_DATA_HOME/mc/filepos"
