@@ -395,10 +395,13 @@ function changelogs() {
 		(
 			function stat() { return 1; }; export -f stat
 			LESSOPEN='|lesspipe %s' ${PAGER:-less} -f <(
-				# repo git changelog
-				local dir; for dir in /var/db/repos/!(gentoo)/ /var/db/repos/gentoo/; do
-					cd "$dir" && git log --color -- "$name" 2>/dev/null
+				for dir in /var/db/repos/!(gentoo)/; do
+					echo "${fg[b]}$(basename "$dir"):${fg[b]}"
+					git -C "$dir" log --color -- "$name" 2>/dev/null
 				done
+			) <(
+				echo "${fg[b]}Gentoo:${fg[x]}"
+				git -C "/var/db/repos/gentoo/" log --color -- "$name" 2>/dev/null
 			) \
 			"${exists[@]}"
 		)
