@@ -178,21 +178,21 @@ function mv() {
 	fi
 }
 
-# Show cert file's info
+# Show cert info for file or remote host
 function cert() {
-	local file="${1:?missing filename}"
-	openssl x509 -noout -text -certopt no_sigdump,no_pubkey < "$file"
-	openssl x509 -checkend 0 -noout < "$file" &>/dev/null \
-		&& echo "Status: ${bg[g]}VALID${bg[x]}" >&2 || echo "Status: ${bg[r]}INVALID${bg[x]}" >&2
-}
-# Grab site's cert info (TODO: check validity?)
-function certs() {
-	local host cert
-	host="${1:?missing url}"; host="${host#*://}"; host="${host%%/*}"
-	cert="$(openssl s_client -connect "$host":443 -servername "$host" </dev/null 2>/dev/null)"
-	openssl x509 -noout -text -certopt no_sigdump,no_pubkey <<< "$cert"
-	openssl x509 -checkend 0 -noout <<< "$cert" &>/dev/null \
-	&& echo "Status: ${bg[g]}VALID${bg[x]}" >&2 || echo "Status: ${bg[r]}INVALID${bg[x]}" >&2
+	local target="${1:?missing filename or url}" pem host port=443
+
+	if [[ -e "target" ]]; then
+		pem="$(<"$target")"
+	else
+		host="${target#*://}"; host="${host%%/*}"
+		if [[ "$host" == *:* ]]; then port="${host##*:}"; host="${host%:*}"; fi
+		pem="$(openssl s_client -connect "$host:$port" -servername "$host" </dev/null 2>/dev/null | openssl x509)"
+	fi
+
+	openssl x509 -noout -text -certopt no_sigdump,no_pubkey -fingerprint -sha256 <<< "$pem" || return 1
+	openssl x509 -checkend 0 -noout <<< "$pem" &>/dev/null \
+		&& echo "Status: ${bg[g]}VALID${bg[x]} (not checking revocation!)" >&2 || echo "Status: ${bg[r]}INVALID${bg[x]}" >&2
 }
 # Check cert file's validity using httpserver
 function certcheck() {
