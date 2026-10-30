@@ -353,7 +353,9 @@ function editvar() {
 # Gentoo-specific stuff
 # Sync portage tree and rebuild, etc.
 function sync-portage() {
-	lopri emerge --sync || return
+	lopri emaint sync || return
+	echo "emerge --regen" >&2
+	lopri emerge --regen >/dev/null
 	etc-update
 	echo "emerge -avDuU -j4 world" >&2
 	emerge -avDuU -j4 world #--changed-deps
