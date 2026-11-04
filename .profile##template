@@ -84,9 +84,6 @@ done; unset _dir
 
 ## LD_PRELOAD
 _preload=(
-	# Disable Cripple-AMD CPU dispatcher in Intel Math Kernel Library (https://danieldk.eu/Intel-MKL-on-AMD-Zen)
-	# FIXME: breaks Steam game launch, unless given launch opts: `LD_PRELOAD="libpthread.so.0 libGL.so.1" %command%`
-###	"$HOME/bogusintel.so"
 	# gtk3-nocsd (also GTK_CSD env var)
 ###	"/usr/lib64/libgtk3-nocsd.so.0"
 )
