@@ -12,7 +12,7 @@ s		toggle-option ^PS
 # F7: search w/ wraparound (https://unix.stackexchange.com/a/621514)
 \e[18~	forw-search ^W
 
-# comma, period: switch files
+# [, ]: switch files
 [		prev-file
 ]		next-file
 
