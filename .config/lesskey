@@ -4,8 +4,9 @@
 \eOQ	toggle-option ^PS
 s		toggle-option ^PS
 
-# F3, F10: quit as in mcview
+# F3 (graphical), F3 (linux console), F10: quit as in mcview
 \eOR	quit
+\e[[C	quit
 \e[21~	quit
 
 # F7: search w/ wraparound (https://unix.stackexchange.com/a/621514)
