@@ -501,6 +501,7 @@ if [[ $(sudo --version) == sudo-rs* ]]
 	else export SUDO_PROMPT="[sudo] %p  "	# and padlock char
 fi
 export SYSTEMD_LESS="$LESS -F"	# Fuck you, Pöttering! use my defaults, also skip pager if it fits on screen
+export LESSSECURE_ALLOW="lesskey"	# still read lesskey in LESSSECURE mode (set by systemd paging while root)
 export WHOIS_OPTIONS="-H"
 export XZ_DEFAULTS="--threads=0"
 export ZSTD_NBTHREADS="0"
