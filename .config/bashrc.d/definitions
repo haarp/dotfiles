@@ -111,6 +111,7 @@ alias stopall='pkill -STOP -f'; alias contall='pkill -CONT -f'
 alias stripexif='exiftool -all='
 alias stripgeo='exiftool -geotag='
 alias sc='systemctl'; alias jc='journalctl'
+	alias journalctl='journalctl -o short-iso'	# include timezone
 	comp_clone systemctl sc; comp_clone journalctl jc
 alias umount.fuse='fusermount -u'
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
