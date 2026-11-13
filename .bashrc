@@ -159,9 +159,6 @@ else
 		PATH="$_dir:$PATH"
 	done; unset _dir
 
-	# Save history when remote session times out
-	trap -- 'exit=$?; trap - HUP; history -a; kill -HUP 0; exit $exit' HUP
-
 	if [[ $- == *i* ]]; then
 		# Show stuff on login (motd isn't shown because we aren't considered a login shell anymore)
 		# but only if we are a direct descendant of sshd to avoid showing it again when using su/sudo
@@ -441,7 +438,10 @@ if [[ $- == *i* ]]; then
 	export HISTCONTROL="ignoreboth"	# ignore identical with previous or beginning with space
 	export HISTIGNORE="$HISTIGNORE:history*:hgrep*:hs:[bf]g*:jobs*:l:exit:logout:pwd:clear:reset"
 
-	# share history across all open terminals
+	# save history under all circumstances
+	trap -- 'history -a' EXIT
+
+	# save/load history after every command
 	##PROMPT_COMMAND+=('history -a; history -n')
 
 	## HSTR stuff
