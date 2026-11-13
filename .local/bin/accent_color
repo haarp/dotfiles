@@ -8,9 +8,9 @@ from gi.repository import Gtk
 
 def rgba_to_hex(color):
 	"""Convert Gdk.RGBA to #RRGGBB string"""
-	r = int(color.red * 255)
-	g = int(color.green * 255)
-	b = int(color.blue * 255)
+	r = round(color.red * 255)
+	g = round(color.green * 255)
+	b = round(color.blue * 255)
 	return f"#{r:02X}{g:02X}{b:02X}"
 
 def print_with_bg_color(color, *args, **kwargs):
@@ -18,9 +18,9 @@ def print_with_bg_color(color, *args, **kwargs):
 	if not 'file' in kwargs:
 		file = sys.stdout
 	if file.isatty():
-		r = int(color.red * 255)
-		g = int(color.green * 255)
-		b = int(color.blue * 255)
+		r = round(color.red * 255)
+		g = round(color.green * 255)
+		b = round(color.blue * 255)
 		print( f"\033[48;2;{r};{g};{b}m", **kwargs, end="" )
 		print( *args, **kwargs, end="" )
 		print( "\033[49m", **kwargs )
