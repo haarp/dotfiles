@@ -420,7 +420,7 @@ function genlop() {
 # Manifest multiple files
 function manifest() {
 	for file in "${@:-*.ebuild}"; do
-		ebuild "$file" manifest
+		ebuild $file manifest
 	done
 }
 # Display reason for masked packages
