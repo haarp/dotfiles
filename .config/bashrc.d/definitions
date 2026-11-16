@@ -68,6 +68,7 @@ alias hs='echo "Saving history now!"; history -a'
 	alias suicide='nh; exit'	# exit without saving history
 	alias hgrep='history | grep'	# history grep
 	alias ghist='less ~/.bash_history'  # show generic history
+alias htop='tabs 8; htop; tabs 4'	# fix broken columns (https://github.com/htop-dev/htop/issues/2149)
 alias icon-picker='exo-desktop-item-edit -c /dev/null --name foo'	# https://gitlab.xfce.org/xfce/exo/-/issues/91#note_55111
 alias inodes='{ for i in *; do echo -e "$(find "$i" | wc -l)\t$i"; done | sort -n; } 2>/dev/null; unset i'	# list dirs with most inodes
 alias intercept='strace -ff -e trace=write -e write=1,2 -p'	# show some process' stdout/stderr
