@@ -113,6 +113,7 @@ alias stripgeo='exiftool -geotag='
 alias sc='systemctl'; alias jc='journalctl'
 	alias journalctl='journalctl -o short-iso'	# include timezone
 	comp_clone systemctl sc; comp_clone journalctl jc
+alias touchpad-reprobe='echo -n none > /sys/bus/serio/devices/serio1/drvctl; sleep 0.1; echo -n psmouse > /sys/bus/serio/devices/serio1/drvctl'	# reprobe touchpad when intertouch is once again laggy (https://gitlab.freedesktop.org/libinput/libinput/-/work_items/398#note_3785303)
 alias umount.fuse='fusermount -u'
 alias visudol='visudo -f /etc/sudoers.d/local'	# directly edit local sudoers
 alias vmware='LD_PRELOAD="" vmware'	# avoid crashes with gtk3-nocsd (https://github.com/PCMan/gtk3-nocsd/issues/22)
